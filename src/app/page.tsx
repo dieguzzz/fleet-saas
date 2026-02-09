@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import DatabaseStatus from '@/components/debug/DatabaseStatus';
 
 export default function HomePage() {
   return (
@@ -110,6 +111,9 @@ export default function HomePage() {
           <p>© 2024 Fleet SaaS. Sistema Multi-Tenant con Next.js + Supabase.</p>
         </div>
       </footer>
+
+      {/* Debug Status */}
+      <DatabaseStatus />
     </div>
   );
 }

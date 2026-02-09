@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
 import type { Profile } from '@/types/database';
 
-export async function signUp(formData: FormData) {
+export async function signUp(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
 
   const email = formData.get('email') as string;
@@ -30,7 +30,7 @@ export async function signUp(formData: FormData) {
   redirect('/onboarding');
 }
 
-export async function signIn(formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
 
   const email = formData.get('email') as string;

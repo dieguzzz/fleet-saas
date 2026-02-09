@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
-import type { InventoryItem, InventoryMovement, InventoryMovementType } from '@/types/database';
+import type { InventoryItem, InventoryMovementType } from '@/types/database';
 
 export async function getInventoryItems(orgId: string) {
   const supabase = await createClient();
@@ -38,29 +38,70 @@ export async function getInventoryItem(id: string) {
   return { data: data as InventoryItem };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function createInventoryItem(
-  orgId: string,
-  item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at' | 'supplier' | 'current_stock'>
+  prevState: unknown,
+  formData: FormData
 ) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  // Extract orgSlug from hidden field
+  const orgSlug = formData.get('orgSlug') as string;
+
+  if (!orgSlug) {
+    return { error: 'Organization Slug is missing', success: false };
+  }
+
+  // Resolve slug to ID
+  const { data: org, error: orgError } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (orgError || !org) {
+    return { error: 'Organization not found', success: false };
+  }
+
+  const orgId = org.id;
+  
+  const item = {
+    name: formData.get('name') as string,
+    sku: formData.get('sku') as string,
+    category: formData.get('category') as string,
+    location: formData.get('location') as string,
+    min_stock_level: Number(formData.get('min_stock_level')),
+    unit: formData.get('unit') as string,
+    cost_per_unit: Number(formData.get('cost_per_unit')),
+    description: formData.get('description') as string,
+    current_stock: Number(formData.get('current_stock')),
+  };
+
+  if (!orgId) {
+    return { error: 'Organization ID is missing', success: false };
+  }
+
+  const { error } = await supabase
     .from('inventory_items')
     .insert({
       ...item,
       organization_id: orgId,
-      current_stock: 0, // Initial stock is 0, must be adjusted via movement
-    })
-    .select()
-    .single();
+    });
 
   if (error) {
     console.error('Error creating inventory item:', error);
-    return { error: error.message };
+    return { error: error.message, success: false };
   }
 
   revalidatePath(`/org/${orgId}/inventory/items`);
-  return { data: data as InventoryItem };
+  // Redirect handled by client or component logic?
+  // Let's return success and let the component redirect or reset.
+  // Actually, server actions can redirect.
+  // But for useActionState, redirecting is fine.
+  
+  // We need to import redirect
+  const { redirect } = await import('next/navigation');
+  redirect(`/${orgId}/inventory/items`);
 }
 
 export async function updateInventoryItem(
@@ -106,14 +147,21 @@ export async function deleteInventoryItem(id: string, orgId: string) {
 }
 
 export async function recordStockMovement(
-  orgId: string,
-  itemId: string,
-  type: InventoryMovementType,
-  quantity: number,
-  notes?: string
+  prevState: unknown,
+  formData: FormData
 ) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  const orgId = formData.get('orgId') as string;
+  const itemId = formData.get('itemId') as string;
+  const type = formData.get('type') as InventoryMovementType;
+  const quantity = Number(formData.get('quantity'));
+  const notes = formData.get('notes') as string;
+
+  if (!orgId || !itemId || !type || !quantity) {
+    return { error: 'Missing required fields', success: false };
+  }
 
   // 1. Get current stock
   const { data: item, error: fetchError } = await supabase
@@ -123,7 +171,7 @@ export async function recordStockMovement(
     .single();
 
   if (fetchError || !item) {
-    return { error: 'Item not found' };
+    return { error: 'Item not found', success: false };
   }
 
   const previousStock = item.current_stock || 0;
@@ -153,7 +201,7 @@ export async function recordStockMovement(
 
   if (movementError) {
     console.error('Error recording movement:', movementError);
-    return { error: movementError.message };
+    return { error: movementError.message, success: false };
   }
 
   // 3. Update item stock (if trigger is not enabled, or just to be safe/explicit if trigger is complex)
@@ -173,7 +221,7 @@ export async function recordStockMovement(
     .eq('id', itemId);
 
   if (updateError) {
-     return { error: 'Failed to update stock level' };
+     return { error: 'Failed to update stock level', success: false };
   }
 
   revalidatePath(`/org/${orgId}/inventory/items`);

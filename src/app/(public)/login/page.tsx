@@ -1,15 +1,15 @@
-import Link from 'next/link';
-import { signIn } from '@/features/auth/actions';
+'use client';
 
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ redirectTo?: string; error?: string }>;
-}) {
-  async function handleSignIn(formData: FormData) {
-    'use server';
-    await signIn(formData);
-  }
+import Link from 'next/link';
+import { useActionState } from 'react';
+import { login } from '@/features/auth/actions';
+
+const initialState = {
+  error: '',
+};
+
+export default function LoginPage() {
+  const [state, formAction, isPending] = useActionState(login, initialState);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
@@ -30,7 +30,13 @@ export default function LoginPage({
             Iniciar Sesión
           </h1>
 
-          <form action={handleSignIn} className="space-y-5">
+          <form action={formAction} className="space-y-5">
+            {state?.error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <p className="text-red-400 text-sm text-center">{state.error}</p>
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                 Email
@@ -61,9 +67,10 @@ export default function LoginPage({
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
+              disabled={isPending}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Iniciar Sesión
+              {isPending ? 'Iniciando...' : 'Iniciar Sesión'}
             </button>
           </form>
 

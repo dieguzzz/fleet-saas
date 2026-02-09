@@ -1,7 +1,40 @@
 -- ============================================
--- FLEET SAAS DATABASE EXPANSION
--- Invoices, Inventory, and Trip Expenses
+-- 0. HELPER FUNCTIONS (Boilerplate)
 -- ============================================
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Check if current user is super admin
+CREATE OR REPLACE FUNCTION is_super_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid()
+    AND is_super_admin = TRUE
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Check if user has a role in an organization
+CREATE OR REPLACE FUNCTION has_org_role(org_id UUID, allowed_roles org_role[])
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM organization_members
+    WHERE organization_id = org_id
+    AND user_id = auth.uid()
+    AND role = ANY(allowed_roles)
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================
 -- 1. INVOICES & FINANCIALS
@@ -106,7 +139,7 @@ ALTER TABLE trip_expenses ENABLE ROW LEVEL SECURITY;
 -- Invoices Policies
 CREATE POLICY "Members can view org invoices"
   ON invoices FOR SELECT
-  USING (organization_id = ANY(get_user_org_ids()) OR is_super_admin());
+  USING (organization_id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid()) OR is_super_admin());
 
 CREATE POLICY "Admins+ can manage invoices"
   ON invoices FOR ALL
@@ -116,7 +149,7 @@ CREATE POLICY "Admins+ can manage invoices"
 -- Inventory Items Policies
 CREATE POLICY "Members can view org inventory"
   ON inventory_items FOR SELECT
-  USING (organization_id = ANY(get_user_org_ids()) OR is_super_admin());
+  USING (organization_id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid()) OR is_super_admin());
 
 CREATE POLICY "Collaborators+ can manage inventory"
   ON inventory_items FOR ALL
@@ -126,7 +159,7 @@ CREATE POLICY "Collaborators+ can manage inventory"
 -- Inventory Movements Policies
 CREATE POLICY "Members can view org inventory movements"
   ON inventory_movements FOR SELECT
-  USING (organization_id = ANY(get_user_org_ids()) OR is_super_admin());
+  USING (organization_id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid()) OR is_super_admin());
 
 CREATE POLICY "Collaborators+ can create movements"
   ON inventory_movements FOR INSERT
@@ -135,7 +168,7 @@ CREATE POLICY "Collaborators+ can create movements"
 -- Trip Expenses Policies
 CREATE POLICY "Members can view org trip expenses"
   ON trip_expenses FOR SELECT
-  USING (organization_id = ANY(get_user_org_ids()) OR is_super_admin());
+  USING (organization_id IN (SELECT organization_id FROM organization_members WHERE user_id = auth.uid()) OR is_super_admin());
 
 CREATE POLICY "Collaborators+ can manage trip expenses"
   ON trip_expenses FOR ALL
