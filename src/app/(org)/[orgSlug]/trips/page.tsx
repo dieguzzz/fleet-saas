@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { getTrips } from '@/features/trips/actions';
-import { getOrganizationBySlug } from '@/features/organizations/queries';
+import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 
 async function TripsList({ orgId }: { orgId: string }) {
@@ -93,7 +93,7 @@ export default async function TripsPage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
-  const { data: org } = await getOrganizationBySlug(orgSlug);
+  const org = await getOrganization(orgSlug);
 
   if (!org) {
     notFound();

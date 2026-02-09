@@ -1,5 +1,5 @@
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm';
-import { getOrganizationBySlug } from '@/features/organizations/queries';
+import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 
 export default async function NewInvoicePage({
@@ -8,7 +8,7 @@ export default async function NewInvoicePage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
-  const { data: org } = await getOrganizationBySlug(orgSlug);
+  const org = await getOrganization(orgSlug);
 
   if (!org) {
     notFound();

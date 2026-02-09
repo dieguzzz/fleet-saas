@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { getTrip } from '@/features/trips/actions';
 import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
-import { getOrganizationBySlug } from '@/features/organizations/queries';
+import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -11,7 +11,7 @@ export default async function TripDetailPage({
   params: Promise<{ orgSlug: string; tripId: string }>;
 }) {
   const { orgSlug, tripId } = await params;
-  const { data: org } = await getOrganizationBySlug(orgSlug);
+  const org = await getOrganization(orgSlug);
 
   if (!org) {
     notFound();

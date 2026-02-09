@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { InventoryList } from '@/features/inventory/components/InventoryList';
-import { getOrganizationBySlug } from '@/features/organizations/queries';
+import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 
 export default async function InventoryPage({
@@ -9,7 +9,7 @@ export default async function InventoryPage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
-  const { data: org } = await getOrganizationBySlug(orgSlug);
+  const org = await getOrganization(orgSlug);
 
   if (!org) {
     notFound();
@@ -21,7 +21,7 @@ export default async function InventoryPage({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
           <p className="text-muted-foreground">
-            Manage your organization's parts and stock levels.
+            Manage your organization&apos;s parts and stock levels.
           </p>
         </div>
       </div>

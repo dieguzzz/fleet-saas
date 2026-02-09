@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { InvoiceList } from '@/features/finance/components/InvoiceList';
-import { getOrganizationBySlug } from '@/features/organizations/queries';
+import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 
 export default async function InvoicesPage({
@@ -9,7 +9,7 @@ export default async function InvoicesPage({
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
-  const { data: org } = await getOrganizationBySlug(orgSlug);
+  const org = await getOrganization(orgSlug);
 
   if (!org) {
     notFound();
@@ -21,7 +21,7 @@ export default async function InvoicesPage({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
           <p className="text-muted-foreground">
-            Manage your organization's invoices and financial records.
+            Manage your organization&apos;s invoices and financial records.
           </p>
         </div>
       </div>
