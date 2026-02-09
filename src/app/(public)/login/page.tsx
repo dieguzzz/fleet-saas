@@ -39,7 +39,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                Email
+                Correo Electrónico
               </label>
               <input
                 id="email"
@@ -70,7 +70,7 @@ export default function LoginPage() {
               disabled={isPending}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPending ? 'Iniciando...' : 'Iniciar Sesión'}
+              {isPending ? 'Iniciando...' : 'Ingresar'}
             </button>
           </form>
 

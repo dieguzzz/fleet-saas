@@ -19,9 +19,9 @@ export default async function InventoryPage({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Inventario</h1>
           <p className="text-muted-foreground">
-            Manage your organization&apos;s parts and stock levels.
+            Gestiona los niveles de existencias y repuestos de tu organización.
           </p>
         </div>
       </div>

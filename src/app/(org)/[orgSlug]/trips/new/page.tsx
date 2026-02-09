@@ -17,7 +17,7 @@ export default async function NewTripPage({
     .single();
 
   if (!org) {
-    return <div>Organization not found</div>;
+    return <div>Organización no encontrada</div>;
   }
 
   // 2. Fetch Vehicles

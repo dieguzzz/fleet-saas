@@ -16,7 +16,7 @@ export default async function NewInvoicePage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Create Invoice</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Crear Factura</h1>
       <InvoiceForm orgId={org.id} />
     </div>
   );

@@ -65,7 +65,7 @@ const getNavItems = (orgSlug: string): NavItem[] => [
     permission: 'maintenance:view',
   },
   {
-    href: `/${orgSlug}/finances`,
+    href: `/${orgSlug}/finance`,
     label: 'Finanzas',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -8,18 +8,18 @@ async function TripsList({ orgId }: { orgId: string }) {
   const { data: trips, error } = await getTrips(orgId);
 
   if (error) {
-    return <div className="text-red-500">Error loading trips: {error}</div>;
+    return <div className="text-red-500">Error cargando viajes: {error}</div>;
   }
 
   if (!trips || trips.length === 0) {
     return (
       <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-        <p className="text-slate-500 mb-4">No trips found.</p>
+        <p className="text-slate-500 mb-4">No se encontraron viajes.</p>
         <Link
-          href={`/org/${orgId}/trips/new`}
+          href={`/${orgId}/trips/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
         >
-          Plan First Trip
+          Planificar Primer Viaje
         </Link>
       </div>
     );
@@ -31,19 +31,19 @@ async function TripsList({ orgId }: { orgId: string }) {
         <table className="w-full text-left text-sm text-gray-600">
           <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
             <tr>
-              <th className="px-6 py-3">Vehicle</th>
-              <th className="px-6 py-3">Driver</th>
-              <th className="px-6 py-3">Route</th>
-              <th className="px-6 py-3">Status</th>
-              <th className="px-6 py-3">Date</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              <th className="px-6 py-3">Vehículo</th>
+              <th className="px-6 py-3">Conductor</th>
+              <th className="px-6 py-3">Ruta</th>
+              <th className="px-6 py-3">Estado</th>
+              <th className="px-6 py-3">Fecha</th>
+              <th className="px-6 py-3 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {trips.map((trip) => (
               <tr key={trip.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-900">
-                  {trip.vehicle?.name || 'Unknown Vehicle'}
+                  {trip.vehicle?.name || 'Vehículo Desconocido'}
                   {trip.vehicle?.plate_number && (
                     <span className="block text-xs text-gray-400">{trip.vehicle.plate_number}</span>
                   )}
@@ -51,8 +51,8 @@ async function TripsList({ orgId }: { orgId: string }) {
                 <td className="px-6 py-4">{trip.driver?.full_name || '-'}</td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">From:</span> {trip.origin}
-                    <span className="text-xs text-gray-400 mt-1">To:</span> {trip.destination}
+                    <span className="text-xs text-gray-400">De:</span> {trip.origin}
+                    <span className="text-xs text-gray-400 mt-1">A:</span> {trip.destination}
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -64,7 +64,10 @@ async function TripsList({ orgId }: { orgId: string }) {
                       ${trip.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
                     `}
                   >
-                    {trip.status}
+                    {trip.status === 'completed' ? 'Completado' :
+                     trip.status === 'in_progress' ? 'En Progreso' :
+                     trip.status === 'planned' ? 'Planificado' :
+                     trip.status === 'cancelled' ? 'Cancelado' : trip.status}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -75,7 +78,7 @@ async function TripsList({ orgId }: { orgId: string }) {
                     href={`/org/${orgId}/trips/${trip.id}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    View
+                    Ver
                   </Link>
                 </td>
               </tr>
@@ -103,18 +106,18 @@ export default async function TripsPage({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Trips</h1>
-          <p className="text-muted-foreground">Manage ongoing and planned trips.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Viajes</h1>
+          <p className="text-muted-foreground">Gestiona tus viajes en curso y planificados.</p>
         </div>
         <Link
-          href={`/org/${org.slug}/trips/new`}
+          href={`/${org.slug}/trips/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Plan New Trip
+          Nuevo Viaje
         </Link>
       </div>
 
-      <Suspense fallback={<div>Loading trips...</div>}>
+      <Suspense fallback={<div>Cargando viajes...</div>}>
         <TripsList orgId={org.id} />
       </Suspense>
     </div>

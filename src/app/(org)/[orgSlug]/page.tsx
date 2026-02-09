@@ -83,6 +83,67 @@ function DashboardSkeleton() {
   );
 }
 
+interface CardProps {
+  title: string;
+  value: string;
+  icon: string;
+  change: string;
+  alert?: boolean;
+}
+
+function Card({ title, value, icon, change, alert }: CardProps) {
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-3xl">{icon}</span>
+        <div className="text-2xl font-bold text-slate-800">{value}</div>
+      </div>
+      <h3 className="text-slate-600 font-medium mb-1">{title}</h3>
+      <p className={`text-xs ${alert ? 'text-red-500 font-bold' : 'text-slate-500'}`}>
+        {change}
+      </p>
+    </div>
+  );
+}
+
+interface ActivityItemProps {
+  title: string;
+  time: string;
+  type: 'success' | 'warning' | 'info';
+}
+
+function ActivityItem({ title, time, type }: ActivityItemProps) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className={`w-2 h-2 rounded-full ${
+          type === 'success' ? 'bg-green-500' : type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+        }`}
+      />
+      <div>
+        <p className="text-sm font-medium text-slate-800">{title}</p>
+        <p className="text-xs text-slate-500">{time}</p>
+      </div>
+    </div>
+  );
+}
+
+interface QuickActionProps {
+  href: string;
+  label: string;
+}
+
+function QuickAction({ href, label }: QuickActionProps) {
+  return (
+    <Link
+      href={href}
+      className="block w-full text-left px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+    >
+      {label}
+    </Link>
+  );
+}
+
 export default async function OrgDashboardPage({ params }: DashboardPageProps) {
   const { orgSlug } = await params;
   const org = await getOrganization(orgSlug);
@@ -99,46 +160,35 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardStats orgSlug={orgSlug} />
-      </Suspense>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          Acciones Rápidas
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href={`/${orgSlug}/vehicles?action=new`}
-            className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors"
-          >
-            + Nuevo Vehículo
-          </Link>
-          <Link
-            href={`/${orgSlug}/trips?action=new`}
-            className="bg-green-50 text-green-700 px-4 py-2 rounded-lg font-medium hover:bg-green-100 transition-colors"
-          >
-            + Nuevo Viaje
-          </Link>
-          <Link
-            href={`/${orgSlug}/team?action=invite`}
-            className="bg-purple-50 text-purple-700 px-4 py-2 rounded-lg font-medium hover:bg-purple-100 transition-colors"
-          >
-            + Invitar Miembro
-          </Link>
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+        <div className="md:col-span-4 bg-white p-6 rounded-lg shadow">
+          <h3 className="font-semibold mb-4">Actividad Reciente</h3>
+          <div className="space-y-4">
+            <ActivityItem
+              title="Viaje completado: Ruta Norte"
+              time="Hace 2 horas"
+              type="success"
+            />
+            <ActivityItem
+              title="Mantenimiento requerido: Camión B-12"
+              time="Hace 5 horas"
+              type="warning"
+            />
+            <ActivityItem
+              title="Factura #INV-2024-001 pagada"
+              time="Hace 1 día"
+              type="success"
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Recent Activity Placeholder */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
-          Actividad Reciente
-        </h2>
-        <p className="text-slate-500 text-center py-8">
-          No hay actividad reciente para mostrar.
-        </p>
+        <div className="md:col-span-3 bg-white p-6 rounded-lg shadow">
+          <h3 className="font-semibold mb-4">Acciones Rápidas</h3>
+          <div className="space-y-2">
+            <QuickAction href={`/${orgSlug}/inventory/items`} label="Revisar Inventario" />
+            <QuickAction href={`/${orgSlug}/contacts`} label="Agregar Contacto" />
+            <QuickAction href={`/${orgSlug}/settings`} label="Configuración de Organización" />
+          </div>
+        </div>
       </div>
     </div>
   );

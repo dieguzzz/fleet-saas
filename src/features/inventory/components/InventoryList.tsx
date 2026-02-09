@@ -15,12 +15,12 @@ export async function InventoryList({ orgId }: InventoryListProps) {
   if (!items || items.length === 0) {
     return (
       <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-        <p className="text-slate-500 mb-4">No inventory items found.</p>
+        <p className="text-slate-500 mb-4">No se encontraron ítems de inventario.</p>
         <Link
-          href={`/org/${orgId}/inventory/items/new`}
+          href={`/${orgId}/inventory/items/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
         >
-          Add First Item
+          Agregar Primer Ítem
         </Link>
       </div>
     );
@@ -29,31 +29,31 @@ export async function InventoryList({ orgId }: InventoryListProps) {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800">Inventory Items</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Inventario</h2>
         <Link
-          href={`/org/${orgId}/inventory/items/new`}
+          href={`/${orgId}/inventory/items/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
         >
-          Add Item
+          Agregar Ítem
         </Link>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-600">
           <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
             <tr>
-              <th className="px-6 py-3">Name</th>
+              <th className="px-6 py-3">Nombre</th>
               <th className="px-6 py-3">SKU</th>
-              <th className="px-6 py-3">Category</th>
-              <th className="px-6 py-3 text-right">Stock</th>
-              <th className="px-6 py-3 text-right">Unit Cost</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              <th className="px-6 py-3">Categoría</th>
+              <th className="px-6 py-3 text-right">Existencia</th>
+              <th className="px-6 py-3 text-right">Costo Unit.</th>
+              <th className="px-6 py-3 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {items.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-900">
-                  <Link href={`/org/${orgId}/inventory/items/${item.id}`} className="hover:underline">
+                  <Link href={`/${orgId}/inventory/items/${item.id}`} className="hover:underline">
                     {item.name}
                   </Link>
                 </td>
@@ -76,10 +76,10 @@ export async function InventoryList({ orgId }: InventoryListProps) {
                 </td>
                 <td className="px-6 py-4 text-center">
                   <Link
-                    href={`/org/${orgId}/inventory/items/${item.id}`}
+                    href={`/${orgId}/inventory/items/${item.id}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    Details
+                    Detalles
                   </Link>
                 </td>
               </tr>

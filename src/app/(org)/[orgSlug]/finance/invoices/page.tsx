@@ -19,9 +19,9 @@ export default async function InvoicesPage({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Facturas</h1>
           <p className="text-muted-foreground">
-            Manage your organization&apos;s invoices and financial records.
+            Gestiona las facturas y registros financieros de tu organización.
           </p>
         </div>
       </div>

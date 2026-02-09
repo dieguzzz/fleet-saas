@@ -44,7 +44,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
 
   return (
     <form action={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4 max-w-2xl">
-      <h2 className="text-xl font-semibold mb-4">Create New Invoice</h2>
+      <h2 className="text-xl font-semibold mb-4">Nueva Factura</h2>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-3 rounded text-sm">
@@ -54,7 +54,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Invoice Number</label>
+          <label className="block text-sm font-medium text-gray-700">Número de Factura</label>
           <input
             name="invoice_number"
             type="text"
@@ -64,7 +64,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Date</label>
+          <label className="block text-sm font-medium text-gray-700">Fecha</label>
           <input
             name="date"
             type="date"
@@ -76,7 +76,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Due Date</label>
+        <label className="block text-sm font-medium text-gray-700">Fecha de Vencimiento</label>
         <input
           name="due_date"
           type="date"
@@ -85,7 +85,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Notes</label>
+        <label className="block text-sm font-medium text-gray-700">Notas</label>
         <textarea
           name="notes"
           rows={3}
@@ -99,7 +99,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          {loading ? 'Creating...' : 'Create Invoice'}
+          {loading ? 'Creando...' : 'Crear Factura'}
         </button>
       </div>
     </form>
