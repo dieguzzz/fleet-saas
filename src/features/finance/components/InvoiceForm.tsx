@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createInvoice } from '../actions';
-import { InvoiceStatus } from '@/types/database';
+import { createInvoice, type CreateInvoiceInput } from '../actions';
 
 interface InvoiceFormProps {
   orgId: string;
@@ -18,16 +17,18 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
     setLoading(true);
     setError(null);
 
-    const invoiceData = {
+    const invoiceData: CreateInvoiceInput = {
       invoice_number: formData.get('invoice_number') as string,
       date: formData.get('date') as string,
       due_date: formData.get('due_date') as string,
-      status: 'draft' as InvoiceStatus,
-      subtotal: 0, // Placeholder
+      status: 'draft',
+      subtotal: 0,
       tax: 0,
       total: 0,
-      items: [], // Placeholder for item lines
+      items: [], // Initialize as empty array
       notes: formData.get('notes') as string,
+      customer_id: null,
+      supplier_id: null,
     };
 
     const result = await createInvoice(orgId, invoiceData);

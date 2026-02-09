@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
-import type { Invoice, InvoiceStatus } from '@/types/database';
+import type { Invoice } from '@/types/database';
 
 export async function getInvoices(orgId: string) {
   const supabase = await createClient();
@@ -38,9 +38,15 @@ export async function getInvoice(id: string) {
   return { data: data as Invoice };
 }
 
+// Define types for inputs to avoid mismatch
+export type CreateInvoiceInput = Omit<
+  Invoice,
+  'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier' | 'organization_id'
+>;
+
 export async function createInvoice(
   orgId: string,
-  invoice: Omit<Invoice, 'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier'>
+  invoice: CreateInvoiceInput
 ) {
   const supabase = await createClient();
 
