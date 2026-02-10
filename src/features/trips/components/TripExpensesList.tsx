@@ -4,9 +4,10 @@ import { getTripExpenses } from '../actions';
 interface TripExpensesListProps {
   tripId: string;
   orgId: string;
+  orgSlug: string;
 }
 
-export async function TripExpensesList({ tripId, orgId }: TripExpensesListProps) {
+export async function TripExpensesList({ tripId, orgId, orgSlug }: TripExpensesListProps) {
   const { data: expenses, error } = await getTripExpenses(tripId);
 
   if (error) {
@@ -20,7 +21,7 @@ export async function TripExpensesList({ tripId, orgId }: TripExpensesListProps)
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
         <h3 className="text-md font-semibold text-gray-800">Gastos del Viaje</h3>
         <Link
-          href={`/${orgId}/trips/${tripId}/expenses/new`}
+          href={`/${orgSlug}/trips/${tripId}/expenses/new`}
           className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs hover:bg-blue-700 transition-colors"
         >
           Agregar Gasto

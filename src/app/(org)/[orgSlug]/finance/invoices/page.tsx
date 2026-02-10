@@ -27,7 +27,7 @@ export default async function InvoicesPage({
       </div>
 
       <Suspense fallback={<div>Loading invoices...</div>}>
-        <InvoiceList orgId={org.id} />
+        <InvoiceList orgId={org.id} orgSlug={org.slug} />
       </Suspense>
     </div>
   );

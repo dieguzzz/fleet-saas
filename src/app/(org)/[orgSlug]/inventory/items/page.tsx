@@ -31,7 +31,7 @@ export default async function InventoryItemsPage({
       </div>
 
       <Suspense fallback={<div>Loading inventory...</div>}>
-        <InventoryList orgId={org.id} />
+        <InventoryList orgId={org.id} orgSlug={org.slug} />
       </Suspense>
     </div>
   );

@@ -3,9 +3,10 @@ import { getInventoryItems } from '../actions';
 
 interface InventoryListProps {
   orgId: string;
+  orgSlug: string;
 }
 
-export async function InventoryList({ orgId }: InventoryListProps) {
+export async function InventoryList({ orgId, orgSlug }: InventoryListProps) {
   const { data: items, error } = await getInventoryItems(orgId);
 
   if (error) {
@@ -17,7 +18,7 @@ export async function InventoryList({ orgId }: InventoryListProps) {
       <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
         <p className="text-slate-500 mb-4">No se encontraron ítems de inventario.</p>
         <Link
-          href={`/${orgId}/inventory/items/new`}
+          href={`/${orgSlug}/inventory/items/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
         >
           Agregar Primer Ítem
@@ -31,7 +32,7 @@ export async function InventoryList({ orgId }: InventoryListProps) {
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Inventario</h2>
         <Link
-          href={`/${orgId}/inventory/items/new`}
+          href={`/${orgSlug}/inventory/items/new`}
           className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
         >
           Agregar Ítem
@@ -53,7 +54,7 @@ export async function InventoryList({ orgId }: InventoryListProps) {
             {items.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-900">
-                  <Link href={`/${orgId}/inventory/items/${item.id}`} className="hover:underline">
+                  <Link href={`/${orgSlug}/inventory/items/${item.id}`} className="hover:underline">
                     {item.name}
                   </Link>
                 </td>
@@ -76,7 +77,7 @@ export async function InventoryList({ orgId }: InventoryListProps) {
                 </td>
                 <td className="px-6 py-4 text-center">
                   <Link
-                    href={`/${orgId}/inventory/items/${item.id}`}
+                    href={`/${orgSlug}/inventory/items/${item.id}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     Detalles
