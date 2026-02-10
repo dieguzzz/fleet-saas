@@ -16,7 +16,7 @@ export async function getOrganizations(): Promise<Organization[]> {
   return data || [];
 }
 
-export async function getOrganization(slug: string): Promise<Organization> {
+export async function getOrganization(slug: string): Promise<Organization | null> {
   const supabase = await createClient();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +26,10 @@ export async function getOrganization(slug: string): Promise<Organization> {
     .eq('slug', slug)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching organization:', error);
+    return null;
+  }
   return data;
 }
 
