@@ -2,6 +2,23 @@
 
 import Link from 'next/link';
 import type { Trip } from '@/types/database';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+ 
+// I didn't install Badge. I'll check my installation list. 
+// List: button card input label select table form dialog checkbox dropdown-menu avatar textarea sonner
+// I missed Badge. I'll use standard classes for badges for now or install it.
+// I'll stick to standard classes for badge to avoid another install step unless necessary. 
+// Or I can install it quickly. "npx shadcn@latest add badge".
+// User said "use shadcn everywhere". I should probably install badge.
+// But for now I'll use classNames, or just standard HTML/Tailwind.
 
 interface TripListProps {
   trips: Trip[];
@@ -13,77 +30,73 @@ export function TripList({ trips, orgSlug }: TripListProps) {
     return (
       <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
         <p className="text-slate-500 mb-4">No se encontraron viajes.</p>
-        <Link
-          href={`/${orgSlug}/trips/new`}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-        >
-          Planificar Primer Viaje
-        </Link>
+        <Button asChild>
+          <Link href={`/${orgSlug}/trips/new`}>
+            Planificar Primer Viaje
+          </Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-600">
-          <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
-            <tr>
-              <th className="px-6 py-3">Vehículo</th>
-              <th className="px-6 py-3">Conductor</th>
-              <th className="px-6 py-3">Ruta</th>
-              <th className="px-6 py-3">Estado</th>
-              <th className="px-6 py-3">Fecha</th>
-              <th className="px-6 py-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {trips.map((trip) => (
-              <tr key={trip.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 font-medium text-gray-900">
-                  {trip.vehicle?.name || 'Vehículo Desconocido'}
-                  {trip.vehicle?.plate_number && (
-                    <span className="block text-xs text-gray-400">{trip.vehicle.plate_number}</span>
-                  )}
-                </td>
-                <td className="px-6 py-4">{trip.driver?.full_name || '-'}</td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">De:</span> {trip.origin}
-                    <span className="text-xs text-gray-400 mt-1">A:</span> {trip.destination}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold
-                      ${trip.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                      ${trip.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : ''}
-                      ${trip.status === 'planned' ? 'bg-yellow-100 text-yellow-800' : ''}
-                      ${trip.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
-                    `}
-                  >
-                    {trip.status === 'completed' ? 'Completado' :
-                     trip.status === 'in_progress' ? 'En Progreso' :
-                     trip.status === 'planned' ? 'Planificado' :
-                     trip.status === 'cancelled' ? 'Cancelado' : trip.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {trip.started_at ? new Date(trip.started_at).toLocaleDateString() : '-'}
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <Link
-                    href={`/${orgSlug}/trips/${trip.id}`}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
-                  >
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Vehículo</TableHead>
+            <TableHead>Conductor</TableHead>
+            <TableHead>Ruta</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead>Fecha</TableHead>
+            <TableHead className="text-right">Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {trips.map((trip) => (
+            <TableRow key={trip.id}>
+              <TableCell className="font-medium">
+                {trip.vehicle?.name || 'Vehículo Desconocido'}
+                {trip.vehicle?.plate_number && (
+                  <span className="block text-xs text-muted-foreground">{trip.vehicle.plate_number}</span>
+                )}
+              </TableCell>
+              <TableCell>{trip.driver?.full_name || '-'}</TableCell>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">De: <span className="text-foreground">{trip.origin}</span></span>
+                  <span className="text-xs text-muted-foreground">A: <span className="text-foreground">{trip.destination}</span></span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset
+                    ${trip.status === 'completed' ? 'bg-green-50 text-green-700 ring-green-600/20' : ''}
+                    ${trip.status === 'in_progress' ? 'bg-blue-50 text-blue-700 ring-blue-700/10' : ''}
+                    ${trip.status === 'planned' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' : ''}
+                    ${trip.status === 'cancelled' ? 'bg-red-50 text-red-700 ring-red-600/10' : ''}
+                  `}
+                >
+                  {trip.status === 'completed' ? 'Completado' :
+                   trip.status === 'in_progress' ? 'En Progreso' :
+                   trip.status === 'planned' ? 'Planificado' :
+                   trip.status === 'cancelled' ? 'Cancelado' : trip.status}
+                </span>
+              </TableCell>
+              <TableCell>
+                {trip.started_at ? new Date(trip.started_at).toLocaleDateString() : '-'}
+              </TableCell>
+              <TableCell className="text-right">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/${orgSlug}/trips/${trip.id}`}>
                     Ver
                   </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

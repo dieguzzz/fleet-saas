@@ -4,6 +4,12 @@ import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const TripMap = dynamic(() => import('@/features/trips/components/TripMap').then((mod) => mod.TripMap), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-slate-100 rounded-lg animate-pulse flex items-center justify-center text-slate-400">Cargando mapa...</div>,
+});
 
 export default async function TripDetailPage({
   params,
@@ -17,15 +23,15 @@ export default async function TripDetailPage({
     notFound();
   }
 
-  if (!org) {
-    notFound();
-  }
-
   const { data: trip, error } = await getTrip(tripId);
 
   if (error || !trip) {
     return <div>Error cargando viaje: {error || 'No encontrado'}</div>;
   }
+  
+  // Parse coordinates safely
+  const originCoords = trip.origin_coords as { lat: number; lng: number; label: string } | null;
+  const destCoords = trip.destination_coords as { lat: number; lng: number; label: string } | null;
 
   return (
     <div className="space-y-6">
@@ -34,7 +40,7 @@ export default async function TripDetailPage({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Link
-              href={`/org/${orgSlug}/trips`}
+              href={`/${orgSlug}/trips`}
               className="text-sm text-blue-600 hover:underline"
             >
               &larr; Volver a Viajes
@@ -63,6 +69,15 @@ export default async function TripDetailPage({
              trip.status === 'cancelled' ? 'Cancelado' : trip.status}
           </span>
         </div>
+      </div>
+      
+      {/* Map Section */}
+      <div className="w-full h-[400px] bg-slate-50 border rounded-xl overflow-hidden shadow-sm">
+         <TripMap 
+            origin={originCoords ? { ...originCoords, label: trip.origin } : undefined}
+            destination={destCoords ? { ...destCoords, label: trip.destination } : undefined}
+            className="h-full w-full"
+         />
       </div>
 
       {/* Details Grid */}
