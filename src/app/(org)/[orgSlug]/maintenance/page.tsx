@@ -17,6 +17,10 @@ export default async function MaintenancePage({
     notFound();
   }
 
+  if (!org) {
+    notFound();
+  }
+
   const { data: records } = await getMaintenanceRecords(org.id);
 
   return (

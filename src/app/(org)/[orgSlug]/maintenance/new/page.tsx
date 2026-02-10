@@ -10,6 +10,10 @@ export default async function NewMaintenancePage({
 }) {
   const { orgSlug } = await params;
   const org = await getOrganization(orgSlug);
+  
+  if (!org) {
+    notFound();
+  }
 
   if (!org) {
     notFound();

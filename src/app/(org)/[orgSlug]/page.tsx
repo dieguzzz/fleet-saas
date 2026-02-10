@@ -8,6 +8,11 @@ interface DashboardPageProps {
 
 async function DashboardStats({ orgSlug }: { orgSlug: string }) {
   const org = await getOrganization(orgSlug);
+
+  if (!org) {
+    return <div>Organización no encontrada</div>;
+  }
+
   const stats = await getOrganizationStats(org.id);
 
   const statCards = [
@@ -147,6 +152,10 @@ function QuickAction({ href, label }: QuickActionProps) {
 export default async function OrgDashboardPage({ params }: DashboardPageProps) {
   const { orgSlug } = await params;
   const org = await getOrganization(orgSlug);
+
+  if (!org) {
+    return <div>Organización no encontrada</div>;
+  }
 
   return (
     <div className="space-y-8">

@@ -17,6 +17,10 @@ export default async function TripDetailPage({
     notFound();
   }
 
+  if (!org) {
+    notFound();
+  }
+
   const { data: trip, error } = await getTrip(tripId);
 
   if (error || !trip) {

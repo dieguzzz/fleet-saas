@@ -27,6 +27,10 @@ export default async function TripsPage({
     notFound();
   }
 
+  if (!org) {
+    notFound();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

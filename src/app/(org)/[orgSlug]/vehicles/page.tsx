@@ -17,6 +17,10 @@ export default async function VehiclesPage({
     notFound();
   }
 
+  if (!org) {
+    notFound();
+  }
+
   const { data: vehiclesData } = await getVehicles(org.id);
 
   // Map to ensure type safety, though current DB schema guarantees status is not null due to default

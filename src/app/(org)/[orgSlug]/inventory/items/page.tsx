@@ -3,13 +3,17 @@ import { InventoryList } from '@/features/inventory/components/InventoryList';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 
-export default async function InventoryPage({
+export default async function InventoryItemsPage({
   params,
 }: {
   params: Promise<{ orgSlug: string }>;
 }) {
   const { orgSlug } = await params;
   const org = await getOrganization(orgSlug);
+
+  if (!org) {
+    notFound();
+  }
 
   if (!org) {
     notFound();

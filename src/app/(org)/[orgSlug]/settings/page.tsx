@@ -14,6 +14,10 @@ export default async function SettingsPage({
     notFound();
   }
 
+  if (!org) {
+    notFound();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
