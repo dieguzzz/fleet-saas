@@ -4,12 +4,7 @@ import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-
-const TripMap = dynamic(() => import('@/features/trips/components/TripMap').then((mod) => mod.TripMap), {
-  ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-slate-100 rounded-lg animate-pulse flex items-center justify-center text-slate-400">Cargando mapa...</div>,
-});
+import { TripMapWrapper } from '@/features/trips/components/TripMapWrapper';
 
 export default async function TripDetailPage({
   params,
@@ -73,7 +68,7 @@ export default async function TripDetailPage({
       
       {/* Map Section */}
       <div className="w-full h-[400px] bg-slate-50 border rounded-xl overflow-hidden shadow-sm">
-         <TripMap 
+         <TripMapWrapper 
             origin={originCoords ? { ...originCoords, label: trip.origin } : undefined}
             destination={destCoords ? { ...destCoords, label: trip.destination } : undefined}
             className="h-full w-full"

@@ -22,7 +22,7 @@ const defaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = defaultIcon;
 
-interface TripMapProps {
+export interface TripMapProps {
   origin?: { lat: number; lng: number; label: string };
   destination?: { lat: number; lng: number; label: string };
   interactive?: boolean;
