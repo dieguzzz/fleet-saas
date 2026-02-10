@@ -8,6 +8,7 @@ export default function UnauthorizedPage() {
         <h1 className="text-3xl font-bold text-white mb-4">
           Acceso No Autorizado
         </h1>
+        <p className="text-slate-400 mb-8 max-w-md">
           No tienes permisos para acceder a esta página.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
