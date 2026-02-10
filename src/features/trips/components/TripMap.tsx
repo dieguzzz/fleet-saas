@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
+import { Map, MapTileLayer } from '@/components/ui/map';
 
 // Fix for default marker icon missing in Leaflet with Next.js/Webpack
 const iconUrl = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png';
@@ -56,7 +56,8 @@ export function TripMap({
   onMapClick,
   className = 'h-[400px] w-full rounded-md border',
 }: TripMapProps) {
-  const defaultCenter: [number, number] = [19.4326, -99.1332]; // CDMX default
+  // Center on Panama City [8.9833, -79.5167]
+  const defaultCenter: [number, number] = [8.9833, -79.5167];
   const center = origin
     ? [origin.lat, origin.lng]
     : destination
@@ -71,42 +72,45 @@ export function TripMap({
 
   if (!isMounted) {
     return (
-      <div className={`${className} bg-slate-100 animate-pulse flex items-center justify-center text-slate-400`}>
+      <div className={`${className} bg-slate-900 animate-pulse flex items-center justify-center text-slate-500`}>
         Cargando mapa...
       </div>
     );
   }
 
   return (
-    <MapContainer
+    <Map
       center={center as [number, number]}
       zoom={13}
       scrollWheelZoom={interactive}
       className={className}
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <MapTileLayer />
       
       {origin && (
         <Marker position={[origin.lat, origin.lng]}>
-          <Popup>
-            <strong>Origen:</strong> {origin.label}
+          <Popup className="premium-popup">
+            <div className="p-1">
+              <strong className="text-blue-400 block mb-1 uppercase text-[10px] tracking-wider font-bold">Origen</strong>
+              <span className="text-slate-100 font-medium">{origin.label}</span>
+            </div>
           </Popup>
         </Marker>
       )}
 
       {destination && (
         <Marker position={[destination.lat, destination.lng]}>
-          <Popup>
-            <strong>Destino:</strong> {destination.label}
+          <Popup className="premium-popup">
+            <div className="p-1">
+              <strong className="text-emerald-400 block mb-1 uppercase text-[10px] tracking-wider font-bold">Destino</strong>
+              <span className="text-slate-100 font-medium">{destination.label}</span>
+            </div>
           </Popup>
         </Marker>
       )}
 
       <MapUpdater center={center as [number, number]} />
       {interactive && <MapClickHandler onClick={onMapClick} />}
-    </MapContainer>
+    </Map>
   );
 }

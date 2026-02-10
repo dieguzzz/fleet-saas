@@ -5,7 +5,7 @@ import { type TripMapProps } from './TripMap';
 
 const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-slate-100 rounded-lg animate-pulse flex items-center justify-center text-slate-400">Cargando mapa...</div>,
+  loading: () => <div className="h-[400px] w-full bg-slate-900 rounded-lg animate-pulse flex items-center justify-center text-slate-500">Cargando mapa...</div>,
 });
 
 export function TripMapWrapper(props: TripMapProps) {
