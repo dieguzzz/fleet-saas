@@ -38,7 +38,7 @@ export async function getOrganizationMembers(orgId: string) {
     .from('organization_members')
     .select(`
       *,
-      profile:profiles(*)
+      profile:profiles!organization_members_user_id_fkey(*)
     `)
     .eq('organization_id', orgId)
     .order('joined_at');
