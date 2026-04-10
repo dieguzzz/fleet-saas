@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { InvoiceAttachment } from './InvoiceAttachment';
 
 interface InvoiceItem {
   description: string;
@@ -11,6 +13,7 @@ interface InvoiceItem {
 
 interface Invoice {
   id: string;
+  organization_id: string;
   invoice_number: string;
   date: string;
   due_date: string | null;
@@ -20,6 +23,7 @@ interface Invoice {
   tax: number | null;
   total: number | null;
   notes: string | null;
+  attachment_url: string | null;
   customer: {
     name: string;
     email?: string | null;
@@ -37,6 +41,7 @@ interface InvoiceDetailProps {
 
 export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) {
   const status = invoice.status || 'draft';
+  const [attachmentUrl, setAttachmentUrl] = useState<string | null>(invoice.attachment_url);
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -150,6 +155,36 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
               <span>${Number(invoice.total).toFixed(2)}</span>
             </div>
           </div>
+        </div>
+
+        {/* Attachment */}
+        <div className="p-8 border-t border-slate-200">
+          <InvoiceAttachment
+            invoiceId={invoice.id}
+            orgId={invoice.organization_id}
+            currentUrl={attachmentUrl}
+            onUploaded={(url) => setAttachmentUrl(url)}
+          />
+          {attachmentUrl && (
+            <div className="mt-4">
+              {attachmentUrl.match(/\.(jpg|jpeg|png|webp)$/i) ? (
+                <img
+                  src={attachmentUrl}
+                  alt="Adjunto de factura"
+                  className="max-h-64 rounded-lg border border-slate-200 object-contain"
+                />
+              ) : (
+                <a
+                  href={attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-blue-600 hover:underline text-sm"
+                >
+                  Ver PDF adjunto
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

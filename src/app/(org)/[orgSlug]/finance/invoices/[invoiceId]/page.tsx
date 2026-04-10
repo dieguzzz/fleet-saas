@@ -1,5 +1,6 @@
 import InvoiceDetail from '@/features/finance/components/InvoiceDetail';
 import { getInvoice } from '@/features/finance/actions';
+import { createClient } from '@/services/supabase/server';
 import { notFound } from 'next/navigation';
 
 export default async function InvoicePage({
@@ -8,13 +9,21 @@ export default async function InvoicePage({
   params: Promise<{ orgSlug: string; invoiceId: string }>;
 }) {
   const { orgSlug, invoiceId } = await params;
-  const { data: invoice } = await getInvoice(invoiceId);
+
+  const supabase = await createClient();
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (!org) notFound();
+
+  const { data: invoice } = await getInvoice(invoiceId, org.id);
 
   if (!invoice) {
     notFound();
   }
 
-  // Cast invoice to any to bypass strict type check between DB Json and component interface
-  // The component handles null/empty checks safely
   return <InvoiceDetail orgSlug={orgSlug} invoice={invoice as any} />;
 }

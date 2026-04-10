@@ -181,6 +181,7 @@ export interface Invoice {
   tax: number | null;
   total: number | null;
   notes: string | null;
+  attachment_url: string | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined

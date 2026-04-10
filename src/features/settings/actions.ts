@@ -17,7 +17,11 @@ export async function updateOrganizationSettings(prevState: SettingsState, formD
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
-  // 1. Get Org and User
+  // 1. Verify authenticated user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  // 2. Get Org and verify user is owner/admin
   const { data: org } = await supabase
     .from('organizations')
     .select('id')
@@ -26,6 +30,17 @@ export async function updateOrganizationSettings(prevState: SettingsState, formD
 
   if (!org) {
     return { error: 'Organización no encontrada' };
+  }
+
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('role')
+    .eq('organization_id', org.id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    return { error: 'No tienes permisos para modificar esta configuración' };
   }
 
   // 2. Validate

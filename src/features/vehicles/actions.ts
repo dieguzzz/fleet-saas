@@ -92,10 +92,20 @@ export async function updateVehicle(
     return { error: 'Datos inválidos' };
   }
 
+  // Get org ID to enforce ownership
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase
     .from('vehicles')
     .update(validatedFields.data)
-    .eq('id', vehicleId);
+    .eq('id', vehicleId)
+    .eq('organization_id', org.id);
 
   if (error) {
     console.error('Error updating vehicle:', error);
@@ -109,10 +119,20 @@ export async function updateVehicle(
 export async function deleteVehicle(orgSlug: string, vehicleId: string) {
   const supabase = await createClient();
 
+  // Get org ID from slug to enforce ownership
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (!org) throw new Error('Organización no encontrada');
+
   const { error } = await supabase
     .from('vehicles')
     .delete()
-    .eq('id', vehicleId);
+    .eq('id', vehicleId)
+    .eq('organization_id', org.id);
 
   if (error) {
     console.error('Error deleting vehicle:', error);

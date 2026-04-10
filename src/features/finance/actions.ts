@@ -21,13 +21,14 @@ export async function getInvoices(orgId: string) {
   return { data: data as Invoice[] };
 }
 
-export async function getInvoice(id: string) {
+export async function getInvoice(id: string, orgId: string) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('invoices')
     .select('*, customer:contacts!invoices_customer_id_fkey(*), supplier:contacts!invoices_supplier_id_fkey(*)')
     .eq('id', id)
+    .eq('organization_id', orgId)
     .single();
 
   if (error) {
@@ -64,7 +65,7 @@ export async function createInvoice(
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/finance/invoices`);
+  revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { data: data as Invoice };
 }
 
@@ -88,7 +89,7 @@ export async function updateInvoice(
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/finance/invoices`);
+  revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { data: data as Invoice };
 }
 
@@ -106,7 +107,7 @@ export async function deleteInvoice(id: string, orgId: string) {
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/finance/invoices`);
+  revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { success: true };
 }
 
@@ -166,7 +167,7 @@ export async function createFinancialTransaction(prevState: unknown, formData: F
     return { error: error.message, success: false };
   }
 
-  revalidatePath(`/org/${orgId}/finance/transactions`); // Assumptions on path
+  revalidatePath('/[orgSlug]/finance/transactions', 'page');
   return { success: true };
 }
 
@@ -184,6 +185,6 @@ export async function deleteFinancialTransaction(id: string, orgId: string) {
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/finance/transactions`);
+  revalidatePath('/[orgSlug]/finance/transactions', 'page');
   return { success: true };
 }
