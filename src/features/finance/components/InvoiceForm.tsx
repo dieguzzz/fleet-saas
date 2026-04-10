@@ -29,6 +29,7 @@ export function InvoiceForm({ orgId }: InvoiceFormProps) {
       notes: formData.get('notes') as string,
       customer_id: null,
       supplier_id: null,
+      attachment_url: null,
     };
 
     const result = await createInvoice(orgId, invoiceData);
