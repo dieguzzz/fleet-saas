@@ -54,7 +54,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
       // Persist the URL on the invoice record
       const { error: updateError } = await supabase
         .from('invoices')
-        .update({ attachment_url: publicUrl })
+        .update({ attachment_url: publicUrl } as any)
         .eq('id', invoiceId)
         .eq('organization_id', orgId);
 
