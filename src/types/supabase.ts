@@ -532,6 +532,7 @@ export type Database = {
       }
       invoices: {
         Row: {
+          attachment_url: string | null
           created_at: string | null
           customer_id: string | null
           date: string
@@ -549,6 +550,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          attachment_url?: string | null
           created_at?: string | null
           customer_id?: string | null
           date?: string
@@ -566,6 +568,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          attachment_url?: string | null
           created_at?: string | null
           customer_id?: string | null
           date?: string
