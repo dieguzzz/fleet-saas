@@ -311,8 +311,8 @@ export interface Database {
       };
       invoices: {
         Row: Invoice;
-        Insert: Omit<Invoice, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Invoice, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
+        Insert: Omit<Invoice, 'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier'>;
+        Update: Partial<Omit<Invoice, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'customer' | 'supplier'>>;
         Relationships: [];
       };
       inventory_items: {

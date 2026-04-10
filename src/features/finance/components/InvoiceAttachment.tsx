@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { createClient } from '@/services/supabase/client';
+import { updateInvoiceAttachmentUrl } from '../actions';
 
 interface InvoiceAttachmentProps {
   invoiceId: string;
@@ -51,14 +52,9 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
 
       const publicUrl = data.publicUrl;
 
-      // Persist the URL on the invoice record
-      const { error: updateError } = await supabase
-        .from('invoices')
-        .update({ attachment_url: publicUrl } as any)
-        .eq('id', invoiceId)
-        .eq('organization_id', orgId);
-
-      if (updateError) throw updateError;
+      // Persist via server action (avoids client-side DB type issues)
+      const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, publicUrl);
+      if (result?.error) throw new Error(result.error);
 
       if (file.type.startsWith('image/')) {
         setPreview(publicUrl);

@@ -93,6 +93,20 @@ export async function updateInvoice(
   return { data: data as Invoice };
 }
 
+export async function updateInvoiceAttachmentUrl(id: string, orgId: string, url: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({ attachment_url: url })
+    .eq('id', id)
+    .eq('organization_id', orgId);
+
+  if (error) return { error: error.message };
+  revalidatePath('/[orgSlug]/finance/invoices', 'page');
+  return { success: true };
+}
+
 export async function deleteInvoice(id: string, orgId: string) {
   const supabase = await createClient();
 
