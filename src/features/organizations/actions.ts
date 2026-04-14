@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
-import type { OrgRole } from '@/types/database';
+import type { OrgRole, Json } from '@/types/database';
 
 function generateSlug(name: string): string {
   return name
@@ -70,7 +70,7 @@ export async function createOrganization(formData: FormData) {
 
 export async function updateOrganization(
   orgId: string,
-  data: { name?: string; logo_url?: string; settings?: Record<string, unknown> }
+  data: { name?: string; logo_url?: string; settings?: Json }
 ) {
   const supabase = await createClient();
 
