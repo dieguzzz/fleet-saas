@@ -61,7 +61,7 @@ export default function OnboardingPage() {
                   name="slug"
                   type="text"
                   placeholder="mi-empresa"
-                  pattern="[a-z0-9-]+"
+                  pattern="[a-z0-9\-]+"
                   className="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-r-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>

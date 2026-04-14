@@ -31,9 +31,14 @@ export async function createOrganization(formData: FormData) {
     return { error: 'Not authenticated' };
   }
 
-  // Create organization
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: org, error: orgError } = await (supabase as any)
+  // Ensure profile exists (in case trigger didn't fire on signup)
+  await supabase.from('profiles').upsert({
+    id: user.id,
+    email: user.email!,
+    full_name: user.user_metadata?.full_name ?? '',
+  }, { onConflict: 'id' });
+
+  const { data: org, error: orgError } = await supabase
     .from('organizations')
     .insert({
       name,
@@ -47,9 +52,7 @@ export async function createOrganization(formData: FormData) {
     return { error: orgError.message };
   }
 
-  // Add creator as owner
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: memberError } = await (supabase as any)
+  const { error: memberError } = await supabase
     .from('organization_members')
     .insert({
       organization_id: org.id,
@@ -71,8 +74,7 @@ export async function updateOrganization(
 ) {
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('organizations')
     .update(data)
     .eq('id', orgId);
@@ -88,8 +90,7 @@ export async function updateOrganization(
 export async function deleteOrganization(orgId: string) {
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('organizations')
     .delete()
     .eq('id', orgId);
@@ -108,17 +109,14 @@ export async function updateMemberRole(
 ) {
   const supabase = await createClient();
 
-  // Prevent demoting the only owner
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: member } = await (supabase as any)
+  const { data: member } = await supabase
     .from('organization_members')
     .select('organization_id, role')
     .eq('id', memberId)
     .single();
 
   if (member?.role === 'owner') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { count } = await (supabase as any)
+    const { count } = await supabase
       .from('organization_members')
       .select('*', { count: 'exact', head: true })
       .eq('organization_id', member.organization_id)
@@ -129,8 +127,7 @@ export async function updateMemberRole(
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('organization_members')
     .update({ role: newRole })
     .eq('id', memberId);
@@ -146,8 +143,7 @@ export async function updateMemberRole(
 export async function removeMember(memberId: string) {
   const supabase = await createClient();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('organization_members')
     .delete()
     .eq('id', memberId);

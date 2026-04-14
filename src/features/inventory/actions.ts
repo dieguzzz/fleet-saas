@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
 import type { InventoryItem, InventoryMovementType } from '@/types/database';
 
@@ -38,21 +39,18 @@ export async function getInventoryItem(id: string) {
   return { data: data as InventoryItem };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function createInventoryItem(
   prevState: unknown,
   formData: FormData
 ) {
   const supabase = await createClient();
 
-  // Extract orgSlug from hidden field
   const orgSlug = formData.get('orgSlug') as string;
 
   if (!orgSlug) {
     return { error: 'Organization Slug is missing', success: false };
   }
 
-  // Resolve slug to ID
   const { data: org, error: orgError } = await supabase
     .from('organizations')
     .select('id')
@@ -64,7 +62,7 @@ export async function createInventoryItem(
   }
 
   const orgId = org.id;
-  
+
   const item = {
     name: formData.get('name') as string,
     sku: formData.get('sku') as string,
@@ -76,10 +74,6 @@ export async function createInventoryItem(
     description: formData.get('description') as string,
     current_stock: Number(formData.get('current_stock')),
   };
-
-  if (!orgId) {
-    return { error: 'Organization ID is missing', success: false };
-  }
 
   const { error } = await supabase
     .from('inventory_items')
@@ -93,15 +87,8 @@ export async function createInventoryItem(
     return { error: error.message, success: false };
   }
 
-  revalidatePath(`/org/${orgId}/inventory/items`);
-  // Redirect handled by client or component logic?
-  // Let's return success and let the component redirect or reset.
-  // Actually, server actions can redirect.
-  // But for useActionState, redirecting is fine.
-  
-  // We need to import redirect
-  const { redirect } = await import('next/navigation');
-  redirect(`/${orgId}/inventory/items`);
+  revalidatePath(`/${orgSlug}/inventory/items`);
+  redirect(`/${orgSlug}/inventory/items`);
 }
 
 export async function updateInventoryItem(
@@ -124,7 +111,7 @@ export async function updateInventoryItem(
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/inventory/items`);
+  revalidatePath('/[orgSlug]/inventory/items', 'page');
   return { data: data as InventoryItem };
 }
 
@@ -142,7 +129,7 @@ export async function deleteInventoryItem(id: string, orgId: string) {
     return { error: error.message };
   }
 
-  revalidatePath(`/org/${orgId}/inventory/items`);
+  revalidatePath('/[orgSlug]/inventory/items', 'page');
   return { success: true };
 }
 
@@ -163,7 +150,6 @@ export async function recordStockMovement(
     return { error: 'Missing required fields', success: false };
   }
 
-  // 1. Get current stock
   const { data: item, error: fetchError } = await supabase
     .from('inventory_items')
     .select('current_stock')
@@ -185,7 +171,6 @@ export async function recordStockMovement(
     newStock = quantity;
   }
 
-  // 2. Record movement
   const { error: movementError } = await supabase
     .from('inventory_movements')
     .insert({
@@ -204,26 +189,15 @@ export async function recordStockMovement(
     return { error: movementError.message, success: false };
   }
 
-  // 3. Update item stock (if trigger is not enabled, or just to be safe/explicit if trigger is complex)
-  // Since we have a trigger in the SQL plan, we might rely on it, but manual update ensures sync return.
-  // The SQL trigger `update_inventory_stock` was defined in the plan.
-  // Let's rely on the trigger for atomicity if it was created.
-  // However, I created `update_inventory_stock` trigger function but did I attach it?
-  // Checking `database-schema-expansion.sql`... yes I did.
-  // Actually, wait. I commented "NOTE: This simple trigger might conflict..." so maybe I should check if I enabled it.
-  // I did include `CREATE OR REPLACE FUNCTION ...` but I did NOT include `CREATE TRIGGER ...` for `inventory_movements` in the applied SQL.
-  // I only included triggers for `updated_at`.
-  // So I MUST manually update the stock here.
-
   const { error: updateError } = await supabase
     .from('inventory_items')
     .update({ current_stock: newStock })
     .eq('id', itemId);
 
   if (updateError) {
-     return { error: 'Failed to update stock level', success: false };
+    return { error: 'Failed to update stock level', success: false };
   }
 
-  revalidatePath(`/org/${orgId}/inventory/items`);
+  revalidatePath('/[orgSlug]/inventory/items', 'page');
   return { success: true, newStock };
 }
