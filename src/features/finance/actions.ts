@@ -25,6 +25,20 @@ export async function getNextInvoiceNumber(orgId: string): Promise<string> {
   return `INV-${year}-${String(nextNum).padStart(3, '0')}`;
 }
 
+export async function getInvoicesByType(orgId: string, type: 'cobro' | 'pago') {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*, customer:contacts!invoices_customer_id_fkey(name), supplier:contacts!invoices_supplier_id_fkey(name)')
+    .eq('organization_id', orgId)
+    .eq('invoice_type', type)
+    .order('date', { ascending: false });
+
+  if (error) return { error: error.message };
+  return { data: data as Invoice[] };
+}
+
 export async function getInvoices(orgId: string) {
   const supabase = await createClient();
 

@@ -380,6 +380,7 @@ export type Database = {
           due_date: string | null
           id: string
           invoice_number: string
+          invoice_type: string
           items: Json | null
           notes: string | null
           organization_id: string
@@ -398,6 +399,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number: string
+          invoice_type?: string
           items?: Json | null
           notes?: string | null
           organization_id: string
@@ -416,6 +418,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           invoice_number?: string
+          invoice_type?: string
           items?: Json | null
           notes?: string | null
           organization_id?: string
