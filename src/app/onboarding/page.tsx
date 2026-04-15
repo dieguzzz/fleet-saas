@@ -1,15 +1,27 @@
+'use client';
+
 import Link from 'next/link';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createOrganization } from '@/features/organizations/actions';
-import { redirect } from 'next/navigation';
+
+type State = { error?: string; success?: boolean; slug?: string } | null;
 
 export default function OnboardingPage() {
-  async function handleCreateOrg(formData: FormData) {
-    'use server';
-    const result = await createOrganization(formData);
-    if (result.success && result.slug) {
-      redirect(`/${result.slug}`);
+  const router = useRouter();
+  const [state, formAction, pending] = useActionState<State, FormData>(
+    async (_prev, formData) => {
+      const result = await createOrganization(formData);
+      return result;
+    },
+    null
+  );
+
+  useEffect(() => {
+    if (state?.success && state.slug) {
+      router.push(`/${state.slug}`);
     }
-  }
+  }, [state, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
@@ -33,7 +45,13 @@ export default function OnboardingPage() {
             Configura tu espacio de trabajo para gestionar tu flota
           </p>
 
-          <form action={handleCreateOrg} className="space-y-5">
+          {state?.error && (
+            <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm">
+              {state.error}
+            </div>
+          )}
+
+          <form action={formAction} className="space-y-5">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
                 Nombre de la Organización
@@ -72,9 +90,10 @@ export default function OnboardingPage() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
+              disabled={pending}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors"
             >
-              Crear Organización
+              {pending ? 'Creando...' : 'Crear Organización'}
             </button>
           </form>
         </div>
