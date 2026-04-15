@@ -13,17 +13,17 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
   const [state, formAction, isPending] = useActionState(createInventoryItem, initialState);
 
   return (
-    <form action={formAction} className="space-y-6 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5 max-w-2xl">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       {state?.error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium text-slate-300">
+          <label htmlFor="name" className="text-sm font-medium text-slate-700">
             Nombre del Ítem *
           </label>
           <input
@@ -32,12 +32,12 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             type="text"
             required
             placeholder="Ej. Aceite Sintético 5W-30"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="sku" className="text-sm font-medium text-slate-300">
+          <label htmlFor="sku" className="text-sm font-medium text-slate-700">
             SKU / Código
           </label>
           <input
@@ -45,18 +45,18 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             name="sku"
             type="text"
             placeholder="OIL-5W30-001"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="category" className="text-sm font-medium text-slate-300">
+          <label htmlFor="category" className="text-sm font-medium text-slate-700">
             Categoría
           </label>
           <select
             id="category"
             name="category"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="parts">Repuestos</option>
             <option value="fluids">Fluidos</option>
@@ -68,7 +68,7 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="location" className="text-sm font-medium text-slate-300">
+          <label htmlFor="location" className="text-sm font-medium text-slate-700">
             Ubicación en Almacén
           </label>
           <input
@@ -76,12 +76,12 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             name="location"
             type="text"
             placeholder="Estante A-4"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="current_stock" className="text-sm font-medium text-slate-300">
+          <label htmlFor="current_stock" className="text-sm font-medium text-slate-700">
             Stock Inicial *
           </label>
           <input
@@ -91,12 +91,12 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             min="0"
             defaultValue="0"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="min_stock_level" className="text-sm font-medium text-slate-300">
+          <label htmlFor="min_stock_level" className="text-sm font-medium text-slate-700">
             Stock Mínimo (Alerta)
           </label>
           <input
@@ -105,12 +105,12 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             type="number"
             min="0"
             defaultValue="5"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="unit" className="text-sm font-medium text-slate-300">
+          <label htmlFor="unit" className="text-sm font-medium text-slate-700">
             Unidad de Medida
           </label>
           <input
@@ -119,12 +119,12 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             type="text"
             defaultValue="unidades"
             placeholder="unidades, litros, cajas"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="cost_per_unit" className="text-sm font-medium text-slate-300">
+          <label htmlFor="cost_per_unit" className="text-sm font-medium text-slate-700">
             Costo Unitario
           </label>
           <input
@@ -134,27 +134,27 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
             min="0"
             step="0.01"
             placeholder="0.00"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium text-slate-300">
+        <label htmlFor="description" className="text-sm font-medium text-slate-700">
           Descripción
         </label>
         <textarea
           id="description"
           name="description"
           rows={3}
-          className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input"
         />
       </div>
 
       <div className="flex items-center gap-4 pt-4">
         <Link
           href={`/${orgSlug}/inventory/items`}
-          className="px-6 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
         >
           Cancelar
         </Link>

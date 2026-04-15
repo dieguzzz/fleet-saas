@@ -59,7 +59,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         <input type="hidden" name="destination_coords" value={destCoords ? JSON.stringify(destCoords) : ''} />
         
         {state?.error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
             {state.error}
           </div>
         )}
@@ -69,14 +69,14 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         {/* I'll use the original content and wrap it. */}
         
         <div className="space-y-2">
-          <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-300">
+          <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-700">
             Vehículo *
           </label>
           <select
             id="vehicle_id"
             name="vehicle_id"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar vehículo</option>
             {vehicles.map((v) => (
@@ -88,14 +88,14 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="driver_id" className="text-sm font-medium text-slate-300">
+          <label htmlFor="driver_id" className="text-sm font-medium text-slate-700">
             Conductor *
           </label>
           <select
             id="driver_id"
             name="driver_id"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar conductor</option>
             {drivers.map((d) => (
@@ -107,7 +107,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="origin" className="text-sm font-medium text-slate-300 flex justify-between">
+          <label htmlFor="origin" className="text-sm font-medium text-slate-700 flex justify-between">
             <span>Origen *</span>
             <button 
               type="button"
@@ -124,14 +124,14 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
               type="text"
               required
               placeholder="Ciudad o Dirección de Origen"
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="field-input"
             />
             {originCoords && <div className="text-green-500 flex items-center" title="Coordenadas establecidas">📍</div>}
           </div>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="destination" className="text-sm font-medium text-slate-300 flex justify-between">
+          <label htmlFor="destination" className="text-sm font-medium text-slate-700 flex justify-between">
              <span>Destino *</span>
              <button 
               type="button"
@@ -148,20 +148,20 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
               type="text"
               required
               placeholder="Ciudad o Dirección de Destino"
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="field-input"
             />
              {destCoords && <div className="text-green-500 flex items-center" title="Coordenadas establecidas">📍</div>}
            </div>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="status" className="text-sm font-medium text-slate-300">
+          <label htmlFor="status" className="text-sm font-medium text-slate-700">
             Estado
           </label>
           <select
             id="status"
             name="status"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="planned">Planificado</option>
             <option value="in_progress">En Progreso</option>
@@ -171,7 +171,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="notes" className="text-sm font-medium text-slate-300">
+          <label htmlFor="notes" className="text-sm font-medium text-slate-700">
             Notas
           </label>
           <textarea
@@ -179,14 +179,14 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
             name="notes"
             rows={3}
             placeholder="Detalles adicionales del viaje..."
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="flex items-center gap-4 pt-4">
           <Link
             href={`/${orgSlug}/trips`}
-            className="px-6 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+            className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
           >
             Cancelar
           </Link>

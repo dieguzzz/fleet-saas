@@ -37,25 +37,25 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
   const [state, formAction] = useActionState(createMaintenanceRecord, initialState);
 
   return (
-    <form action={formAction} className="space-y-6 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5 max-w-2xl">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-300">
+          <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-700">
             Vehículo *
           </label>
           <select
             id="vehicle_id"
             name="vehicle_id"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar vehículo</option>
             {vehicles.map((v) => (
@@ -67,14 +67,14 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="type" className="text-sm font-medium text-slate-300">
+          <label htmlFor="type" className="text-sm font-medium text-slate-700">
             Tipo de Mantenimiento *
           </label>
           <select
             id="type"
             name="type"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar tipo</option>
             <option value="preventive">Preventivo</option>
@@ -85,7 +85,7 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="performed_at" className="text-sm font-medium text-slate-300">
+          <label htmlFor="performed_at" className="text-sm font-medium text-slate-700">
              Fecha Realizada *
           </label>
           <input
@@ -94,12 +94,12 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
             type="date"
             required
             defaultValue={new Date().toISOString().split('T')[0]}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="cost" className="text-sm font-medium text-slate-300">
+          <label htmlFor="cost" className="text-sm font-medium text-slate-700">
             Costo Total *
           </label>
           <input
@@ -110,12 +110,12 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
             min="0"
             placeholder="0.00"
             required
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="odometer_reading" className="text-sm font-medium text-slate-300">
+          <label htmlFor="odometer_reading" className="text-sm font-medium text-slate-700">
             Lectura Odómetro (km)
           </label>
           <input
@@ -124,12 +124,12 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
             type="number"
             min="0"
             placeholder="Ej. 50000"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="performed_by" className="text-sm font-medium text-slate-300">
+          <label htmlFor="performed_by" className="text-sm font-medium text-slate-700">
             Realizado por (Taller/Mecánico)
           </label>
           <input
@@ -137,24 +137,24 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
             name="performed_by"
             type="text"
             placeholder="Ej. Taller Central"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="next_due_at" className="text-sm font-medium text-slate-300">
+          <label htmlFor="next_due_at" className="text-sm font-medium text-slate-700">
             Próximo Mantenimiento (Fecha)
           </label>
           <input
             id="next_due_at"
             name="next_due_at"
             type="date"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
         
         <div className="space-y-2">
-          <label htmlFor="next_due_km" className="text-sm font-medium text-slate-300">
+          <label htmlFor="next_due_km" className="text-sm font-medium text-slate-700">
             Próximo Mantenimiento (Km)
           </label>
           <input
@@ -163,13 +163,13 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
             type="number"
             min="0"
             placeholder="Ej. 60000"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium text-slate-300">
+        <label htmlFor="description" className="text-sm font-medium text-slate-700">
           Descripción / Detalles
         </label>
         <textarea
@@ -177,14 +177,14 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
           name="description"
           rows={3}
           placeholder="Detalles del trabajo realizado..."
-          className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input"
         />
       </div>
 
       <div className="flex items-center gap-4 pt-4">
         <Link
           href={`/${orgSlug}/maintenance`}
-          className="px-6 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
         >
           Cancelar
         </Link>

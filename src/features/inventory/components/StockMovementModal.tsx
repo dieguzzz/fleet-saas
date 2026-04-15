@@ -38,17 +38,17 @@ export default function StockMovementModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 w-full max-w-md shadow-xl">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 w-full max-w-md shadow-xl">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">Registrar Movimiento</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <h3 className="text-lg font-bold text-slate-800">Registrar Movimiento</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1">
             ✕
           </button>
         </div>
 
-        <div className="mb-4">
-          <p className="text-slate-400 text-sm">Ítem: <span className="text-white font-medium">{itemName}</span></p>
-          <p className="text-slate-400 text-sm">Stock Actual: <span className="text-white font-medium">{currentStock}</span></p>
+        <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+          <p className="text-slate-500 text-sm">Ítem: <span className="text-slate-800 font-medium">{itemName}</span></p>
+          <p className="text-slate-500 text-sm">Stock Actual: <span className="text-slate-800 font-medium">{currentStock}</span></p>
         </div>
 
         <form action={async (formData) => {
@@ -68,13 +68,13 @@ export default function StockMovementModal({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Tipo de Movimiento</label>
-            <div className="flex gap-2 p-1 bg-slate-900 rounded-lg">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Tipo de Movimiento</label>
+            <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
               <button
                 type="button"
                 onClick={() => setType('in')}
                 className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  type === 'in' ? 'bg-green-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  type === 'in' ? 'bg-green-600 text-white' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Entrada
@@ -83,7 +83,7 @@ export default function StockMovementModal({
                 type="button"
                 onClick={() => setType('out')}
                 className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  type === 'out' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  type === 'out' ? 'bg-red-600 text-white' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Salida
@@ -92,7 +92,7 @@ export default function StockMovementModal({
                 type="button"
                 onClick={() => setType('adjustment')}
                 className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  type === 'adjustment' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  type === 'adjustment' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
                 Ajuste
@@ -101,7 +101,7 @@ export default function StockMovementModal({
           </div>
 
           <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="quantity" className="block text-sm font-medium text-slate-700 mb-2">
               Cantidad
             </label>
             <input
@@ -110,19 +110,19 @@ export default function StockMovementModal({
               type="number"
               min="1"
               required
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="field-input"
             />
           </div>
 
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="notes" className="block text-sm font-medium text-slate-700 mb-2">
               Notas / Referencia
             </label>
             <textarea
               id="notes"
               name="notes"
               rows={2}
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="field-input"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default function StockMovementModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors"
+              className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Cancelar
             </button>

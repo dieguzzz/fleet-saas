@@ -44,18 +44,18 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
   );
 
   return (
-    <form action={formAction} className="space-y-6 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5 max-w-2xl">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium text-slate-300">
+          <label htmlFor="name" className="text-sm font-medium text-slate-700">
             Nombre / Identificador *
           </label>
           <input
@@ -65,12 +65,12 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
             required
             defaultValue={vehicle?.name}
             placeholder="Ej. Camión 01"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="plate_number" className="text-sm font-medium text-slate-300">
+          <label htmlFor="plate_number" className="text-sm font-medium text-slate-700">
             Placa / Matrícula
           </label>
           <input
@@ -79,19 +79,19 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
             type="text"
             defaultValue={vehicle?.plate_number || ''}
             placeholder="ABC-123"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="type" className="text-sm font-medium text-slate-300">
+          <label htmlFor="type" className="text-sm font-medium text-slate-700">
             Tipo de Vehículo
           </label>
           <select
             id="type"
             name="type"
             defaultValue={vehicle?.type || ''}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar tipo</option>
             <option value="truck">Camión</option>
@@ -103,14 +103,14 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="status" className="text-sm font-medium text-slate-300">
+          <label htmlFor="status" className="text-sm font-medium text-slate-700">
             Estado
           </label>
           <select
             id="status"
             name="status"
             defaultValue={vehicle?.status || 'active'}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="active">Activo</option>
             <option value="maintenance">En Mantenimiento</option>
@@ -119,7 +119,7 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="brand" className="text-sm font-medium text-slate-300">
+          <label htmlFor="brand" className="text-sm font-medium text-slate-700">
             Marca
           </label>
           <input
@@ -128,12 +128,12 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
             type="text"
             defaultValue={vehicle?.brand || ''}
             placeholder="Toyota, Ford..."
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="model" className="text-sm font-medium text-slate-300">
+          <label htmlFor="model" className="text-sm font-medium text-slate-700">
             Modelo
           </label>
           <input
@@ -142,12 +142,12 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
             type="text"
             defaultValue={vehicle?.model || ''}
             placeholder="Hilux, F-150..."
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="year" className="text-sm font-medium text-slate-300">
+          <label htmlFor="year" className="text-sm font-medium text-slate-700">
             Año
           </label>
           <input
@@ -155,7 +155,7 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
             name="year"
             type="number"
             defaultValue={vehicle?.year || new Date().getFullYear()}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
       <div className="flex items-center gap-4 pt-4">
         <Link
           href={`/${orgSlug}/vehicles`}
-          className="px-6 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
         >
           Cancelar
         </Link>

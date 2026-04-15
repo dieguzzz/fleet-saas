@@ -48,7 +48,7 @@ export default function OnboardingPage() {
 
           <form action={formAction} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
                 Nombre de la Organización
               </label>
               <input
@@ -62,7 +62,7 @@ export default function OnboardingPage() {
             </div>
 
             <div>
-              <label htmlFor="slug" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-2">
                 URL de la Organización
               </label>
               <div className="flex items-center">

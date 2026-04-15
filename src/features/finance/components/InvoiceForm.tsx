@@ -134,7 +134,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             type="text"
             required
             defaultValue={invoice?.invoice_number ?? nextInvoiceNumber}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
           {!isEditing && <p className="mt-1 text-xs text-slate-400">Generado automáticamente</p>}
         </div>
@@ -143,7 +143,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
           <select
             name="status"
             defaultValue={invoice?.status ?? 'draft'}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="field-input"
           >
             <option value="draft">Borrador</option>
             <option value="sent">Enviada</option>
@@ -163,7 +163,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             type="date"
             required
             defaultValue={invoice?.date ?? new Date().toISOString().split('T')[0]}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
         <div>
@@ -172,7 +172,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             name="due_date"
             type="date"
             defaultValue={invoice?.due_date ?? ''}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
       </div>
@@ -188,7 +188,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             step="0.01"
             value={subtotal}
             onChange={(e) => setSubtotal(Number(e.target.value))}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
         <div>
@@ -200,7 +200,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             step="0.01"
             value={tax}
             onChange={(e) => setTax(Number(e.target.value))}
-            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
         <div>
@@ -218,7 +218,7 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
           name="notes"
           rows={2}
           defaultValue={invoice?.notes ?? ''}
-          className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="field-input resize-none"
           placeholder="Notas opcionales..."
         />
       </div>

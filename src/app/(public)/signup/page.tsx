@@ -38,7 +38,7 @@ export default function SignUpPage() {
             )}
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-2">
                 Nombre Completo
               </label>
               <input
@@ -52,7 +52,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email
               </label>
               <input
@@ -66,7 +66,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Contraseña
               </label>
               <input

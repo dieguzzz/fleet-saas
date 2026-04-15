@@ -27,18 +27,18 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
   const [state, formAction] = useActionState(createContact, initialState);
 
   return (
-    <form action={formAction} className="space-y-6 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5 max-w-2xl">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium text-slate-300">
+          <label htmlFor="name" className="text-sm font-medium text-slate-700">
             Nombre Completo *
           </label>
           <input
@@ -47,18 +47,18 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
             type="text"
             required
             placeholder="Ej. Juan Pérez"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="role" className="text-sm font-medium text-slate-300">
+          <label htmlFor="role" className="text-sm font-medium text-slate-700">
             Rol / Tipo
           </label>
           <select
             id="role"
             name="role"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           >
             <option value="">Seleccionar rol</option>
             <option value="driver">Conductor</option>
@@ -70,7 +70,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="company" className="text-sm font-medium text-slate-300">
+          <label htmlFor="company" className="text-sm font-medium text-slate-700">
             Empresa
           </label>
           <input
@@ -78,12 +78,12 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="company"
             type="text"
             placeholder="Ej. Transportes SA"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium text-slate-300">
+          <label htmlFor="email" className="text-sm font-medium text-slate-700">
             Email
           </label>
           <input
@@ -91,12 +91,12 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="email"
             type="email"
             placeholder="juan@ejemplo.com"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="phone" className="text-sm font-medium text-slate-300">
+          <label htmlFor="phone" className="text-sm font-medium text-slate-700">
             Teléfono
           </label>
           <input
@@ -104,12 +104,12 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="phone"
             type="tel"
             placeholder="+1 234 567 890"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="address" className="text-sm font-medium text-slate-300">
+          <label htmlFor="address" className="text-sm font-medium text-slate-700">
             Dirección
           </label>
           <input
@@ -117,20 +117,20 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
             name="address"
             type="text"
             placeholder="Calle Principal 123"
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-input"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="notes" className="text-sm font-medium text-slate-300">
+        <label htmlFor="notes" className="text-sm font-medium text-slate-700">
           Notas
         </label>
         <textarea
           id="notes"
           name="notes"
           rows={3}
-          className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input"
         />
       </div>
 
@@ -141,7 +141,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
           type="checkbox"
           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
         />
-        <label htmlFor="is_emergency" className="text-sm font-medium text-slate-300">
+        <label htmlFor="is_emergency" className="text-sm font-medium text-slate-700">
           Es contacto de emergencia
         </label>
       </div>
@@ -149,7 +149,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
       <div className="flex items-center gap-4 pt-4">
         <Link
           href={`/${orgSlug}/contacts`}
-          className="px-6 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
+          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
         >
           Cancelar
         </Link>
