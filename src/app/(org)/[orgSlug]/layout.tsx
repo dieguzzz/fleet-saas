@@ -88,14 +88,14 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   }, [orgSlug, setCurrentOrg, setUser, setOrganizations, setIsLoading]);
 
   return (
-    <div className={`min-h-screen bg-slate-100 ${isImpersonating ? 'pt-10' : ''}`}>
+    <div className={`h-screen flex flex-col bg-slate-100 overflow-hidden ${isImpersonating ? '' : ''}`}>
       <ImpersonationBanner />
-      <div className="flex h-screen lg:h-auto">
+      <div className="flex flex-1 min-h-0">
         <Sidebar
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
         />
-        <div className="flex-1 flex flex-col min-w-0 lg:h-screen lg:overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <Header onMenuToggle={() => setIsMobileMenuOpen((v) => !v)} />
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
             {children}
