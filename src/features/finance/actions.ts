@@ -53,7 +53,7 @@ export async function getInvoices(orgId: string) {
     return { error: error.message };
   }
 
-  return { data: data as Invoice[] };
+  return { data: data as unknown as Invoice[] };
 }
 
 export async function getInvoice(id: string, orgId: string) {
