@@ -193,3 +193,23 @@ CREATE POLICY "Users can insert own profile" ON profiles
 ```
 
 **Regla:** La tabla `profiles` necesita políticas para SELECT, INSERT y UPDATE del propio usuario. Verificar que existen al crear el schema inicial.
+
+---
+
+## REGLA 9 — Supabase joins con `as Invoice[]` requieren cast doble `as unknown as Type[]`
+
+**Error que ocurre:**
+```
+Type error: Conversion of type '{ ...; customer: { name: string } | null; }[]' to type 'Invoice[]' may be a mistake
+Types of property 'customer' are incompatible.
+Type '{ name: string; }' is missing the following properties from type 'Contact': id, organization_id, ...
+```
+
+**Causa:** Cuando se hace un join parcial en Supabase (ej. `.select('*, customer:contacts(name)')`), el tipo inferido por TypeScript es `{ name: string }`, pero el tipo local `Invoice` define `customer` como el tipo completo `Contact`. El cast directo `as Invoice[]` falla porque TypeScript detecta que los tipos no se solapan suficientemente.
+
+**Solución correcta:**
+```ts
+return { data: data as unknown as Invoice[] };
+```
+
+**Regla:** Cuando el resultado de una query Supabase con joins parciales se castea a un tipo local que tiene relaciones completas, usar siempre `as unknown as TipoLocal[]`. Nunca usar cast directo `as TipoLocal[]` si el join selecciona menos campos que el tipo completo.
