@@ -37,7 +37,7 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
   const [state, formAction] = useActionState(createMaintenanceRecord, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
@@ -46,7 +46,7 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-700">
             Vehículo *

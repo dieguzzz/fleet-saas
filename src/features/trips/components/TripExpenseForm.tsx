@@ -13,7 +13,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
   const [state, formAction, isPending] = useActionState(createTripExpense, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       <input type="hidden" name="tripId" value={tripId} />
       
@@ -23,7 +23,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label htmlFor="category" className="text-sm font-medium text-slate-700">
             Categoría *

@@ -27,7 +27,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
   const [state, formAction] = useActionState(createContact, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
@@ -36,7 +36,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label htmlFor="name" className="text-sm font-medium text-slate-700">
             Nombre Completo *

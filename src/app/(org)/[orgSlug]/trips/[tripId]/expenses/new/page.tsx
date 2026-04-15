@@ -8,15 +8,12 @@ export default async function NewTripExpensePage({
   const { orgSlug, tripId } = await params;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Registrar Gasto</h1>
-        <p className="text-slate-400">Añade un nuevo gasto a este viaje.</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl lg:text-2xl font-bold text-slate-800">Registrar Gasto</h1>
+        <p className="text-slate-500 text-sm mt-1">Añade un nuevo gasto a este viaje.</p>
       </div>
-      
-      <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
-        <TripExpenseForm orgSlug={orgSlug} tripId={tripId} />
-      </div>
+      <TripExpenseForm orgSlug={orgSlug} tripId={tripId} />
     </div>
   );
 }

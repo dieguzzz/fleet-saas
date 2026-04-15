@@ -36,7 +36,7 @@ export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsF
   const [state, formAction] = useActionState(updateOrganizationSettings, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5 max-w-2xl">
+    <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       
       {state?.error && (
