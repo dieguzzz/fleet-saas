@@ -173,7 +173,7 @@ export interface Invoice {
   customer_id: string | null;
   supplier_id: string | null;
   invoice_number: string;
-  invoice_type: string | null;
+  invoice_type: string;
   date: string;
   due_date: string | null;
   status: InvoiceStatus | null;
