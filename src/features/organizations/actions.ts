@@ -28,41 +28,22 @@ export async function createOrganization(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: 'Not authenticated' };
+    return { error: 'No autenticado. Por favor inicia sesión nuevamente.' };
   }
 
-  // Ensure profile exists (in case trigger didn't fire on signup)
-  await supabase.from('profiles').upsert({
-    id: user.id,
-    email: user.email!,
-    full_name: user.user_metadata?.full_name ?? '',
-  }, { onConflict: 'id' });
-
-  const { data: org, error: orgError } = await supabase
-    .from('organizations')
-    .insert({
-      name,
-      slug,
-      settings: {},
+  // Use SECURITY DEFINER function to bypass RLS for org creation
+  const { data, error } = await supabase
+    .rpc('create_organization_for_user', {
+      org_name: name,
+      org_slug: slug,
     })
-    .select()
     .single();
 
-  if (orgError) {
-    return { error: orgError.message };
+  if (error) {
+    return { error: error.message };
   }
 
-  const { error: memberError } = await supabase
-    .from('organization_members')
-    .insert({
-      organization_id: org.id,
-      user_id: user.id,
-      role: 'owner' as OrgRole,
-    });
-
-  if (memberError) {
-    return { error: memberError.message };
-  }
+  const org = data as { id: string; name: string; slug: string };
 
   revalidatePath('/', 'layout');
   return { success: true, slug: org.slug };
