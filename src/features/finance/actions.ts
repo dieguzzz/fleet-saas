@@ -4,6 +4,27 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
 import type { Invoice } from '@/types/database';
 
+export async function getNextInvoiceNumber(orgId: string): Promise<string> {
+  const supabase = await createClient();
+  const year = new Date().getFullYear();
+
+  const { data } = await supabase
+    .from('invoices')
+    .select('invoice_number')
+    .eq('organization_id', orgId)
+    .like('invoice_number', `INV-${year}-%`)
+    .order('invoice_number', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!data) return `INV-${year}-001`;
+
+  const parts = data.invoice_number.split('-');
+  const lastNum = parseInt(parts[parts.length - 1], 10);
+  const nextNum = isNaN(lastNum) ? 1 : lastNum + 1;
+  return `INV-${year}-${String(nextNum).padStart(3, '0')}`;
+}
+
 export async function getInvoices(orgId: string) {
   const supabase = await createClient();
 
