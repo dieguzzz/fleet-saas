@@ -823,11 +823,11 @@ export type Database = {
     }
     Functions: {
       create_organization_for_user: {
-        Args: { org_name: string; org_slug: string }
+        Args: { p_name: string; p_slug: string }
         Returns: {
-          id: string
-          name: string
-          slug: string
+          org_id: string
+          org_name: string
+          org_slug: string
         }[]
       }
       get_user_org_ids: { Args: never; Returns: string[] }

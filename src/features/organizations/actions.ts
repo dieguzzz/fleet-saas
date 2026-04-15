@@ -36,8 +36,8 @@ export async function createOrganization(_prevState: CreateOrgState, formData: F
   // Use SECURITY DEFINER function to bypass RLS for org creation
   const { data, error } = await supabase
     .rpc('create_organization_for_user', {
-      org_name: name,
-      org_slug: slug,
+      p_name: name,
+      p_slug: slug,
     })
     .single();
 
@@ -45,10 +45,10 @@ export async function createOrganization(_prevState: CreateOrgState, formData: F
     return { error: error.message };
   }
 
-  const org = data as { id: string; name: string; slug: string };
+  const org = data as { org_id: string; org_name: string; org_slug: string };
 
   revalidatePath('/', 'layout');
-  return { success: true, slug: org.slug };
+  return { success: true, slug: org.org_slug };
 }
 
 export async function updateOrganization(
