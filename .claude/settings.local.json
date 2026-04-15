@@ -16,7 +16,10 @@
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(cmd.exe /c \"node_modules\\\\.bin\\\\tsc --noEmit 2>&1\")",
       "mcp__supabase__get_logs",
-      "mcp__supabase__generate_typescript_types"
+      "mcp__supabase__generate_typescript_types",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   },
   "enableAllProjectMcpServers": true,
