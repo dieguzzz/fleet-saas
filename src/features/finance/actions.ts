@@ -36,7 +36,7 @@ export async function getInvoicesByType(orgId: string, type: 'cobro' | 'pago') {
     .order('date', { ascending: false });
 
   if (error) return { error: error.message };
-  return { data: data as Invoice[] };
+  return { data: data as unknown as Invoice[] };
 }
 
 export async function getInvoices(orgId: string) {
