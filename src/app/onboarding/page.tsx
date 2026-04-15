@@ -3,17 +3,12 @@
 import Link from 'next/link';
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createOrganization } from '@/features/organizations/actions';
-
-type State = { error?: string; success?: boolean; slug?: string } | null;
+import { createOrganization, type CreateOrgState } from '@/features/organizations/actions';
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState<State, FormData>(
-    async (_prev, formData) => {
-      const result = await createOrganization(formData);
-      return result;
-    },
+  const [state, formAction, pending] = useActionState<CreateOrgState, FormData>(
+    createOrganization,
     null
   );
 
