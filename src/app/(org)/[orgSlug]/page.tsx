@@ -47,22 +47,22 @@ async function DashboardStats({ orgSlug }: { orgSlug: string }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
       {statCards.map((stat) => (
         <Link
           key={stat.label}
           href={stat.href}
-          className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow active:scale-95"
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-3xl">{stat.icon}</span>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-2xl lg:text-3xl">{stat.icon}</span>
             <div
-              className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center text-white font-bold text-xl`}
+              className={`w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center text-white font-bold text-lg lg:text-xl`}
             >
               {stat.value}
             </div>
           </div>
-          <h3 className="text-slate-600 font-medium">{stat.label}</h3>
+          <h3 className="text-slate-600 font-medium text-sm lg:text-base">{stat.label}</h3>
         </Link>
       ))}
     </div>
@@ -71,7 +71,7 @@ async function DashboardStats({ orgSlug }: { orgSlug: string }) {
 
 function DashboardSkeleton() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
@@ -158,41 +158,29 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">
+        <h1 className="text-xl lg:text-2xl font-bold text-slate-800">
           Bienvenido a {org.name}
         </h1>
-        <p className="text-slate-500 mt-1">
+        <p className="text-slate-500 mt-1 text-sm">
           Resumen general de tu organización
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
-        <div className="md:col-span-4 bg-white p-6 rounded-lg shadow">
-          <h3 className="font-semibold mb-4">Actividad Reciente</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
+        <div className="lg:col-span-4 bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="font-semibold mb-4 text-slate-800">Actividad Reciente</h3>
           <div className="space-y-4">
-            <ActivityItem
-              title="Viaje completado: Ruta Norte"
-              time="Hace 2 horas"
-              type="success"
-            />
-            <ActivityItem
-              title="Mantenimiento requerido: Camión B-12"
-              time="Hace 5 horas"
-              type="warning"
-            />
-            <ActivityItem
-              title="Factura #INV-2024-001 pagada"
-              time="Hace 1 día"
-              type="success"
-            />
+            <ActivityItem title="Viaje completado: Ruta Norte" time="Hace 2 horas" type="success" />
+            <ActivityItem title="Mantenimiento requerido: Camión B-12" time="Hace 5 horas" type="warning" />
+            <ActivityItem title="Factura #INV-2024-001 pagada" time="Hace 1 día" type="success" />
           </div>
         </div>
-        <div className="md:col-span-3 bg-white p-6 rounded-lg shadow">
-          <h3 className="font-semibold mb-4">Acciones Rápidas</h3>
-          <div className="space-y-2">
+        <div className="lg:col-span-3 bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="font-semibold mb-4 text-slate-800">Acciones Rápidas</h3>
+          <div className="space-y-1">
             <QuickAction href={`/${orgSlug}/inventory/items`} label="Revisar Inventario" />
             <QuickAction href={`/${orgSlug}/contacts`} label="Agregar Contacto" />
             <QuickAction href={`/${orgSlug}/settings`} label="Configuración de Organización" />
