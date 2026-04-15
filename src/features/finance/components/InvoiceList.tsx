@@ -1,5 +1,6 @@
-import Link from 'next/link';
 import { getInvoicesByType } from '../actions';
+import Link from 'next/link';
+import { InvoiceRowActions } from './InvoiceRowActions';
 
 const STATUS_LABELS: Record<string, string> = {
   paid: 'Pagada',
@@ -61,7 +62,7 @@ export async function InvoiceList({ orgId, orgSlug, type }: InvoiceListProps) {
               </th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">Estado</th>
               <th className="text-right px-4 py-3 font-medium text-slate-600">Total</th>
-              <th className="text-right px-4 py-3 font-medium text-slate-600">Acciones</th>
+              <th className="text-right px-4 py-3 font-medium text-slate-600 w-28">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white">
@@ -72,12 +73,17 @@ export async function InvoiceList({ orgId, orgSlug, type }: InvoiceListProps) {
                 <tr key={invoice.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-slate-800">
                     {invoice.invoice_number}
+                    {invoice.attachment_url && (
+                      <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-blue-400 align-middle" title="Tiene adjunto" />
+                    )}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {new Date(invoice.date).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
-                    {(contact as { name: string } | null)?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                    {(contact as { name: string } | null)?.name || (
+                      <span className="text-slate-400 italic">Sin asignar</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${STATUS_STYLES[status] || STATUS_STYLES.draft}`}>
@@ -87,21 +93,14 @@ export async function InvoiceList({ orgId, orgSlug, type }: InvoiceListProps) {
                   <td className="px-4 py-3 text-right font-medium text-slate-800">
                     ${Number(invoice.total || 0).toFixed(2)}
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/${orgSlug}/finance/invoices/${invoice.id}`}
-                        className="text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 text-xs font-medium"
-                      >
-                        Ver
-                      </Link>
-                      <Link
-                        href={`/${orgSlug}/finance/invoices/${invoice.id}/edit`}
-                        className="text-slate-500 hover:text-slate-700 transition-colors px-2 py-1 rounded hover:bg-slate-100 text-xs font-medium"
-                      >
-                        Editar
-                      </Link>
-                    </div>
+                  <td className="px-4 py-3">
+                    <InvoiceRowActions
+                      invoiceId={invoice.id}
+                      orgId={orgId}
+                      orgSlug={orgSlug}
+                      attachmentUrl={invoice.attachment_url}
+                      invoiceType={invoice.invoice_type}
+                    />
                   </td>
                 </tr>
               );
@@ -119,7 +118,12 @@ export async function InvoiceList({ orgId, orgSlug, type }: InvoiceListProps) {
             <div key={invoice.id} className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-slate-800">{invoice.invoice_number}</p>
+                  <p className="font-semibold text-slate-800">
+                    {invoice.invoice_number}
+                    {invoice.attachment_url && (
+                      <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-blue-400 align-middle" title="Tiene adjunto" />
+                    )}
+                  </p>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {new Date(invoice.date).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </p>
@@ -130,23 +134,20 @@ export async function InvoiceList({ orgId, orgSlug, type }: InvoiceListProps) {
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-600">
-                  {(contact as { name: string } | null)?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                  {(contact as { name: string } | null)?.name || (
+                    <span className="text-slate-400 italic">Sin asignar</span>
+                  )}
                 </p>
                 <p className="font-bold text-slate-800">${Number(invoice.total || 0).toFixed(2)}</p>
               </div>
-              <div className="flex gap-2 pt-1 border-t border-slate-100">
-                <Link
-                  href={`/${orgSlug}/finance/invoices/${invoice.id}`}
-                  className="flex-1 text-center py-1.5 text-sm text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  Ver detalle
-                </Link>
-                <Link
-                  href={`/${orgSlug}/finance/invoices/${invoice.id}/edit`}
-                  className="flex-1 text-center py-1.5 text-sm text-slate-600 font-medium rounded-lg hover:bg-slate-100 transition-colors"
-                >
-                  Editar
-                </Link>
+              <div className="pt-1 border-t border-slate-100">
+                <InvoiceRowActions
+                  invoiceId={invoice.id}
+                  orgId={orgId}
+                  orgSlug={orgSlug}
+                  attachmentUrl={invoice.attachment_url}
+                  invoiceType={invoice.invoice_type}
+                />
               </div>
             </div>
           );
