@@ -213,3 +213,52 @@ return { data: data as unknown as Invoice[] };
 ```
 
 **Regla:** Cuando el resultado de una query Supabase con joins parciales se castea a un tipo local que tiene relaciones completas, usar siempre `as unknown as TipoLocal[]`. Nunca usar cast directo `as TipoLocal[]` si el join selecciona menos campos que el tipo completo.
+
+---
+
+## REGLA 10 — Siempre actualizar AMBOS archivos de tipos cuando cambia el schema de DB
+
+**Error que ocurre:**
+```
+Type error: Object literal may only specify known properties, and 'nombre_campo' does not exist in type 'CreateSomeInput'
+```
+
+**Causa:** El proyecto tiene DOS archivos de tipos:
+- `src/types/supabase.ts` — generado automáticamente con `mcp__supabase__generate_typescript_types`
+- `src/types/database.ts` — mantenido manualmente con interfaces como `Invoice`, `Contact`, etc.
+
+El código de negocio (actions, components) importa desde `@/types/database`. Si se agrega una columna nueva a la DB y solo se actualiza `supabase.ts`, el tipo en `database.ts` queda desactualizado y el build falla en Railway.
+
+**Ejemplo concreto:** Se agregó `invoice_type` a la tabla `invoices`. Se regeneró `supabase.ts` pero no se actualizó la interfaz `Invoice` en `database.ts`. Resultado: `'invoice_type' does not exist in type 'CreateInvoiceInput'`.
+
+**Solución correcta — al agregar una columna nueva:**
+1. Agregar la columna en Supabase con `mcp__supabase__apply_migration`
+2. Regenerar `src/types/supabase.ts` con `mcp__supabase__generate_typescript_types`
+3. **Agregar el campo también a la interfaz correspondiente en `src/types/database.ts`**
+
+**Regla:** Cualquier cambio de schema de DB requiere actualizar los DOS archivos: `supabase.ts` (auto-generado) Y `database.ts` (manual). Nunca actualizar solo uno de los dos.
+
+---
+
+## REGLA 11 — Railway: variables `NEXT_PUBLIC_*` deben declararse como ARG en el Dockerfile
+
+**Error que ocurre:** En producción la app no conecta a Supabase aunque las variables estén configuradas en Railway.
+
+**Causa:** Next.js embebe las variables `NEXT_PUBLIC_*` en el bundle al momento de `npm run build`. En Docker, las variables de entorno de Railway están disponibles en runtime pero NO durante el build del Dockerfile. Si el Dockerfile no declara `ARG` para esas variables antes de `RUN npm run build`, quedan vacías en el bundle.
+
+**Solución correcta en el Dockerfile:**
+```dockerfile
+# Declarar ARGs antes del build
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Pasar como ENV para que Next.js los tome durante el build
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+RUN npm run build
+```
+
+En Railway, configurar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` como variables de entorno del servicio (bajo Settings → Variables). Railway las inyecta como build args automáticamente si coinciden con los ARG del Dockerfile.
+
+**Regla:** Toda variable `NEXT_PUBLIC_*` usada en el código cliente DEBE tener su `ARG` + `ENV` correspondiente en el Dockerfile antes del `RUN npm run build`.
