@@ -22,6 +22,30 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
+  async function compressImage(file: File): Promise<File> {
+    const MAX_PX = 1920;
+    const QUALITY = 0.82;
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => resolve(blob ? new File([blob], file.name, { type: 'image/jpeg' }) : file),
+          'image/jpeg',
+          QUALITY
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
   async function handleFile(file: File) {
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) { setError('El archivo no puede superar 10 MB.'); return; }
@@ -33,12 +57,15 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
 
     try {
       const supabase = createClient();
-      const ext = file.name.split('.').pop();
+
+      // Comprimir imágenes antes de subir (fotos de celular pueden ser 5-8 MB)
+      const fileToUpload = file.type.startsWith('image/') ? await compressImage(file) : file;
+      const ext = file.type.startsWith('image/') ? 'jpg' : (file.name.split('.').pop() ?? 'pdf');
       const path = `${orgId}/invoices/${invoiceId}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('invoice-attachments')
-        .upload(path, file, { upsert: true });
+        .upload(path, fileToUpload, { upsert: true });
 
       if (uploadError) throw new Error(uploadError.message);
 
