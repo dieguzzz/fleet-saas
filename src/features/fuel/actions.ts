@@ -40,7 +40,7 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
   };
 
   const validated = fuelSchema.safeParse(raw);
-  if (!validated.success) return { error: validated.error.errors[0].message };
+  if (!validated.success) return { error: validated.error.issues[0].message };
 
   const { error } = await supabase.from('fuel_records').insert({
     organization_id: org.id,

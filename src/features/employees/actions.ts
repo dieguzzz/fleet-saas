@@ -40,7 +40,7 @@ export async function createEmployee(prevState: EmployeeFormState, formData: For
     notes: formData.get('notes') || undefined,
   });
 
-  if (!validated.success) return { error: validated.error.errors[0].message };
+  if (!validated.success) return { error: validated.error.issues[0].message };
 
   const { error } = await supabase.from('employees').insert({
     organization_id: org.id,
@@ -76,7 +76,7 @@ export async function updateEmployee(prevState: EmployeeFormState, formData: For
     notes: formData.get('notes') || undefined,
   });
 
-  if (!validated.success) return { error: validated.error.errors[0].message };
+  if (!validated.success) return { error: validated.error.issues[0].message };
 
   const { error } = await supabase.from('employees').update({
     ...validated.data,
