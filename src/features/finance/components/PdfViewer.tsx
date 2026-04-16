@@ -5,11 +5,11 @@ interface PdfViewerProps {
 }
 
 export function PdfViewer({ url }: PdfViewerProps) {
-  const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
+  const viewerUrl = `https://docs.google.com/gviewer?url=${encodeURIComponent(url)}&embedded=true`;
 
   return (
     <iframe
-      src={proxyUrl}
+      src={viewerUrl}
       title="Vista previa del PDF"
       className="w-full border-0"
       style={{ height: '700px' }}
