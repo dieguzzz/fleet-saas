@@ -200,19 +200,19 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
       </form>
 
-      <div className="h-full min-h-[400px] bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
-         <TripMap 
+      <div className="relative rounded-xl overflow-hidden border border-slate-700">
+         <TripMap
             interactive={!!selecting}
             origin={originCoords ? { ...originCoords, label: 'Origen Seleccionado' } : undefined}
             destination={destCoords ? { ...destCoords, label: 'Destino Seleccionado' } : undefined}
             onMapClick={(lat, lng) => {
               if (selecting) handleMapClick(selecting, lat, lng);
             }}
-            className="h-full w-full"
+            className="h-[450px] w-full"
          />
          {!selecting && !originCoords && !destCoords && (
-             <div className="p-4 text-sm text-slate-400 text-center">
-                 Selecciona &quot;Origen&quot; o &quot;Destino&quot; arriba y haz clic en el mapa para establecer la ubicación.
+             <div className="absolute bottom-0 left-0 right-0 p-3 text-sm text-slate-300 text-center bg-slate-900/70 backdrop-blur-sm">
+                 Seleccioná &quot;Origen&quot; o &quot;Destino&quot; arriba y hacé clic en el mapa para fijar la ubicación.
              </div>
          )}
       </div>

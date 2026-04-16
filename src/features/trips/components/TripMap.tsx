@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Map, MapTileLayer } from '@/components/ui/map';
@@ -63,20 +63,6 @@ export function TripMap({
     : destination
     ? [destination.lat, destination.lng]
     : defaultCenter;
-
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return (
-      <div className={`${className} bg-slate-900 animate-pulse flex items-center justify-center text-slate-500`}>
-        Cargando mapa...
-      </div>
-    );
-  }
 
   return (
     <Map
