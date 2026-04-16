@@ -156,6 +156,46 @@ export interface Contact {
   updated_at: string | null;
 }
 
+export type EmployeeStatus = 'active' | 'inactive' | 'on_leave';
+export type FuelType = 'diesel' | 'gasoline' | 'gasoil';
+
+export interface Employee {
+  id: string;
+  organization_id: string;
+  full_name: string;
+  position: string | null;
+  document_number: string | null;
+  phone: string | null;
+  email: string | null;
+  license_number: string | null;
+  license_expiry: string | null;
+  hire_date: string | null;
+  status: EmployeeStatus;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface FuelRecord {
+  id: string;
+  organization_id: string;
+  vehicle_id: string | null;
+  employee_id: string | null;
+  fuel_type: FuelType;
+  liters: number;
+  price_per_liter: number;
+  total_cost: number;
+  odometer: number | null;
+  station: string | null;
+  fuel_date: string;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  // Joined
+  vehicle?: Vehicle;
+  employee?: Employee;
+}
+
 export interface ImpersonationLog {
   id: string;
   super_admin_id: string;
@@ -334,6 +374,18 @@ export interface Database {
         Update: Partial<Omit<TripExpense, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
         Relationships: [];
       };
+      employees: {
+        Row: Employee;
+        Insert: Omit<Employee, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Employee, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
+        Relationships: [];
+      };
+      fuel_records: {
+        Row: FuelRecord;
+        Insert: Omit<FuelRecord, 'id' | 'created_at' | 'updated_at' | 'vehicle' | 'employee'>;
+        Update: Partial<Omit<FuelRecord, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'vehicle' | 'employee'>>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -361,6 +413,8 @@ export interface Database {
       vehicle_status: VehicleStatus;
       invoice_status: InvoiceStatus;
       inventory_movement_type: InventoryMovementType;
+      employee_status: EmployeeStatus;
+      fuel_type: FuelType;
     };
     CompositeTypes: Record<string, never>;
   };
