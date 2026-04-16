@@ -132,7 +132,7 @@ export async function updateInvoiceAttachmentUrl(id: string, orgId: string, url:
   return { success: true };
 }
 
-type InvoiceStatus = 'cancelled' | 'draft' | 'sent' | 'paid' | 'overdue';
+export type InvoiceStatus = 'cancelled' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export async function updateInvoiceStatus(id: string, orgId: string, status: InvoiceStatus) {
   const supabase = await createClient();
