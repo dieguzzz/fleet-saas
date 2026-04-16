@@ -10,6 +10,10 @@ function formatDate(dateStr: string) {
   return `${day}/${month}/${year}`;
 }
 
+function isPdf(url: string) {
+  return url.toLowerCase().includes('.pdf');
+}
+
 interface InvoiceItem {
   description: string;
   quantity: number;
@@ -24,20 +28,14 @@ interface Invoice {
   date: string;
   due_date: string | null;
   status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled' | null;
-  items: InvoiceItem[] | any[] | null;
+  items: InvoiceItem[] | null;
   subtotal: number | null;
   tax: number | null;
   total: number | null;
   notes: string | null;
   attachment_url: string | null;
-  customer: {
-    name: string;
-    email?: string | null;
-    address?: string | null;
-  } | null;
-  supplier: {
-    name: string;
-  } | null;
+  customer: { name: string; email?: string | null; address?: string | null } | null;
+  supplier: { name: string } | null;
 }
 
 interface InvoiceDetailProps {
@@ -45,38 +43,48 @@ interface InvoiceDetailProps {
   invoice: Invoice;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  paid: 'Pagada',
+  sent: 'Enviada',
+  overdue: 'Vencida',
+  draft: 'Borrador',
+  cancelled: 'Cancelada',
+};
+
+const STATUS_CLASSES: Record<string, string> = {
+  paid: 'bg-green-100 text-green-800',
+  sent: 'bg-blue-100 text-blue-800',
+  overdue: 'bg-red-100 text-red-800',
+  draft: 'bg-gray-100 text-gray-800',
+  cancelled: 'bg-yellow-100 text-yellow-800',
+};
+
 export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) {
-  const status = invoice.status || 'draft';
+  const status = invoice.status ?? 'draft';
   const [attachmentUrl, setAttachmentUrl] = useState<string | null>(invoice.attachment_url);
 
   return (
     <div className="max-w-4xl mx-auto py-8">
+      {/* Cabecera */}
       <div className="flex justify-between items-start mb-8">
-    
-    {/* ... (rest of component uses 'status' variable instead of invoice.status directly for badge logic) */}
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Factura {invoice.invoice_number}
           </h1>
-          <p className="text-slate-500">
-            Fecha: {formatDate(invoice.date)}
-          </p>
+          <p className="text-slate-500">Fecha: {formatDate(invoice.date)}</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <Link
             href={`/${orgSlug}/finance/invoices`}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors text-sm"
           >
             Volver
           </Link>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Descargar PDF
-          </button>
         </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        {/* Header Section */}
+        {/* Cliente / Estado */}
         <div className="p-8 border-b border-slate-200 flex justify-between">
           <div>
             <h2 className="text-sm font-semibold text-slate-500 uppercase mb-4">Cliente</h2>
@@ -92,20 +100,8 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
           </div>
           <div className="text-right">
             <h2 className="text-sm font-semibold text-slate-500 uppercase mb-4">Estado</h2>
-            <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold
-                ${status === 'paid' ? 'bg-green-100 text-green-800' : ''}
-                ${status === 'sent' ? 'bg-blue-100 text-blue-800' : ''}
-                ${status === 'overdue' ? 'bg-red-100 text-red-800' : ''}
-                ${status === 'draft' ? 'bg-gray-100 text-gray-800' : ''}
-                ${status === 'cancelled' ? 'bg-yellow-100 text-yellow-800' : ''}
-              `}
-            >
-              {status === 'paid' ? 'Pagada' :
-               status === 'sent' ? 'Enviada' :
-               status === 'overdue' ? 'Vencida' :
-               status === 'draft' ? 'Borrador' :
-               status === 'cancelled' ? 'Cancelada' : status}
+            <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${STATUS_CLASSES[status] ?? 'bg-gray-100 text-gray-800'}`}>
+              {STATUS_LABELS[status] ?? status}
             </span>
             {invoice.due_date && (
               <p className="text-slate-500 mt-2 text-sm">
@@ -115,7 +111,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
           </div>
         </div>
 
-        {/* Items Table */}
+        {/* Items */}
         <div className="p-8">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -127,12 +123,14 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {(!invoice.items || invoice.items.length === 0) ? (
-                 <tr>
-                   <td colSpan={4} className="py-4 text-center text-slate-500 italic">No hay ítems registrados</td>
-                 </tr>
+              {!invoice.items || invoice.items.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-4 text-center text-slate-500 italic">
+                    No hay ítems registrados
+                  </td>
+                </tr>
               ) : (
-                (invoice.items as InvoiceItem[]).map((item, idx) => (
+                invoice.items.map((item, idx) => (
                   <tr key={idx}>
                     <td className="py-4 px-4 text-slate-800">{item.description}</td>
                     <td className="py-4 px-4 text-slate-800 text-right">{item.quantity}</td>
@@ -145,54 +143,51 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
           </table>
         </div>
 
-        {/* Totals */}
+        {/* Totales */}
         <div className="p-8 bg-slate-50 border-t border-slate-200 flex justify-end">
           <div className="w-64 space-y-3">
             <div className="flex justify-between text-slate-600">
               <span>Subtotal:</span>
-              <span>${Number(invoice.subtotal).toFixed(2)}</span>
+              <span>${Number(invoice.subtotal ?? 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Impuestos:</span>
-              <span>${Number(invoice.tax).toFixed(2)}</span>
+              <span>${Number(invoice.tax ?? 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-900 font-bold text-lg pt-3 border-t border-slate-300">
               <span>Total:</span>
-              <span>${Number(invoice.total).toFixed(2)}</span>
+              <span>${Number(invoice.total ?? 0).toFixed(2)}</span>
             </div>
           </div>
         </div>
 
-        {/* Attachment */}
-        <div className="p-8 border-t border-slate-200">
+        {/* Adjunto */}
+        <div className="p-8 border-t border-slate-200 space-y-4">
           <InvoiceAttachment
             invoiceId={invoice.id}
             orgId={invoice.organization_id}
             currentUrl={attachmentUrl}
             onUploaded={(url) => setAttachmentUrl(url)}
           />
+
           {attachmentUrl && (
-            <div className="mt-4">
-              {attachmentUrl.match(/\.(jpg|jpeg|png|webp)$/i) ? (
-                <img
-                  src={attachmentUrl}
-                  alt="Adjunto de factura"
-                  className="w-full rounded-lg border border-slate-200 object-contain max-h-[600px]"
-                />
-              ) : (
-                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+            <div className="rounded-xl border border-slate-200 overflow-hidden">
+              {isPdf(attachmentUrl) ? (
+                <>
                   <div className="flex items-center justify-between px-4 py-2 bg-slate-100 border-b border-slate-200">
-                    <span className="text-xs text-slate-500 font-medium">Vista previa del PDF</span>
-                    <a
-                      href={attachmentUrl}
-                      download
-                      className="text-xs text-blue-600 hover:underline"
-                    >
+                    <span className="text-xs font-medium text-slate-500">Vista previa del PDF</span>
+                    <a href={attachmentUrl} download className="text-xs text-blue-600 hover:underline">
                       Descargar
                     </a>
                   </div>
                   <PdfViewer url={attachmentUrl} />
-                </div>
+                </>
+              ) : (
+                <img
+                  src={attachmentUrl}
+                  alt="Adjunto de factura"
+                  className="w-full object-contain max-h-[600px]"
+                />
               )}
             </div>
           )}

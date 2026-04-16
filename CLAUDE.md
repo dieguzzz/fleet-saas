@@ -262,3 +262,100 @@ RUN npm run build
 En Railway, configurar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` como variables de entorno del servicio (bajo Settings → Variables). Railway las inyecta como build args automáticamente si coinciden con los ARG del Dockerfile.
 
 **Regla:** Toda variable `NEXT_PUBLIC_*` usada en el código cliente DEBE tener su `ARG` + `ENV` correspondiente en el Dockerfile antes del `RUN npm run build`.
+
+---
+
+## REGLA 12 — Supabase Storage: subida y visualización de archivos adjuntos
+
+### Upload desde el cliente (Client Component)
+
+```ts
+const supabase = createClient(); // @/services/supabase/client — usa sesión del cookie
+const path = `${orgId}/carpeta/${itemId}.${ext}`;
+
+const { error } = await supabase.storage
+  .from('nombre-bucket')
+  .upload(path, file, { upsert: true });
+
+const { data } = supabase.storage.from('nombre-bucket').getPublicUrl(path);
+// Guardar data.publicUrl en la DB via server action
+```
+
+**Políticas RLS necesarias en storage.objects:**
+- `INSERT` — `with_check`: verifica que `(storage.foldername(name))[1]` (primer segmento del path) sea un org_id al que pertenece el usuario
+- `UPDATE` — igual que INSERT
+- `SELECT` — público (si el bucket es público)
+
+**Regla:** El primer segmento del path SIEMPRE debe ser el `organization_id` del usuario para que las políticas RLS puedan verificarlo.
+
+### Visualización de PDFs en el browser (sin abrir Adobe)
+
+Supabase Storage envía el header `X-Frame-Options: SAMEORIGIN`, lo que bloquea cargar la URL directamente en un `<iframe>`. La solución correcta es:
+
+1. Hacer `fetch()` de la URL pública en el cliente
+2. Crear un `Blob` con el buffer y `type: 'application/pdf'`
+3. Crear una blob URL con `URL.createObjectURL(blob)`
+4. Renderizar con `<object data={blobUrl} type="application/pdf">`
+
+```tsx
+// PdfViewer.tsx
+useEffect(() => {
+  fetch(url)
+    .then(res => res.arrayBuffer())
+    .then(buffer => {
+      const blob = new Blob([buffer], { type: 'application/pdf' });
+      const objectUrl = URL.createObjectURL(blob);
+      blobRef.current = objectUrl;
+      setBlobUrl(objectUrl);
+    })
+    .catch(() => setStatus('error'));
+
+  return () => {
+    // Delay la revocación para que el <object> termine de leer el blob
+    const current = blobRef.current;
+    if (current) setTimeout(() => URL.revokeObjectURL(current), 5000);
+  };
+}, [url]);
+
+return <object data={blobUrl} type="application/pdf" style={{ height: '640px' }} className="w-full" />;
+```
+
+**Usar `<object>` en lugar de `<iframe>` o `<embed>`** — mejor compatibilidad entre Chrome, Firefox y Edge para PDFs, y permite poner contenido fallback dentro del tag.
+
+**NO revocar el blob URL inmediatamente** en el cleanup del useEffect — el `<object>` todavía lo está leyendo. Usar un `setTimeout` de al menos 5 segundos.
+
+### Estado inicial en componentes de adjunto
+
+**Error:** Inicializar `preview` state con la URL del adjunto existente y luego renderizarla como `<img>` — si es un PDF, muestra imagen rota.
+
+**Solución correcta:**
+```tsx
+// NO hacer esto:
+const [preview, setPreview] = useState<string | null>(currentUrl);
+// ...
+{preview && <img src={preview} />}  // ← roto si preview es una URL de PDF
+
+// SÍ hacer esto: separar la indicación de adjunto existente del preview de imagen
+const hasAttachment = !!currentUrl;
+// Solo mostrar <img> si se acaba de subir una imagen
+const [imagePreview, setImagePreview] = useState<string | null>(null);
+```
+
+### React error #418 (hydration mismatch)
+
+El error `Minified React error #418` con `args[]=text&args[]=` en producción es casi siempre causado por **extensiones del browser** (Grammarly, Google Translate, ad blockers) que modifican el DOM antes de que React hidrate.
+
+**No es un bug del código.** Para confirmar: abrir la misma página en modo Incógnito sin extensiones — el error desaparece.
+
+Causas reales de #418 en el código:
+- `new Date().toLocaleDateString()` — locale diferente entre server (Node.js) y cliente (browser)
+- `new Date()` en `defaultValue` de inputs — puede dar fecha diferente si se renderiza justo a medianoche
+- Comentarios JSX `{/* */}` dentro de elementos flex no causan el error (son válidos)
+
+**Solución para fechas:** usar formato fijo sin locale:
+```ts
+function formatDate(dateStr: string) {
+  const [year, month, day] = dateStr.split('T')[0].split('-');
+  return `${day}/${month}/${year}`;
+}
+```
