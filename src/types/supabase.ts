@@ -70,6 +70,65 @@ export type Database = {
           },
         ]
       }
+      employees: {
+        Row: {
+          created_at: string | null
+          document_number: string | null
+          email: string | null
+          full_name: string
+          hire_date: string | null
+          id: string
+          license_expiry: string | null
+          license_number: string | null
+          notes: string | null
+          organization_id: string
+          phone: string | null
+          position: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_number?: string | null
+          email?: string | null
+          full_name: string
+          hire_date?: string | null
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string | null
+          organization_id: string
+          phone?: string | null
+          position?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_number?: string | null
+          email?: string | null
+          full_name?: string
+          hire_date?: string | null
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string | null
+          organization_id?: string
+          phone?: string | null
+          position?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_transactions: {
         Row: {
           amount: number
@@ -132,6 +191,79 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fuel_records: {
+        Row: {
+          created_at: string | null
+          employee_id: string | null
+          fuel_date: string
+          fuel_type: string
+          id: string
+          liters: number
+          notes: string | null
+          odometer: number | null
+          organization_id: string
+          price_per_liter: number
+          station: string | null
+          total_cost: number
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          employee_id?: string | null
+          fuel_date?: string
+          fuel_type?: string
+          id?: string
+          liters: number
+          notes?: string | null
+          odometer?: number | null
+          organization_id: string
+          price_per_liter: number
+          station?: string | null
+          total_cost: number
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          employee_id?: string | null
+          fuel_date?: string
+          fuel_type?: string
+          id?: string
+          liters?: number
+          notes?: string | null
+          odometer?: number | null
+          organization_id?: string
+          price_per_liter?: number
+          station?: string | null
+          total_cost?: number
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_records_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
