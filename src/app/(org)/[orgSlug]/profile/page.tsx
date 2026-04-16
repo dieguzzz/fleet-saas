@@ -3,10 +3,8 @@
 import { useActionState } from 'react';
 import { updateProfile } from '@/features/auth/actions';
 
-const initialState = { error: '', success: false };
-
 export default function ProfilePage() {
-  const [state, formAction, isPending] = useActionState(updateProfile, initialState);
+  const [state, formAction, isPending] = useActionState(updateProfile, null);
 
   return (
     <div className="max-w-lg space-y-6">
