@@ -3,6 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { InvoiceAttachment } from './InvoiceAttachment';
+import { PdfViewer } from './PdfViewer';
+
+function formatDate(dateStr: string) {
+  const [year, month, day] = dateStr.split('T')[0].split('-');
+  return `${day}/${month}/${year}`;
+}
 
 interface InvoiceItem {
   description: string;
@@ -53,7 +59,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
             Factura {invoice.invoice_number}
           </h1>
           <p className="text-slate-500">
-            Fecha: {new Date(invoice.date).toLocaleDateString()}
+            Fecha: {formatDate(invoice.date)}
           </p>
         </div>
         <div className="flex gap-4">
@@ -103,7 +109,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
             </span>
             {invoice.due_date && (
               <p className="text-slate-500 mt-2 text-sm">
-                Vence: {new Date(invoice.due_date).toLocaleDateString()}
+                Vence: {formatDate(invoice.due_date)}
               </p>
             )}
           </div>
@@ -185,12 +191,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
                       Descargar
                     </a>
                   </div>
-                  <iframe
-                    src={attachmentUrl}
-                    title="Vista previa de factura"
-                    className="w-full"
-                    style={{ height: '600px' }}
-                  />
+                  <PdfViewer url={attachmentUrl} />
                 </div>
               )}
             </div>
