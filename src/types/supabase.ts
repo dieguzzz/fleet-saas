@@ -371,6 +371,32 @@ export type Database = {
           },
         ]
       }
+      invoice_counters: {
+        Row: {
+          last_number: number
+          organization_id: string
+          year: number
+        }
+        Insert: {
+          last_number?: number
+          organization_id: string
+          year: number
+        }
+        Update: {
+          last_number?: number
+          organization_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_counters_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           attachment_url: string | null
@@ -833,6 +859,7 @@ export type Database = {
           org_slug: string
         }[]
       }
+      get_next_invoice_number: { Args: { org_id: string }; Returns: string }
       get_user_org_ids: { Args: never; Returns: string[] }
       has_org_role: {
         Args: {
