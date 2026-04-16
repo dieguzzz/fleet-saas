@@ -363,3 +363,143 @@ function formatDate(dateStr: string) {
   return `${day}/${month}/${year}`;
 }
 ```
+
+---
+
+## REGLA 13 — `useActionState`: el `initialState` debe ser `null`, no un objeto con campos opcionales
+
+**Error que ocurre:**
+```
+Type error: No overload matches this call.
+Argument of type '{ error: string; success: boolean; }' is not assignable to parameter of type
+'{ error: string; success?: undefined; } | { success: boolean; error?: undefined; }'
+```
+
+**Causa:** Cuando una server action retorna un tipo union discriminado como `{ error: string } | { success: boolean }`, TypeScript infiere que los dos campos nunca coexisten. Un `initialState = { error: '', success: false }` tiene ambos campos simultáneamente, lo que no es compatible con ninguna de las ramas del union.
+
+**Solución correcta — usar `null` como initialState:**
+```tsx
+// MAL:
+const initialState = { error: '', success: false };
+const [state, formAction, isPending] = useActionState(miAction, initialState);
+
+// BIEN:
+const [state, formAction, isPending] = useActionState(miAction, null);
+
+// Y en el JSX usar optional chaining:
+{state?.error && <p>{state.error}</p>}
+{state?.success && <p>¡Éxito!</p>}
+```
+
+**Afecta a:** `forgot-password/page.tsx`, `reset-password/page.tsx`, `profile/page.tsx` — cualquier página que use `useActionState` con una action que retorna union discriminado.
+
+**Regla:** Siempre usar `null` como `initialState` en `useActionState`. Nunca pasar un objeto con campos de distintas ramas del union type de la action.
+
+---
+
+## REGLA 14 — Middleware: el matcher debe excluir todos los archivos estáticos de `public/`
+
+**Error que ocurre:**
+```
+Setting up fake worker failed: "Failed to fetch dynamically imported module: /pdf.worker.min.mjs"
+The server responded with a non-JavaScript MIME type of "text/html".
+```
+
+**Causa:** El matcher del middleware captura rutas que coinciden con nombres de archivos estáticos (ej. `/pdf.worker.min.mjs`). La regex `^\/([^\/]+)` captura `"pdf.worker.min.mjs"` como `orgSlug`, no encuentra membership, y redirige a `/unauthorized` devolviendo HTML en lugar del archivo JS.
+
+**Solución correcta — matcher en `src/middleware.ts`:**
+```ts
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mjs|js|css|map|woff|woff2|ttf|otf|ico)$).*)',
+  ],
+};
+```
+
+Extensiones que DEBEN estar excluidas: `svg`, `png`, `jpg`, `jpeg`, `gif`, `webp`, `mjs`, `js`, `css`, `map`, `woff`, `woff2`, `ttf`, `otf`, `ico`.
+
+**Regla:** Cada vez que se agrega un archivo a `public/` con una extensión nueva (ej. `.wasm`, `.json`), agregar esa extensión al matcher del middleware.
+
+---
+
+## REGLA 15 — Zod: usar `.issues` en lugar de `.errors` sobre `ZodError`
+
+**Error que ocurre:**
+```
+Type error: Property 'errors' does not exist on type 'ZodError<...>'
+```
+
+**Causa:** `ZodError` tiene `.issues` como propiedad tipada en TypeScript. `.errors` existe en runtime (es un alias) pero **no está en la definición de tipos** de Zod, por lo que TypeScript strict lo rechaza en el build.
+
+**Solución correcta:**
+```ts
+// MAL:
+if (!validated.success) return { error: validated.error.errors[0].message };
+
+// BIEN:
+if (!validated.success) return { error: validated.error.issues[0].message };
+```
+
+**Regla:** Siempre usar `.issues[0].message` (o `.flatten()`) para acceder a los errores de Zod. Nunca usar `.errors`.
+
+---
+
+## REGLA 16 — Nuevos módulos: checklist de archivos a crear/actualizar
+
+Al crear un módulo nuevo (ej. `employees`, `fuel`), estos son los archivos que SIEMPRE hay que tocar:
+
+### DB
+1. `mcp__supabase__apply_migration` — crear tabla con RLS usando `get_user_org_ids()`
+2. `mcp__supabase__generate_typescript_types` → reemplazar `src/types/supabase.ts`
+3. `src/types/database.ts` — agregar interface y entrada en `Database.public.Tables`
+
+### Feature
+4. `src/features/<módulo>/actions.ts` — server actions con Zod (usar `.issues`, no `.errors`)
+5. `src/features/<módulo>/components/` — componentes de lista y formulario
+
+### Pages
+6. `src/app/(org)/[orgSlug]/<módulo>/page.tsx` — página principal
+7. `src/app/(org)/[orgSlug]/<módulo>/new/page.tsx` — si aplica
+8. `src/app/(org)/[orgSlug]/<módulo>/[id]/edit/page.tsx` — si aplica
+
+### Navegación
+9. `src/components/layout/sidebar.tsx` — agregar entrada al nav
+
+### Formularios
+- Usar `useActionState(action, null)` — initialState siempre `null`
+- Usar `state?.error` con optional chaining
+- En actions: `validated.error.issues[0].message`
+
+---
+
+## REGLA 17 — Leaflet / Mapas: siempre usar altura en píxeles explícita
+
+**Error que ocurre:** El mapa no se renderiza o aparece con altura 0.
+
+**Causa:** Leaflet necesita que el contenedor del mapa tenga una altura concreta en píxeles en el momento del montaje. Usar `h-full` en un contenedor cuya altura depende del contenido (CSS grid/flex sin altura definida en el padre) crea una referencia circular: el mapa no tiene altura → el contenedor tampoco → Leaflet renderiza con 0px.
+
+**Solución correcta:**
+```tsx
+// MAL — h-full sin padre con altura fija:
+<TripMap className="h-full w-full" />
+
+// BIEN — altura explícita en píxeles:
+<TripMap className="h-[450px] w-full" />
+```
+
+**Regla:** Cualquier componente que use Leaflet (o cualquier biblioteca de mapas) debe tener su altura definida con un valor fijo en px o rem, nunca con `h-full` a menos que todos sus ancestros tengan alturas explícitas.
+
+---
+
+## REGLA 18 — PWA: manifest.json debe tener line endings LF (no CRLF)
+
+**Error que ocurre:** El browser reporta error al parsear el manifest o lo ignora silenciosamente en producción.
+
+**Causa:** En Windows, archivos creados con `echo` o editores con configuración CRLF quedan con `\r\n`. Algunos parsers de JSON en browsers móviles o en el build de Next.js fallan con CRLF en archivos de `public/`.
+
+**Solución correcta:** Crear el archivo con `printf` en bash (que usa LF) o verificar que el archivo tenga LF antes de hacer commit:
+```bash
+file public/manifest.json  # debe decir "ASCII text" no "with CRLF line terminators"
+```
+
+**Regla:** Los archivos en `public/` (manifest.json, sw.js, etc.) deben tener LF. Configurar `.gitattributes` si es necesario para forzar LF en esos archivos.
