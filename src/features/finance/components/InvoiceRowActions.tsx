@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteInvoice, updateInvoiceStatus } from '../actions';
+import { deleteInvoice, updateInvoiceStatus, type InvoiceStatus } from '../actions';
 
 interface InvoiceRowActionsProps {
   invoiceId: string;
@@ -38,7 +38,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
   async function handleStatusChange(newStatus: string) {
     if (newStatus === status) return;
     setUpdatingStatus(true);
-    const result = await updateInvoiceStatus(invoiceId, orgId, newStatus);
+    const result = await updateInvoiceStatus(invoiceId, orgId, newStatus as InvoiceStatus);
     if (result.error) {
       alert('Error al cambiar estado: ' + result.error);
     } else {
