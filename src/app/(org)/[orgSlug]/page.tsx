@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { getOrganization, getOrganizationStats } from '@/features/organizations/queries';
+import { getFinanceKPIs } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
 
 interface DashboardPageProps {
@@ -34,6 +35,29 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
           </div>
           <h3 className="text-slate-600 font-medium text-sm lg:text-base">{stat.label}</h3>
         </Link>
+      ))}
+    </div>
+  );
+}
+
+async function FinanceKPIs({ orgId }: { orgId: string }) {
+  const kpis = await getFinanceKPIs(orgId);
+  const cards = [
+    { label: 'Ingresos del mes', value: `$${kpis.monthlyIncome.toFixed(2)}`, color: 'text-green-600', bg: 'bg-green-50', icon: '📈' },
+    { label: 'Gastos del mes', value: `$${kpis.monthlyExpenses.toFixed(2)}`, color: 'text-red-600', bg: 'bg-red-50', icon: '📉' },
+    { label: 'Facturas vencidas', value: String(kpis.overdueInvoices), color: kpis.overdueInvoices > 0 ? 'text-orange-600' : 'text-slate-500', bg: kpis.overdueInvoices > 0 ? 'bg-orange-50' : 'bg-slate-50', icon: '⚠️' },
+    { label: 'Por cobrar', value: `$${kpis.pendingReceivables.toFixed(2)}`, color: 'text-blue-600', bg: 'bg-blue-50', icon: '🕐' },
+  ];
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {cards.map((c) => (
+        <div key={c.label} className={`${c.bg} rounded-xl p-4 flex items-center gap-3`}>
+          <span className="text-2xl">{c.icon}</span>
+          <div className="min-w-0">
+            <p className={`text-lg font-bold ${c.color} truncate`}>{c.value}</p>
+            <p className="text-xs text-slate-500 truncate">{c.label}</p>
+          </div>
+        </div>
       ))}
     </div>
   );
@@ -161,6 +185,10 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
 
       <Suspense fallback={<StatsSkeleton />}>
         <DashboardStats orgSlug={orgSlug} orgId={org.id} />
+      </Suspense>
+
+      <Suspense fallback={<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />)}</div>}>
+        <FinanceKPIs orgId={org.id} />
       </Suspense>
 
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">

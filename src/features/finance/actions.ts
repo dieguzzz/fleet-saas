@@ -132,6 +132,18 @@ export async function updateInvoiceAttachmentUrl(id: string, orgId: string, url:
   return { success: true };
 }
 
+export async function updateInvoiceStatus(id: string, orgId: string, status: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('invoices')
+    .update({ status })
+    .eq('id', id)
+    .eq('organization_id', orgId);
+  if (error) return { error: error.message };
+  revalidatePath('/[orgSlug]/finance/invoices', 'page');
+  return { success: true };
+}
+
 export async function deleteInvoice(id: string, orgId: string) {
   const supabase = await createClient();
 
@@ -148,6 +160,28 @@ export async function deleteInvoice(id: string, orgId: string) {
 
   revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { success: true };
+}
+
+export async function getFinanceKPIs(orgId: string) {
+  const supabase = await createClient();
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+  const [{ data: income }, { data: expenses }, { count: overdueCount }, { data: pending }] =
+    await Promise.all([
+      supabase.from('financial_transactions').select('amount').eq('organization_id', orgId).eq('type', 'income').gte('transaction_date', firstDay).lte('transaction_date', lastDay),
+      supabase.from('financial_transactions').select('amount').eq('organization_id', orgId).eq('type', 'expense').gte('transaction_date', firstDay).lte('transaction_date', lastDay),
+      supabase.from('invoices').select('*', { count: 'exact', head: true }).eq('organization_id', orgId).eq('status', 'overdue'),
+      supabase.from('invoices').select('total').eq('organization_id', orgId).in('status', ['sent', 'draft']).eq('invoice_type', 'cobro'),
+    ]);
+
+  return {
+    monthlyIncome: (income ?? []).reduce((s, t) => s + Number(t.amount), 0),
+    monthlyExpenses: (expenses ?? []).reduce((s, t) => s + Number(t.amount), 0),
+    overdueInvoices: overdueCount ?? 0,
+    pendingReceivables: (pending ?? []).reduce((s, inv) => s + Number(inv.total ?? 0), 0),
+  };
 }
 
 // Transaction Actions

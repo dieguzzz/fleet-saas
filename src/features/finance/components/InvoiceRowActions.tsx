@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteInvoice } from '../actions';
+import { deleteInvoice, updateInvoiceStatus } from '../actions';
 
 interface InvoiceRowActionsProps {
   invoiceId: string;
@@ -10,11 +10,43 @@ interface InvoiceRowActionsProps {
   orgSlug: string;
   attachmentUrl: string | null;
   invoiceType: string;
+  currentStatus: string;
 }
 
-export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, invoiceType }: InvoiceRowActionsProps) {
+const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Borrador' },
+  { value: 'sent', label: 'Enviada' },
+  { value: 'paid', label: 'Pagada' },
+  { value: 'overdue', label: 'Vencida' },
+  { value: 'cancelled', label: 'Cancelada' },
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  paid: 'text-green-700 bg-green-50 ring-green-600/20',
+  sent: 'text-blue-700 bg-blue-50 ring-blue-700/10',
+  overdue: 'text-red-700 bg-red-50 ring-red-600/10',
+  draft: 'text-gray-600 bg-gray-50 ring-gray-500/10',
+  cancelled: 'text-yellow-800 bg-yellow-50 ring-yellow-600/20',
+};
+
+export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, invoiceType, currentStatus }: InvoiceRowActionsProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [status, setStatus] = useState(currentStatus || 'draft');
+
+  async function handleStatusChange(newStatus: string) {
+    if (newStatus === status) return;
+    setUpdatingStatus(true);
+    const result = await updateInvoiceStatus(invoiceId, orgId, newStatus);
+    if (result.error) {
+      alert('Error al cambiar estado: ' + result.error);
+    } else {
+      setStatus(newStatus);
+      router.refresh();
+    }
+    setUpdatingStatus(false);
+  }
 
   async function handleDelete() {
     if (!confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.')) return;
@@ -28,10 +60,20 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
     }
   }
 
-  const tab = invoiceType === 'pago' ? 'pagos' : 'cobros';
-
   return (
     <div className="flex items-center justify-end gap-1">
+      {/* Status selector */}
+      <select
+        value={status}
+        onChange={(e) => handleStatusChange(e.target.value)}
+        disabled={updatingStatus}
+        className={`text-xs font-semibold rounded-full px-2 py-0.5 ring-1 ring-inset border-none outline-none cursor-pointer disabled:opacity-50 ${STATUS_COLORS[status] ?? STATUS_COLORS.draft}`}
+      >
+        {STATUS_OPTIONS.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+
       {/* Ver adjunto */}
       {attachmentUrl ? (
         <a
@@ -47,7 +89,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
           </svg>
         </a>
       ) : (
-        <span title="Sin adjunto" className="p-1.5 rounded-lg text-slate-200 cursor-not-allowed">
+        <span className="p-1.5 rounded-lg text-slate-200 cursor-not-allowed">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
