@@ -74,6 +74,57 @@ export async function login(prevState: unknown, formData: FormData) {
   redirect('/onboarding');
 }
 
+export async function forgotPassword(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get('email') as string;
+  if (!email) return { error: 'Ingresá tu email.' };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/auth/callback?next=/reset-password`,
+  });
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function resetPassword(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const password = formData.get('password') as string;
+  const confirm = formData.get('confirm') as string;
+
+  if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.' };
+  if (password !== confirm) return { error: 'Las contraseñas no coinciden.' };
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+export async function updateProfile(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const fullName = formData.get('fullName') as string;
+  const newPassword = formData.get('newPassword') as string;
+  const confirm = formData.get('confirm') as string;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado.' };
+
+  if (newPassword) {
+    if (newPassword.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.' };
+    if (newPassword !== confirm) return { error: 'Las contraseñas no coinciden.' };
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) return { error: error.message };
+  }
+
+  if (fullName) {
+    const { error } = await supabase.from('profiles').update({ full_name: fullName }).eq('id', user.id);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath('/', 'layout');
+  return { success: true };
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

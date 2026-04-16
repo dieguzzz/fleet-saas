@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const publicRoutes = ['/', '/login', '/signup', '/invite'];
+const publicRoutes = ['/', '/login', '/signup', '/invite', '/forgot-password', '/reset-password'];
 
 // Routes that require super_admin
 const adminRoutes = ['/admin'];
