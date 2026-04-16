@@ -9,12 +9,11 @@ import type { Invoice } from '@/types/database';
 interface InvoiceFormProps {
   orgId: string;
   orgSlug: string;
-  nextInvoiceNumber?: string;
   invoiceType: 'cobro' | 'pago';
   invoice?: Invoice;
 }
 
-export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, invoice }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,14 +118,19 @@ export function InvoiceForm({ orgId, orgSlug, nextInvoiceNumber, invoiceType, in
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="field-label">Número de Factura</label>
-                <input
-                  name="invoice_number"
-                  type="text"
-                  required
-                  defaultValue={invoice?.invoice_number ?? nextInvoiceNumber}
-                  className="field-input"
-                />
-                {!isEditing && <p className="mt-1 text-xs text-slate-400">Generado automáticamente</p>}
+                {isEditing ? (
+                  <input
+                    name="invoice_number"
+                    type="text"
+                    required
+                    defaultValue={invoice?.invoice_number}
+                    className="field-input"
+                  />
+                ) : (
+                  <div className="field-input bg-slate-50 text-slate-400 cursor-not-allowed select-none">
+                    Se generará automáticamente
+                  </div>
+                )}
               </div>
               <div>
                 <label className="field-label">Estado</label>

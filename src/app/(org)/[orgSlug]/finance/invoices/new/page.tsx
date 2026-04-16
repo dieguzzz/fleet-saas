@@ -1,6 +1,5 @@
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm';
 import { getOrganization } from '@/features/organizations/queries';
-import { getNextInvoiceNumber } from '@/features/finance/actions';
 import { notFound } from 'next/navigation';
 
 export default async function NewInvoicePage({
@@ -17,8 +16,6 @@ export default async function NewInvoicePage({
   const org = await getOrganization(orgSlug);
   if (!org) notFound();
 
-  const nextInvoiceNumber = await getNextInvoiceNumber(org.id);
-
   return (
     <div className="space-y-6">
       <h1 className="text-xl lg:text-2xl font-bold tracking-tight text-slate-800">
@@ -27,7 +24,6 @@ export default async function NewInvoicePage({
       <InvoiceForm
         orgId={org.id}
         orgSlug={orgSlug}
-        nextInvoiceNumber={nextInvoiceNumber}
         invoiceType={invoiceType as 'cobro' | 'pago'}
       />
     </div>

@@ -4,26 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
 import type { Invoice } from '@/types/database';
 
-export async function getNextInvoiceNumber(orgId: string): Promise<string> {
-  const supabase = await createClient();
-  const year = new Date().getFullYear();
-
-  const { data } = await supabase
-    .from('invoices')
-    .select('invoice_number')
-    .eq('organization_id', orgId)
-    .like('invoice_number', `INV-${year}-%`)
-    .order('invoice_number', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (!data) return `INV-${year}-001`;
-
-  const parts = data.invoice_number.split('-');
-  const lastNum = parseInt(parts[parts.length - 1], 10);
-  const nextNum = isNaN(lastNum) ? 1 : lastNum + 1;
-  return `INV-${year}-${String(nextNum).padStart(3, '0')}`;
-}
 
 export async function getInvoicesByType(orgId: string, type: 'cobro' | 'pago') {
   const supabase = await createClient();
@@ -86,10 +66,20 @@ export async function createInvoice(
 ) {
   const supabase = await createClient();
 
+  // Generar número de factura atómicamente en la DB para evitar duplicados
+  const { data: invoiceNumber, error: rpcError } = await supabase
+    .rpc('get_next_invoice_number', { org_id: orgId });
+
+  if (rpcError || !invoiceNumber) {
+    console.error('Error generating invoice number:', rpcError);
+    return { error: 'Error al generar número de factura' };
+  }
+
   const { data, error } = await supabase
     .from('invoices')
     .insert({
       ...invoice,
+      invoice_number: invoiceNumber,
       organization_id: orgId,
     })
     .select()

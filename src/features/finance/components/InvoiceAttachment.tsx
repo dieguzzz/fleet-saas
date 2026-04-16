@@ -123,14 +123,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
       )}
 
       {!preview && currentUrl && (
-        <a
-          href={currentUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-600 underline"
-        >
-          Ver adjunto actual
-        </a>
+        <p className="text-xs text-slate-400 italic">El adjunto se muestra en la sección inferior.</p>
       )}
     </div>
   );
