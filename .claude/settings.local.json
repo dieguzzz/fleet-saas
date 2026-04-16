@@ -23,7 +23,8 @@
       "Bash(xargs sed *)",
       "Bash(cat)",
       "Bash(npm install *)",
-      "Bash(node -e \"require\\('react-pdf'\\); console.log\\('ok'\\)\")"
+      "Bash(node -e \"require\\('react-pdf'\\); console.log\\('ok'\\)\")",
+      "WebFetch(domain:github.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

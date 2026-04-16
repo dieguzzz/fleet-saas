@@ -1,9 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { InvoiceAttachment } from './InvoiceAttachment';
-import { PdfViewer } from './PdfViewer';
+
+const PdfViewer = dynamic(
+  () => import('./PdfViewer').then((m) => m.PdfViewer),
+  { ssr: false, loading: () => <p className="text-sm text-slate-400 p-4">Cargando PDF...</p> }
+);
 
 function formatDate(dateStr: string) {
   const [year, month, day] = dateStr.split('T')[0].split('-');
