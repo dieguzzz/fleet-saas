@@ -290,39 +290,43 @@ const { data } = supabase.storage.from('nombre-bucket').getPublicUrl(path);
 
 ### Visualización de PDFs en el browser (sin abrir Adobe)
 
-Supabase Storage envía el header `X-Frame-Options: SAMEORIGIN`, lo que bloquea cargar la URL directamente en un `<iframe>`. La solución correcta es:
+Supabase Storage envía el header `X-Frame-Options: SAMEORIGIN`, lo que bloquea cargar la URL directamente en `<iframe>`, `<embed>` u `<object>`. Las alternativas con blob URL del cliente también fallan por CORS o porque el browser no puede cargar el blob.
 
-1. Hacer `fetch()` de la URL pública en el cliente
-2. Crear un `Blob` con el buffer y `type: 'application/pdf'`
-3. Crear una blob URL con `URL.createObjectURL(blob)`
-4. Renderizar con `<object data={blobUrl} type="application/pdf">`
+**Solución correcta y definitiva: API route proxy en Next.js**
 
-```tsx
-// PdfViewer.tsx
-useEffect(() => {
-  fetch(url)
-    .then(res => res.arrayBuffer())
-    .then(buffer => {
-      const blob = new Blob([buffer], { type: 'application/pdf' });
-      const objectUrl = URL.createObjectURL(blob);
-      blobRef.current = objectUrl;
-      setBlobUrl(objectUrl);
-    })
-    .catch(() => setStatus('error'));
+El servidor hace el fetch (sin CORS), responde con `Content-Type: application/pdf` y sin `X-Frame-Options`. El `<object>` carga desde la misma origin de la app.
 
-  return () => {
-    // Delay la revocación para que el <object> termine de leer el blob
-    const current = blobRef.current;
-    if (current) setTimeout(() => URL.revokeObjectURL(current), 5000);
-  };
-}, [url]);
-
-return <object data={blobUrl} type="application/pdf" style={{ height: '640px' }} className="w-full" />;
+```ts
+// src/app/api/pdf-proxy/route.ts
+export async function GET(request: NextRequest) {
+  const url = request.nextUrl.searchParams.get('url');
+  // Validar que la URL sea del bucket propio de Supabase
+  const upstream = await fetch(url, { cache: 'no-store' });
+  const buffer = await upstream.arrayBuffer();
+  return new NextResponse(buffer, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline',
+    },
+  });
+}
 ```
 
-**Usar `<object>` en lugar de `<iframe>` o `<embed>`** — mejor compatibilidad entre Chrome, Firefox y Edge para PDFs, y permite poner contenido fallback dentro del tag.
+```tsx
+// PdfViewer.tsx — sin useEffect, sin blob URLs
+export function PdfViewer({ url }: { url: string }) {
+  const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
+  return (
+    <object data={proxyUrl} type="application/pdf" className="w-full" style={{ height: '640px' }}>
+      <a href={url} download>Descargar PDF</a>
+    </object>
+  );
+}
+```
 
-**NO revocar el blob URL inmediatamente** en el cleanup del useEffect — el `<object>` todavía lo está leyendo. Usar un `setTimeout` de al menos 5 segundos.
+**Usar `<object>` en lugar de `<iframe>` o `<embed>`** — mejor compatibilidad entre Chrome, Firefox y Edge, y permite fallback content dentro del tag.
+
+**NUNCA intentar blob URL en el cliente para PDFs de Supabase** — falla por CORS o por timing de revocación.
 
 ### Estado inicial en componentes de adjunto
 
