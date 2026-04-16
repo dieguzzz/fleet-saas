@@ -31,12 +31,16 @@ export async function GET(request: NextRequest) {
   try {
     const upstream = await fetch(url, { cache: 'no-store' });
 
+    console.log('[pdf-proxy] upstream status:', upstream.status, 'url:', url);
+
     if (!upstream.ok) {
+      console.error('[pdf-proxy] upstream error:', upstream.status, upstream.statusText);
       return new NextResponse('Failed to fetch file', { status: upstream.status });
     }
 
     const contentType = upstream.headers.get('content-type') ?? 'application/pdf';
     const buffer = await upstream.arrayBuffer();
+    console.log('[pdf-proxy] serving', buffer.byteLength, 'bytes, type:', contentType);
 
     return new NextResponse(buffer, {
       status: 200,
