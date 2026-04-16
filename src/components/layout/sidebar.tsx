@@ -225,7 +225,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+        <nav className="flex-1 px-3 py-3 space-y-4">
           {sections.map((section, si) => {
             const visibleItems = section.items.filter(
               (item) => !item.permission || hasPermission(role, item.permission)

@@ -17,7 +17,7 @@ interface FuelRecord {
   employee: { full_name: string } | null;
 }
 
-const FUEL_LABEL: Record<string, string> = { diesel: 'Diesel', gasoline: 'Nafta', gasoil: 'Gasoil' };
+const FUEL_LABEL: Record<string, string> = { diesel: 'Diesel', gasoline: 'Gasolina', gasoil: 'Gasoil' };
 const FUEL_COLOR: Record<string, string> = {
   diesel: 'bg-blue-100 text-blue-700',
   gasoline: 'bg-green-100 text-green-700',
@@ -87,7 +87,7 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
         >
           <option value="">Todos los combustibles</option>
           <option value="diesel">Diesel</option>
-          <option value="gasoline">Nafta</option>
+          <option value="gasoline">Gasolina</option>
           <option value="gasoil">Gasoil</option>
         </select>
       </div>

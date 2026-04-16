@@ -55,7 +55,7 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
           <p className="text-xs text-blue-500 mt-0.5">{fmt(stats.totalLitersDiesel)} L</p>
         </div>
         <div className="bg-green-50 border border-green-100 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-green-600 font-medium">🚗 Nafta (total)</p>
+          <p className="text-xs text-green-600 font-medium">🚗 Gasolina (total)</p>
           <p className="text-xl font-bold text-green-800 mt-1">${fmt(stats.totalCostGasoline)}</p>
           <p className="text-xs text-green-500 mt-0.5">{fmt(stats.totalLitersGasoline)} L</p>
         </div>

@@ -69,7 +69,7 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: Pro
                   <label className="block text-xs font-medium text-slate-700 mb-1">Tipo *</label>
                   <select name="fuel_type" required className={field}>
                     <option value="diesel">Diesel</option>
-                    <option value="gasoline">Nafta</option>
+                    <option value="gasoline">Gasolina</option>
                     <option value="gasoil">Gasoil</option>
                   </select>
                 </div>
