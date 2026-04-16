@@ -67,6 +67,7 @@ const STATUS_CLASSES: Record<string, string> = {
 export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) {
   const status = invoice.status ?? 'draft';
   const [attachmentUrl, setAttachmentUrl] = useState<string | null>(invoice.attachment_url);
+  const [attachmentVersion, setAttachmentVersion] = useState(0);
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -172,7 +173,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
             invoiceId={invoice.id}
             orgId={invoice.organization_id}
             currentUrl={attachmentUrl}
-            onUploaded={(url) => setAttachmentUrl(url)}
+            onUploaded={(url) => { setAttachmentUrl(url); setAttachmentVersion(v => v + 1); }}
           />
 
           {attachmentUrl && (
@@ -185,7 +186,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
                       Descargar
                     </a>
                   </div>
-                  <PdfViewer url={attachmentUrl} />
+                  <PdfViewer key={attachmentVersion} url={attachmentUrl} />
                 </>
               ) : (
                 <img
