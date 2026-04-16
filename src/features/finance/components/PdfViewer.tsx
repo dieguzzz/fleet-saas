@@ -5,10 +5,8 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+// Worker copiado a /public para que Turbopack lo resuelva correctamente
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 interface PdfViewerProps {
   url: string;
@@ -16,33 +14,24 @@ interface PdfViewerProps {
 
 export function PdfViewer({ url }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
-  const [error, setError] = useState(false);
-
-  const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-10 gap-3 bg-slate-50">
-        <p className="text-sm text-slate-500">No se pudo mostrar el PDF.</p>
-        <a href={proxyUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline font-medium">
-          Abrir PDF
-        </a>
-      </div>
-    );
-  }
+  const [error, setError] = useState<string | null>(null);
 
   return (
-    <div
-      className="flex flex-col items-center bg-slate-100 py-4 gap-2 overflow-y-auto"
-      style={{ maxHeight: '700px' }}
-    >
+    <div className="flex flex-col items-center bg-slate-100 py-4 gap-2 overflow-y-auto" style={{ maxHeight: '700px' }}>
       <Document
-        file={proxyUrl}
+        file={url}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-        onLoadError={() => setError(true)}
+        onLoadError={(err) => setError(err.message)}
         loading={
-          <div className="flex items-center justify-center py-10">
-            <p className="text-sm text-slate-400">Cargando PDF...</p>
+          <div className="py-10 text-sm text-slate-400">Cargando PDF...</div>
+        }
+        error={
+          <div className="flex flex-col items-center py-10 gap-3">
+            <p className="text-sm text-slate-500">No se pudo mostrar el PDF.</p>
+            {error && <p className="text-xs text-red-400 font-mono">{error}</p>}
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+              Abrir en nueva pestaña
+            </a>
           </div>
         }
       >
