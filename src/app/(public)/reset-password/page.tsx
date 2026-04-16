@@ -6,10 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { resetPassword } from '@/features/auth/actions';
 
-const initialState = { error: '', success: false };
-
 export default function ResetPasswordPage() {
-  const [state, formAction, isPending] = useActionState(resetPassword, initialState);
+  const [state, formAction, isPending] = useActionState(resetPassword, null);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');

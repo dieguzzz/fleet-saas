@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { useActionState } from 'react';
+
 import { forgotPassword } from '@/features/auth/actions';
 
-const initialState = { error: '', success: false };
-
 export default function ForgotPasswordPage() {
-  const [state, formAction, isPending] = useActionState(forgotPassword, initialState);
+  const [state, formAction, isPending] = useActionState(forgotPassword, null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
