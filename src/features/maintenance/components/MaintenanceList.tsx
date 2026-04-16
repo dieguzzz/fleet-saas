@@ -35,7 +35,7 @@ export default function MaintenanceList({ orgSlug, records }: MaintenanceListPro
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-600">
           <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
