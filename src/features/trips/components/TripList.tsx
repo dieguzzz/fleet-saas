@@ -28,12 +28,10 @@ interface TripListProps {
 export function TripList({ trips, orgSlug }: TripListProps) {
   if (!trips || trips.length === 0) {
     return (
-      <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-        <p className="text-slate-500 mb-4">No se encontraron viajes.</p>
+      <div className="text-center p-8 bg-muted/30 rounded-lg border border-dashed border-border">
+        <p className="text-muted-foreground mb-4">No se encontraron viajes.</p>
         <Button asChild>
-          <Link href={`/${orgSlug}/trips/new`}>
-            Planificar Primer Viaje
-          </Link>
+          <Link href={`/${orgSlug}/trips/new`}>Planificar Primer Viaje</Link>
         </Button>
       </div>
     );

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { deleteEmployee } from '@/features/employees/actions';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Employee {
   id: string;
@@ -23,10 +24,10 @@ const STATUS_LABEL: Record<string, string> = {
   on_leave: 'De licencia',
 };
 
-const STATUS_COLOR: Record<string, string> = {
-  active: 'bg-green-100 text-green-700',
-  inactive: 'bg-slate-100 text-slate-500',
-  on_leave: 'bg-yellow-100 text-yellow-700',
+const STATUS_CLASS: Record<string, string> = {
+  active: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  inactive: 'bg-muted text-muted-foreground',
+  on_leave: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
 };
 
 function formatDate(d: string | null) {
@@ -37,8 +38,7 @@ function formatDate(d: string | null) {
 
 function isExpiringSoon(d: string | null) {
   if (!d) return false;
-  const expiry = new Date(d);
-  const diff = (expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+  const diff = (new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
   return diff < 30 && diff > 0;
 }
 
@@ -66,31 +66,29 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
 
   if (employees.length === 0) {
     return (
-      <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl">
-        <p className="text-4xl mb-3">👷</p>
-        <p className="text-slate-500 mb-4">No hay empleados registrados.</p>
-        <Link href={`/${orgSlug}/employees/new`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-          Agregar primer empleado
-        </Link>
-      </div>
+      <EmptyState
+        icon="👷"
+        title="Sin empleados"
+        description="No hay empleados registrados."
+        action={<Link href={`/${orgSlug}/employees/new`} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Agregar primer empleado</Link>}
+      />
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           placeholder="Buscar por nombre, cargo o documento..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input flex-1"
         />
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="field-input sm:w-48"
         >
           <option value="">Todos los estados</option>
           <option value="active">Activo</option>
@@ -99,12 +97,12 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
         </select>
       </div>
 
-      <p className="text-xs text-slate-400">{filtered.length} de {employees.length} empleados</p>
+      <p className="text-xs text-muted-foreground">{filtered.length} de {employees.length} empleados</p>
 
       {/* Desktop table */}
-      <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          <thead className="bg-muted/50 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             <tr>
               <th className="px-4 py-3 text-left">Empleado</th>
               <th className="px-4 py-3 text-left">Cargo</th>
@@ -114,22 +112,22 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
               <th className="px-4 py-3 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {filtered.map(e => {
               const expired = isExpired(e.license_expiry);
               const expiring = isExpiringSoon(e.license_expiry);
               return (
-                <tr key={e.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={e.id} className="hover:bg-accent/30 transition-colors">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-slate-900">{e.full_name}</p>
-                    {e.document_number && <p className="text-xs text-slate-400">{e.document_number}</p>}
+                    <p className="font-medium text-foreground">{e.full_name}</p>
+                    {e.document_number && <p className="text-xs text-muted-foreground">{e.document_number}</p>}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{e.position || '-'}</td>
+                  <td className="px-4 py-3">{e.position || '-'}</td>
                   <td className="px-4 py-3">
                     <div className="text-xs space-y-0.5">
                       {e.phone && <p>{e.phone}</p>}
-                      {e.email && <p className="text-slate-400">{e.email}</p>}
-                      {!e.phone && !e.email && <span className="text-slate-300">-</span>}
+                      {e.email && <p className="text-muted-foreground">{e.email}</p>}
+                      {!e.phone && !e.email && <span className="text-muted-foreground/40">-</span>}
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -137,22 +135,22 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
                       <div className="text-xs">
                         <p>{e.license_number}</p>
                         {e.license_expiry && (
-                          <p className={expired ? 'text-red-500 font-medium' : expiring ? 'text-yellow-500' : 'text-slate-400'}>
+                          <p className={expired ? 'text-destructive font-medium' : expiring ? 'text-yellow-500 dark:text-yellow-400' : 'text-muted-foreground'}>
                             Vence: {formatDate(e.license_expiry)}{expired ? ' ⚠️' : expiring ? ' ⏰' : ''}
                           </p>
                         )}
                       </div>
-                    ) : <span className="text-slate-300">-</span>}
+                    ) : <span className="text-muted-foreground/40">-</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_COLOR[e.status] ?? ''}`}>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_CLASS[e.status] ?? ''}`}>
                       {STATUS_LABEL[e.status] ?? e.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-xs text-blue-600 hover:text-blue-800 font-medium">Editar</Link>
-                      <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-xs text-red-500 hover:text-red-700 font-medium disabled:opacity-50">Eliminar</button>
+                    <div className="flex justify-end gap-3">
+                      <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-xs text-primary hover:text-primary/80 font-medium">Editar</Link>
+                      <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">Eliminar</button>
                     </div>
                   </td>
                 </tr>
@@ -168,32 +166,32 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
           const expired = isExpired(e.license_expiry);
           const expiring = isExpiringSoon(e.license_expiry);
           return (
-            <div key={e.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2">
+            <div key={e.id} className="bg-card border border-border rounded-xl p-4 shadow-sm space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-slate-900">{e.full_name}</p>
-                  {e.document_number && <p className="text-xs text-slate-400">{e.document_number}</p>}
-                  {e.position && <p className="text-sm text-slate-500">{e.position}</p>}
+                  <p className="font-semibold text-foreground">{e.full_name}</p>
+                  {e.document_number && <p className="text-xs text-muted-foreground">{e.document_number}</p>}
+                  {e.position && <p className="text-sm text-muted-foreground">{e.position}</p>}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${STATUS_COLOR[e.status] ?? ''}`}>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${STATUS_CLASS[e.status] ?? ''}`}>
                   {STATUS_LABEL[e.status] ?? e.status}
                 </span>
               </div>
               {(e.phone || e.email) && (
-                <div className="text-xs text-slate-500 space-y-0.5">
+                <div className="text-xs text-muted-foreground space-y-0.5">
                   {e.phone && <p>📱 {e.phone}</p>}
                   {e.email && <p>✉️ {e.email}</p>}
                 </div>
               )}
               {e.license_number && (
-                <p className={`text-xs ${expired ? 'text-red-500' : expiring ? 'text-yellow-600' : 'text-slate-400'}`}>
+                <p className={`text-xs ${expired ? 'text-destructive' : expiring ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'}`}>
                   Licencia: {e.license_number}{e.license_expiry ? ` · Vence ${formatDate(e.license_expiry)}` : ''}
                   {expired ? ' ⚠️' : expiring ? ' ⏰' : ''}
                 </p>
               )}
-              <div className="flex gap-4 pt-1 border-t border-slate-100">
-                <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-sm text-blue-600 font-medium">Editar</Link>
-                <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-sm text-red-500 font-medium disabled:opacity-50">Eliminar</button>
+              <div className="flex gap-4 pt-1 border-t border-border">
+                <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-sm text-primary font-medium">Editar</Link>
+                <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">Eliminar</button>
               </div>
             </div>
           );

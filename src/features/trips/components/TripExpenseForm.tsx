@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { createTripExpense } from '@/features/trips/actions';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const initialState = {
   error: '',
@@ -18,14 +19,14 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
       <input type="hidden" name="tripId" value={tripId} />
       
       {state?.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <label htmlFor="category" className="text-sm font-medium text-slate-700">
+          <label htmlFor="category" className="field-label">
             Categoría *
           </label>
           <select
@@ -44,7 +45,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="amount" className="text-sm font-medium text-slate-700">
+          <label htmlFor="amount" className="field-label">
             Monto *
           </label>
           <input
@@ -59,7 +60,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="currency" className="text-sm font-medium text-slate-700">
+          <label htmlFor="currency" className="field-label">
             Moneda
           </label>
           <select
@@ -74,7 +75,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="expense_date" className="text-sm font-medium text-slate-700">
+          <label htmlFor="expense_date" className="field-label">
             Fecha *
           </label>
           <input
@@ -89,9 +90,7 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="notes" className="text-sm font-medium text-slate-700">
-          Notas
-        </label>
+        <label htmlFor="notes" className="field-label">Notas</label>
         <textarea
           id="notes"
           name="notes"
@@ -102,19 +101,12 @@ export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; 
       </div>
 
       <div className="flex items-center gap-4 pt-4">
-        <Link
-          href={`/${orgSlug}/trips/${tripId}`}
-          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
-        >
-          Cancelar
-        </Link>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
-        >
+        <Button variant="outline" asChild>
+          <Link href={`/${orgSlug}/trips/${tripId}`}>Cancelar</Link>
+        </Button>
+        <Button type="submit" disabled={isPending}>
           {isPending ? 'Guardando...' : 'Registrar Gasto'}
-        </button>
+        </Button>
       </div>
     </form>
   );

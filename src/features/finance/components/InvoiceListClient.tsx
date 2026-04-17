@@ -9,11 +9,11 @@ const STATUS_LABELS: Record<string, string> = {
   paid: 'Pagada', sent: 'Enviada', overdue: 'Vencida', draft: 'Borrador', cancelled: 'Cancelada',
 };
 const STATUS_STYLES: Record<string, string> = {
-  paid: 'bg-green-50 text-green-700 ring-green-600/20',
-  sent: 'bg-blue-50 text-blue-700 ring-blue-700/10',
-  overdue: 'bg-red-50 text-red-700 ring-red-600/10',
-  draft: 'bg-gray-50 text-gray-600 ring-gray-500/10',
-  cancelled: 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+  paid: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20',
+  sent: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-500/20',
+  overdue: 'bg-destructive/10 text-destructive ring-destructive/20',
+  draft: 'bg-muted text-muted-foreground ring-border',
+  cancelled: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-500/20',
 };
 
 interface Props {
@@ -21,6 +21,11 @@ interface Props {
   orgId: string;
   orgSlug: string;
   type: 'cobro' | 'pago';
+}
+
+function formatDate(d: string) {
+  const [y, m, day] = d.split('T')[0].split('-');
+  return `${day}/${m}/${y}`;
 }
 
 export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
@@ -40,14 +45,14 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
 
   if (invoices.length === 0) {
     return (
-      <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+      <div className="text-center py-12 bg-muted/30 rounded-xl border border-dashed border-border">
         <div className="text-4xl mb-3">{type === 'cobro' ? '📄' : '💸'}</div>
-        <p className="text-slate-500 mb-4 text-sm">
+        <p className="text-muted-foreground mb-4 text-sm">
           No hay {type === 'cobro' ? 'facturas de cobro' : 'facturas de pago'} registradas.
         </p>
         <Link
           href={`/${orgSlug}/finance/invoices/new?type=${type}`}
-          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
         >
           Crear primera factura
         </Link>
@@ -57,19 +62,18 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
 
   return (
     <div className="space-y-3">
-      {/* Filters */}
       <div className="flex gap-2 flex-wrap">
         <input
           type="text"
           placeholder="Buscar por número o contacto..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-48 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input flex-1 min-w-48"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="field-input w-auto"
         >
           <option value="">Todos los estados</option>
           {Object.entries(STATUS_LABELS).map(([v, l]) => (
@@ -79,7 +83,7 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
         {(search || statusFilter) && (
           <button
             onClick={() => { setSearch(''); setStatusFilter(''); }}
-            className="px-3 py-1.5 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-accent transition-colors"
           >
             Limpiar
           </button>
@@ -87,50 +91,46 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-8 text-slate-400 text-sm">
-          Sin resultados para la búsqueda.
-        </div>
+        <div className="text-center py-8 text-muted-foreground text-sm">Sin resultados para la búsqueda.</div>
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden sm:block rounded-xl border border-slate-200 overflow-hidden">
+          <div className="hidden sm:block rounded-xl border border-border overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Número</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Fecha</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{type === 'cobro' ? 'Cliente' : 'Proveedor'}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Estado</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Total</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600 w-52">Acciones</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Número</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Fecha</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">{type === 'cobro' ? 'Cliente' : 'Proveedor'}</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Estado</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Total</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground w-52">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-border bg-card">
                 {filtered.map((invoice) => {
                   const contact = type === 'cobro' ? invoice.customer : invoice.supplier;
                   const status = invoice.status || 'draft';
                   return (
-                    <tr key={invoice.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-slate-800">
-                        <Link href={`/${orgSlug}/finance/invoices/${invoice.id}`} className="hover:text-blue-600">
+                    <tr key={invoice.id} className="hover:bg-accent/30 transition-colors">
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        <Link href={`/${orgSlug}/finance/invoices/${invoice.id}`} className="hover:text-primary">
                           {invoice.invoice_number}
                         </Link>
                         {invoice.attachment_url && (
-                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-blue-400 align-middle" title="Tiene adjunto" />
+                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-primary/60 align-middle" title="Tiene adjunto" />
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {new Date(invoice.date).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">
-                        {(contact as { name: string } | null)?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                      <td className="px-4 py-3 text-muted-foreground">{formatDate(invoice.date)}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {(contact as { name: string } | null)?.name || <span className="italic">Sin asignar</span>}
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${STATUS_STYLES[status] || STATUS_STYLES.draft}`}>
                           {STATUS_LABELS[status] || status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-medium text-slate-800">
+                      <td className="px-4 py-3 text-right font-medium text-foreground">
                         ${Number(invoice.total || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
@@ -156,30 +156,28 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
               const contact = type === 'cobro' ? invoice.customer : invoice.supplier;
               const status = invoice.status || 'draft';
               return (
-                <div key={invoice.id} className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+                <div key={invoice.id} className="bg-card rounded-xl border border-border p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <Link href={`/${orgSlug}/finance/invoices/${invoice.id}`} className="font-semibold text-slate-800 hover:text-blue-600">
+                      <Link href={`/${orgSlug}/finance/invoices/${invoice.id}`} className="font-semibold text-foreground hover:text-primary">
                         {invoice.invoice_number}
                         {invoice.attachment_url && (
-                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-blue-400 align-middle" />
+                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-primary/60 align-middle" />
                         )}
                       </Link>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {new Date(invoice.date).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{formatDate(invoice.date)}</p>
                     </div>
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${STATUS_STYLES[status] || STATUS_STYLES.draft}`}>
                       {STATUS_LABELS[status] || status}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-slate-600">
-                      {(contact as { name: string } | null)?.name || <span className="text-slate-400 italic">Sin asignar</span>}
+                    <p className="text-sm text-muted-foreground">
+                      {(contact as { name: string } | null)?.name || <span className="italic">Sin asignar</span>}
                     </p>
-                    <p className="font-bold text-slate-800">${Number(invoice.total || 0).toFixed(2)}</p>
+                    <p className="font-bold text-foreground">${Number(invoice.total || 0).toFixed(2)}</p>
                   </div>
-                  <div className="pt-1 border-t border-slate-100">
+                  <div className="pt-1 border-t border-border">
                     <InvoiceRowActions
                       invoiceId={invoice.id}
                       orgId={orgId}
@@ -194,9 +192,7 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
             })}
           </div>
 
-          <p className="text-xs text-slate-400 text-right">
-            {filtered.length} de {invoices.length} facturas
-          </p>
+          <p className="text-xs text-muted-foreground text-right">{filtered.length} de {invoices.length} facturas</p>
         </>
       )}
     </div>

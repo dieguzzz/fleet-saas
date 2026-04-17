@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getInventoryItems } from '../actions';
+import { EmptyState } from '@/components/ui/empty-state';
 import {
   Table,
   TableBody,
@@ -24,14 +25,12 @@ export async function InventoryList({ orgId, orgSlug }: InventoryListProps) {
 
   if (!items || items.length === 0) {
     return (
-      <div className="text-center p-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-        <p className="text-muted-foreground mb-4">No se encontraron ítems de inventario.</p>
-        <Button asChild>
-          <Link href={`/${orgSlug}/inventory/items/new`}>
-            Agregar Primer Ítem
-          </Link>
-        </Button>
-      </div>
+      <EmptyState
+        icon="📦"
+        title="Sin inventario"
+        description="No se encontraron ítems de inventario."
+        action={<Link href={`/${orgSlug}/inventory/items/new`} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Agregar Primer Ítem</Link>}
+      />
     );
   }
 

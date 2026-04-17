@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { deleteFuelRecord } from '@/features/fuel/actions';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface FuelRecord {
   id: string;
@@ -18,10 +19,10 @@ interface FuelRecord {
 }
 
 const FUEL_LABEL: Record<string, string> = { diesel: 'Diesel', gasoline: 'Gasolina', gasoil: 'Gasoil' };
-const FUEL_COLOR: Record<string, string> = {
-  diesel: 'bg-blue-100 text-blue-700',
-  gasoline: 'bg-green-100 text-green-700',
-  gasoil: 'bg-yellow-100 text-yellow-700',
+const FUEL_CLASS: Record<string, string> = {
+  diesel: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  gasoline: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  gasoil: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
 };
 
 function formatDate(d: string) {
@@ -62,28 +63,28 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
 
   if (records.length === 0) {
     return (
-      <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl">
-        <p className="text-4xl mb-3">⛽</p>
-        <p className="text-slate-500">No hay registros de combustible todavía.</p>
-      </div>
+      <EmptyState
+        icon="⛽"
+        title="Sin registros"
+        description="No hay registros de combustible todavía."
+      />
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           placeholder="Buscar vehículo, estación, conductor..."
           value={search}
           onChange={e => { setSearch(e.target.value); setPage(1); }}
-          className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input flex-1"
         />
         <select
           value={fuelFilter}
           onChange={e => { setFuelFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="field-input sm:w-52"
         >
           <option value="">Todos los combustibles</option>
           <option value="diesel">Diesel</option>
@@ -92,12 +93,12 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
         </select>
       </div>
 
-      <p className="text-xs text-slate-400">{filtered.length} de {records.length} registros</p>
+      <p className="text-xs text-muted-foreground">{filtered.length} de {records.length} registros</p>
 
       {/* Desktop table */}
-      <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          <thead className="bg-muted/50 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             <tr>
               <th className="px-4 py-3 text-left">Fecha</th>
               <th className="px-4 py-3 text-left">Vehículo</th>
@@ -111,27 +112,27 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {paginated.map(r => (
-              <tr key={r.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{formatDate(r.fuel_date)}</td>
+              <tr key={r.id} className="hover:bg-accent/30 transition-colors">
+                <td className="px-4 py-3 whitespace-nowrap">{formatDate(r.fuel_date)}</td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-slate-900">{r.vehicle?.name ?? '-'}</p>
-                  {r.vehicle?.plate_number && <p className="text-xs text-slate-400">{r.vehicle.plate_number}</p>}
+                  <p className="font-medium text-foreground">{r.vehicle?.name ?? '-'}</p>
+                  {r.vehicle?.plate_number && <p className="text-xs text-muted-foreground">{r.vehicle.plate_number}</p>}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{r.employee?.full_name ?? '-'}</td>
+                <td className="px-4 py-3">{r.employee?.full_name ?? '-'}</td>
                 <td className="px-4 py-3">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${FUEL_COLOR[r.fuel_type] ?? ''}`}>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${FUEL_CLASS[r.fuel_type] ?? ''}`}>
                     {FUEL_LABEL[r.fuel_type] ?? r.fuel_type}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right font-mono">{fmt(r.liters)} L</td>
-                <td className="px-4 py-3 text-right font-mono text-slate-500">${fmt(r.price_per_liter)}</td>
-                <td className="px-4 py-3 text-right font-semibold text-slate-900">${fmt(r.total_cost)}</td>
-                <td className="px-4 py-3 text-slate-500 text-xs">{r.station ?? '-'}</td>
-                <td className="px-4 py-3 text-right text-slate-500 text-xs">{r.odometer ? r.odometer.toLocaleString('es-AR') : '-'}</td>
+                <td className="px-4 py-3 text-right font-mono text-muted-foreground">${fmt(r.price_per_liter)}</td>
+                <td className="px-4 py-3 text-right font-semibold text-foreground">${fmt(r.total_cost)}</td>
+                <td className="px-4 py-3 text-xs">{r.station ?? '-'}</td>
+                <td className="px-4 py-3 text-right text-xs">{r.odometer ? r.odometer.toLocaleString('es-AR') : '-'}</td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-xs text-red-500 hover:text-red-700 font-medium disabled:opacity-50">
+                  <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">
                     Eliminar
                   </button>
                 </td>
@@ -144,29 +145,29 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
       {/* Mobile cards */}
       <div className="md:hidden space-y-3">
         {paginated.map(r => (
-          <div key={r.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2">
+          <div key={r.id} className="bg-card border border-border rounded-xl p-4 shadow-sm space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="font-semibold text-slate-900">{r.vehicle?.name ?? 'Sin vehículo'}</p>
-                {r.vehicle?.plate_number && <p className="text-xs text-slate-400">{r.vehicle.plate_number}</p>}
+                <p className="font-semibold text-foreground">{r.vehicle?.name ?? 'Sin vehículo'}</p>
+                {r.vehicle?.plate_number && <p className="text-xs text-muted-foreground">{r.vehicle.plate_number}</p>}
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${FUEL_COLOR[r.fuel_type] ?? ''}`}>
+              <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${FUEL_CLASS[r.fuel_type] ?? ''}`}>
                 {FUEL_LABEL[r.fuel_type] ?? r.fuel_type}
               </span>
             </div>
             <div className="flex gap-4 text-sm">
-              <div><p className="text-xs text-slate-400">Litros</p><p className="font-mono font-medium">{fmt(r.liters)} L</p></div>
-              <div><p className="text-xs text-slate-400">$/L</p><p className="font-mono">${fmt(r.price_per_liter)}</p></div>
-              <div><p className="text-xs text-slate-400">Total</p><p className="font-semibold">${fmt(r.total_cost)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Litros</p><p className="font-mono font-medium">{fmt(r.liters)} L</p></div>
+              <div><p className="text-xs text-muted-foreground">$/L</p><p className="font-mono">${fmt(r.price_per_liter)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Total</p><p className="font-semibold">${fmt(r.total_cost)}</p></div>
             </div>
-            <div className="text-xs text-slate-500 space-y-0.5">
+            <div className="text-xs text-muted-foreground space-y-0.5">
               <p>📅 {formatDate(r.fuel_date)}</p>
               {r.employee && <p>👤 {r.employee.full_name}</p>}
               {r.station && <p>⛽ {r.station}</p>}
               {r.odometer && <p>🔢 {r.odometer.toLocaleString('es-AR')} km</p>}
             </div>
-            <div className="pt-1 border-t border-slate-100">
-              <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-sm text-red-500 font-medium disabled:opacity-50">
+            <div className="pt-1 border-t border-border">
+              <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">
                 Eliminar
               </button>
             </div>
@@ -174,15 +175,14 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
         ))}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} de {filtered.length}
           </p>
           <div className="flex gap-2">
-            <button onClick={() => setPage(p => p - 1)} disabled={page === 1} className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg disabled:opacity-40 hover:bg-slate-50">← Anterior</button>
-            <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages} className="px-3 py-1.5 text-xs border border-slate-200 rounded-lg disabled:opacity-40 hover:bg-slate-50">Siguiente →</button>
+            <button onClick={() => setPage(p => p - 1)} disabled={page === 1} className="px-3 py-1.5 text-xs border border-border rounded-lg disabled:opacity-40 hover:bg-accent transition-colors">← Anterior</button>
+            <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages} className="px-3 py-1.5 text-xs border border-border rounded-lg disabled:opacity-40 hover:bg-accent transition-colors">Siguiente →</button>
           </div>
         </div>
       )}

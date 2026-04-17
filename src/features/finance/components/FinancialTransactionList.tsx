@@ -11,6 +11,11 @@ interface FinancialTransactionListProps {
   orgId: string;
 }
 
+function formatDate(d: string) {
+  const [y, m, day] = d.split('T')[0].split('-');
+  return `${day}/${m}/${y}`;
+}
+
 export function FinancialTransactionList({ transactions, orgId }: FinancialTransactionListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -20,31 +25,31 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
 
   return (
     <>
-      <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-800">
+      <div className="w-full bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-foreground">
             Transacciones Recientes
             {transactions.length > 0 && (
-              <span className="ml-2 text-sm font-normal text-slate-400">({transactions.length})</span>
+              <span className="ml-2 text-sm font-normal text-muted-foreground">({transactions.length})</span>
             )}
           </h2>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-primary/90 transition-colors"
           >
             Nueva Transacción
           </button>
         </div>
 
-        {(!transactions || transactions.length === 0) ? (
-          <div className="p-8 text-center text-slate-500 italic">
+        {transactions.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground italic">
             No hay transacciones registradas.
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-600">
-                <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
+              <table className="w-full text-left text-sm text-muted-foreground">
+                <thead className="bg-muted/50 font-medium uppercase text-xs">
                   <tr>
                     <th className="px-6 py-3">Fecha</th>
                     <th className="px-6 py-3">Tipo</th>
@@ -53,25 +58,29 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
                     <th className="px-6 py-3 text-right">Monto</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-border">
                   {paginated.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(tx.transaction_date).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </td>
+                    <tr key={tx.id} className="hover:bg-accent/30 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">{formatDate(tx.transaction_date)}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          tx.type === 'income'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-destructive/10 text-destructive'
+                        }`}>
                           {tx.type === 'income' ? 'Ingreso' : 'Gasto'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-gray-900 font-medium">{tx.category}</div>
-                        {tx.subcategory && <div className="text-xs text-gray-400">{tx.subcategory}</div>}
+                        <div className="text-foreground font-medium">{tx.category}</div>
+                        {tx.subcategory && <div className="text-xs text-muted-foreground">{tx.subcategory}</div>}
                       </td>
                       <td className="px-6 py-4 max-w-xs truncate" title={tx.description || ''}>
                         {tx.description || '-'}
                       </td>
-                      <td className={`px-6 py-4 text-right font-medium ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      <td className={`px-6 py-4 text-right font-medium ${
+                        tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
+                      }`}>
                         {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
                       </td>
                     </tr>
@@ -81,23 +90,13 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
             </div>
 
             {totalPages > 1 && (
-              <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between text-sm text-slate-500">
-                <span>
-                  {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, transactions.length)} de {transactions.length}
-                </span>
+              <div className="px-6 py-3 border-t border-border flex items-center justify-between text-sm text-muted-foreground">
+                <span>{page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, transactions.length)} de {transactions.length}</span>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={page === 0}
-                    className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
+                  <button onClick={() => setPage(p => p - 1)} disabled={page === 0} className="px-3 py-1 rounded border border-border hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     ← Anterior
                   </button>
-                  <button
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={page >= totalPages - 1}
-                    className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
+                  <button onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1} className="px-3 py-1 rounded border border-border hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                     Siguiente →
                   </button>
                 </div>
@@ -107,11 +106,7 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
         )}
       </div>
 
-      <NewFinancialTransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        orgId={orgId}
-      />
+      <NewFinancialTransactionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} orgId={orgId} />
     </>
   );
 }

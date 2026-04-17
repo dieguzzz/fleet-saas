@@ -11,16 +11,24 @@ interface Member {
   } | null;
 }
 
-interface TeamListProps {
-  members: Member[];
+const ROLE_LABEL: Record<string, string> = {
+  owner: 'Propietario',
+  admin: 'Administrador',
+  collaborator: 'Colaborador',
+  viewer: 'Observador',
+};
+
+function formatDate(d: string) {
+  const [y, m, day] = d.split('T')[0].split('-');
+  return `${day}/${m}/${y}`;
 }
 
-export default function TeamList({ members }: TeamListProps) {
+export default function TeamList({ members }: { members: Member[] }) {
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-600">
-          <thead className="bg-gray-50 text-gray-700 font-medium uppercase text-xs">
+        <table className="w-full text-left text-sm text-muted-foreground">
+          <thead className="bg-muted/50 font-medium uppercase text-xs">
             <tr>
               <th className="px-6 py-3">Miembro</th>
               <th className="px-6 py-3">Email</th>
@@ -29,29 +37,22 @@ export default function TeamList({ members }: TeamListProps) {
               <th className="px-6 py-3 text-center">Estado</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-border">
             {members.map((member) => (
-              <tr key={member.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 font-medium text-gray-900">
+              <tr key={member.id} className="hover:bg-accent/30 transition-colors">
+                <td className="px-6 py-4 font-medium text-foreground">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs">
                       {member.profile?.full_name?.charAt(0) || member.profile?.email?.charAt(0) || '?'}
                     </div>
                     {member.profile?.full_name || 'Sin nombre'}
                   </div>
                 </td>
                 <td className="px-6 py-4">{member.profile?.email}</td>
-                <td className="px-6 py-4 capitalize">
-                  {member.role === 'owner' ? 'Propietario' :
-                   member.role === 'admin' ? 'Administrador' :
-                   member.role === 'collaborator' ? 'Colaborador' :
-                   member.role === 'viewer' ? 'Observador' : member.role}
-                </td>
-                <td className="px-6 py-4">
-                  {new Date(member.joined_at).toLocaleDateString()}
-                </td>
+                <td className="px-6 py-4">{ROLE_LABEL[member.role] ?? member.role}</td>
+                <td className="px-6 py-4">{formatDate(member.joined_at)}</td>
                 <td className="px-6 py-4 text-center">
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                  <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs px-2 py-1 rounded-full font-medium">
                     Activo
                   </span>
                 </td>
