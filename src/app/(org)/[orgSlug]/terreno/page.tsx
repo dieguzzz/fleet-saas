@@ -79,7 +79,7 @@ export default async function TerrenoPage({ params }: { params: Promise<{ orgSlu
           Cobros de {MONTH_NAMES[month - 1]} {year}
         </h2>
         <MonthlyPayments
-          payments={allPayments as Parameters<typeof MonthlyPayments>[0]['payments']}
+          payments={allPayments}
           orgSlug={orgSlug}
           orgId={org.id}
           year={year}

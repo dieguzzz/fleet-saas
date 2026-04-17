@@ -19,7 +19,7 @@ const MONTH_NAMES = [
 
 export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormProps) {
   const [state, formAction, isPending] = useActionState(
-    async (_prev: MarkPaidFormState, formData: FormData) => markPaymentPaid(_prev, formData),
+    async (_prev: MarkPaidFormState | null, formData: FormData) => markPaymentPaid(_prev, formData),
     null
   );
 

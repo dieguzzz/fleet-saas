@@ -14,7 +14,7 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
   const router = useRouter();
   const action = tenant ? updateTenant : createTenant;
   const [state, formAction, isPending] = useActionState(
-    async (_prev: TenantFormState, formData: FormData) => action(_prev, formData),
+    async (_prev: TenantFormState | null, formData: FormData) => action(_prev, formData),
     null
   );
 

@@ -3,7 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import type { LandTenant } from '@/types/database';
+import type { LandTenant, LandPayment } from '@/types/database';
 import { z } from 'zod';
 
 const tenantSchema = z.object({
@@ -21,11 +21,12 @@ export type TenantFormState = { error?: string; success?: boolean };
 
 export async function getTenants(orgId: string) {
   const supabase = await createClient();
-  return await supabase
+  const result = await supabase
     .from('land_tenants')
     .select('*')
     .eq('organization_id', orgId)
     .order('name');
+  return { ...result, data: result.data as unknown as LandTenant[] | null };
 }
 
 export async function getTenant(id: string) {
@@ -38,7 +39,7 @@ export async function getTenant(id: string) {
   return { ...result, data: result.data as unknown as LandTenant | null };
 }
 
-export async function createTenant(prevState: TenantFormState, formData: FormData): Promise<TenantFormState> {
+export async function createTenant(prevState: TenantFormState | null, formData: FormData): Promise<TenantFormState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
@@ -76,7 +77,7 @@ export async function createTenant(prevState: TenantFormState, formData: FormDat
   return { success: true };
 }
 
-export async function updateTenant(prevState: TenantFormState, formData: FormData): Promise<TenantFormState> {
+export async function updateTenant(prevState: TenantFormState | null, formData: FormData): Promise<TenantFormState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
   const tenantId = formData.get('tenantId') as string;
@@ -143,7 +144,7 @@ export async function generateMonthlyPayments(orgSlug: string, year: number, mon
   }
 
   const today = new Date().toISOString().split('T')[0];
-  const payments = tenants.map((tenant: LandTenant) => {
+  const payments = (tenants as unknown as LandTenant[]).map((tenant: LandTenant) => {
     const actualDay = Math.min(tenant.due_day, lastDayOfMonth);
     const dueDate = `${year}-${monthStr}-${String(actualDay).padStart(2, '0')}`;
     const isOverdue = dueDate < today;
@@ -173,24 +174,26 @@ export async function generateMonthlyPayments(orgSlug: string, year: number, mon
 
 export async function getPaymentsByMonth(orgId: string, year: number, month: number) {
   const supabase = await createClient();
-  return await supabase
+  const result = await supabase
     .from('land_payments')
     .select('*, tenant:land_tenants(id, name, equipment_description, phone)')
     .eq('organization_id', orgId)
     .eq('period_year', year)
     .eq('period_month', month)
     .order('due_date');
+  return { ...result, data: result.data as unknown as LandPayment[] | null };
 }
 
 export async function getPaymentsByTenant(tenantId: string, orgId: string) {
   const supabase = await createClient();
-  return await supabase
+  const result = await supabase
     .from('land_payments')
     .select('*')
     .eq('tenant_id', tenantId)
     .eq('organization_id', orgId)
     .order('period_year', { ascending: false })
     .order('period_month', { ascending: false });
+  return { ...result, data: result.data as unknown as LandPayment[] | null };
 }
 
 const markPaidSchema = z.object({
@@ -202,7 +205,7 @@ const markPaidSchema = z.object({
 
 export type MarkPaidFormState = { error?: string; success?: boolean; paymentId?: string };
 
-export async function markPaymentPaid(prevState: MarkPaidFormState, formData: FormData): Promise<MarkPaidFormState> {
+export async function markPaymentPaid(prevState: MarkPaidFormState | null, formData: FormData): Promise<MarkPaidFormState> {
   const supabase = await createClient();
   const paymentId = formData.get('paymentId') as string;
   const orgSlug = formData.get('orgSlug') as string;
