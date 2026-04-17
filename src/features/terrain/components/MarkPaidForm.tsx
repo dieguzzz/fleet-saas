@@ -102,17 +102,17 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
       <div
-        className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl"
+        className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div>
-            <h3 className="font-semibold text-slate-100 text-base">Registrar pago</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h3 className="font-semibold text-foreground text-base">Registrar pago</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {payment.tenant?.name} — {MONTH_NAMES[(payment.period_month - 1)]} {payment.period_year}
             </p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-colors">
+          <button onClick={onClose} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -129,9 +129,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
             </div>
           )}
 
-          <div className="bg-slate-800/50 rounded-xl p-3 flex items-center justify-between">
-            <span className="text-sm text-slate-400">Monto a cobrar</span>
-            <span className="font-semibold text-slate-100">{formatCurrency(payment.amount)}</span>
+          <div className="bg-muted/50 rounded-xl p-3 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Monto a cobrar</span>
+            <span className="font-semibold text-foreground">{formatCurrency(payment.amount)}</span>
           </div>
 
           <div className="space-y-1.5">
@@ -195,7 +195,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-xs text-slate-400 hover:text-slate-200 shrink-0 ml-2"
+                  className="text-xs text-muted-foreground hover:text-foreground shrink-0 ml-2"
                 >
                   Cambiar
                 </button>
@@ -205,7 +205,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full flex items-center justify-center gap-2 p-3 border border-dashed border-slate-600 hover:border-blue-500 rounded-lg text-sm text-slate-400 hover:text-blue-400 transition-colors"
+                className="w-full flex items-center justify-center gap-2 p-3 border border-dashed border-border hover:border-primary rounded-lg text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {uploading ? (
                   <>
@@ -250,7 +250,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-sm font-medium transition-colors"
+              className="flex-1 py-2.5 bg-muted hover:bg-accent text-foreground rounded-lg text-sm font-medium transition-colors"
             >
               Cancelar
             </button>

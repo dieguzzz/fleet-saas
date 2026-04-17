@@ -4,24 +4,18 @@ import { useActionState } from 'react';
 import { inviteMember } from '../actions';
 import { useFormStatus } from 'react-dom';
 import { useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
-    >
+    <Button type="submit" disabled={pending} size="sm">
       {pending ? 'Enviando...' : 'Invitar'}
-    </button>
+    </Button>
   );
 }
 
-const initialState = {
-  error: '',
-  success: false,
-};
+const initialState = { error: '', success: false };
 
 export default function InviteMemberForm({ orgSlug }: { orgSlug: string }) {
   const [state, formAction] = useActionState(inviteMember, initialState);
@@ -34,28 +28,24 @@ export default function InviteMemberForm({ orgSlug }: { orgSlug: string }) {
   }, [state.success]);
 
   return (
-    <form ref={formRef} action={formAction} className="flex flex-col sm:flex-row gap-4 items-start sm:items-end bg-slate-50 p-4 rounded-lg border border-slate-200">
+    <form ref={formRef} action={formAction} className="flex flex-col sm:flex-row gap-4 items-start sm:items-end bg-muted/40 p-4 rounded-lg border border-border">
       <input type="hidden" name="orgSlug" value={orgSlug} />
-      
+
       <div className="flex-1 w-full sm:w-auto space-y-1">
-        <label htmlFor="email" className="text-xs font-medium text-slate-500 uppercase">Email</label>
+        <label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase">Email</label>
         <input
           id="email"
           name="email"
           type="email"
           required
           placeholder="colaborador@ejemplo.com"
-          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          className="field-input"
         />
       </div>
 
       <div className="w-full sm:w-40 space-y-1">
-        <label htmlFor="role" className="text-xs font-medium text-slate-500 uppercase">Rol</label>
-        <select
-          id="role"
-          name="role"
-          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-        >
+        <label htmlFor="role" className="text-xs font-medium text-muted-foreground uppercase">Rol</label>
+        <select id="role" name="role" className="field-input">
           <option value="viewer">Observador</option>
           <option value="collaborator">Colaborador</option>
           <option value="admin">Admin</option>
@@ -67,14 +57,10 @@ export default function InviteMemberForm({ orgSlug }: { orgSlug: string }) {
       </div>
 
       {state?.error && (
-        <div className="text-red-500 text-sm mt-2 sm:mt-0 self-center">
-          {state.error}
-        </div>
+        <p className="text-destructive text-sm mt-2 sm:mt-0 self-center">{state.error}</p>
       )}
       {state?.success && (
-        <div className="text-green-600 text-sm mt-2 sm:mt-0 self-center">
-          ¡Invitación enviada!
-        </div>
+        <p className="text-emerald-600 dark:text-emerald-400 text-sm mt-2 sm:mt-0 self-center">¡Invitación enviada!</p>
       )}
     </form>
   );
