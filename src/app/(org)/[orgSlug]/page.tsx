@@ -3,20 +3,24 @@ import Link from 'next/link';
 import { getOrganization, getOrganizationStats } from '@/features/organizations/queries';
 import { getFinanceKPIs } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatCard } from '@/components/ui/stat-card';
+import { SkeletonCard } from '@/components/ui/skeleton';
+import { SectionCard } from '@/components/ui/section-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardPageProps {
   params: Promise<{ orgSlug: string }>;
 }
 
-// --- Stat Cards ---
 async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: string }) {
   const stats = await getOrganizationStats(orgId);
 
   const statCards = [
-    { label: 'Vehículos', value: stats.vehicles, href: `/${orgSlug}/vehicles`, icon: '🚗', color: 'from-blue-500 to-blue-600' },
-    { label: 'Viajes', value: stats.trips, href: `/${orgSlug}/trips`, icon: '🗺️', color: 'from-green-500 to-green-600' },
-    { label: 'Mantenimientos', value: stats.maintenance, href: `/${orgSlug}/maintenance`, icon: '🔧', color: 'from-orange-500 to-orange-600' },
-    { label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`, icon: '👥', color: 'from-purple-500 to-purple-600' },
+    { label: 'Vehículos', value: stats.vehicles, href: `/${orgSlug}/vehicles`, gradient: 'bg-gradient-to-br from-blue-500 to-blue-600', icon: '🚗' },
+    { label: 'Viajes', value: stats.trips, href: `/${orgSlug}/trips`, gradient: 'bg-gradient-to-br from-green-500 to-green-600', icon: '🗺️' },
+    { label: 'Mantenimientos', value: stats.maintenance, href: `/${orgSlug}/maintenance`, gradient: 'bg-gradient-to-br from-orange-500 to-orange-600', icon: '🔧' },
+    { label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`, gradient: 'bg-gradient-to-br from-purple-500 to-purple-600', icon: '👥' },
   ];
 
   return (
@@ -25,15 +29,19 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
         <Link
           key={stat.label}
           href={stat.href}
-          className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow active:scale-95"
+          className="group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-2xl lg:text-3xl">{stat.icon}</span>
-            <div className={`w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center text-white font-bold text-lg lg:text-xl`}>
-              {stat.value}
-            </div>
-          </div>
-          <h3 className="text-slate-600 font-medium text-sm lg:text-base">{stat.label}</h3>
+          <StatCard
+            label={stat.label}
+            value={
+              <div className="flex items-center justify-between mt-1">
+                <span>{stat.value}</span>
+                <span className="text-base">{stat.icon}</span>
+              </div>
+            }
+            iconGradient={stat.gradient}
+            className="hover:shadow-md transition-shadow group-active:scale-95"
+          />
         </Link>
       ))}
     </div>
@@ -42,23 +50,16 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
 
 async function FinanceKPIs({ orgId }: { orgId: string }) {
   const kpis = await getFinanceKPIs(orgId);
-  const cards = [
-    { label: 'Ingresos del mes', value: `$${kpis.monthlyIncome.toFixed(2)}`, color: 'text-green-600', bg: 'bg-green-50', icon: '📈' },
-    { label: 'Gastos del mes', value: `$${kpis.monthlyExpenses.toFixed(2)}`, color: 'text-red-600', bg: 'bg-red-50', icon: '📉' },
-    { label: 'Facturas vencidas', value: String(kpis.overdueInvoices), color: kpis.overdueInvoices > 0 ? 'text-orange-600' : 'text-slate-500', bg: kpis.overdueInvoices > 0 ? 'bg-orange-50' : 'bg-slate-50', icon: '⚠️' },
-    { label: 'Por cobrar', value: `$${kpis.pendingReceivables.toFixed(2)}`, color: 'text-blue-600', bg: 'bg-blue-50', icon: '🕐' },
-  ];
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      {cards.map((c) => (
-        <div key={c.label} className={`${c.bg} rounded-xl p-4 flex items-center gap-3`}>
-          <span className="text-2xl">{c.icon}</span>
-          <div className="min-w-0">
-            <p className={`text-lg font-bold ${c.color} truncate`}>{c.value}</p>
-            <p className="text-xs text-slate-500 truncate">{c.label}</p>
-          </div>
-        </div>
-      ))}
+      <StatCard label="Ingresos del mes" value={`$${kpis.monthlyIncome.toFixed(2)}`} tone="success" />
+      <StatCard label="Gastos del mes" value={`$${kpis.monthlyExpenses.toFixed(2)}`} tone="danger" />
+      <StatCard
+        label="Facturas vencidas"
+        value={String(kpis.overdueInvoices)}
+        tone={kpis.overdueInvoices > 0 ? 'warning' : 'default'}
+      />
+      <StatCard label="Por cobrar" value={`$${kpis.pendingReceivables.toFixed(2)}`} tone="info" />
     </div>
   );
 }
@@ -66,24 +67,22 @@ async function FinanceKPIs({ orgId }: { orgId: string }) {
 function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border border-slate-200 animate-pulse">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-8 h-8 bg-slate-200 rounded-lg" />
-            <div className="w-10 h-10 bg-slate-200 rounded-lg" />
-          </div>
-          <div className="h-4 bg-slate-200 rounded w-20" />
-        </div>
-      ))}
+      {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
     </div>
   );
 }
 
-// --- Recent Activity ---
+function FinanceSkeleton() {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+    </div>
+  );
+}
+
 async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
   const supabase = await createClient();
 
-  // Fetch last 5 trips and last 5 maintenance records in parallel
   const [{ data: trips }, { data: maintenance }, { data: invoices }] = await Promise.all([
     supabase
       .from('trips')
@@ -105,14 +104,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
       .limit(3),
   ]);
 
-  type ActivityItem = {
-    id: string;
-    text: string;
-    time: string;
-    type: 'success' | 'warning' | 'info';
-    href: string;
-  };
-
+  type ActivityItem = { id: string; text: string; time: string; type: 'success' | 'warning' | 'info'; href: string };
   const items: ActivityItem[] = [];
 
   for (const t of trips ?? []) {
@@ -145,14 +137,13 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     });
   }
 
-  // Sort by most recent (items already come ordered, just interleave)
   items.sort((a, b) => b.time.localeCompare(a.time));
   const recent = items.slice(0, 6);
 
-  const dotColor = { success: 'bg-green-500', warning: 'bg-orange-500', info: 'bg-blue-500' };
+  const dotColor = { success: 'bg-emerald-500', warning: 'bg-amber-500', info: 'bg-blue-500' };
 
   if (recent.length === 0) {
-    return <p className="text-sm text-slate-400 italic">Sin actividad reciente.</p>;
+    return <p className="text-sm text-muted-foreground italic">Sin actividad reciente.</p>;
   }
 
   return (
@@ -161,8 +152,8 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
         <Link key={item.id} href={item.href} className="flex items-start gap-3 group">
           <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dotColor[item.type]}`} />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-800 group-hover:text-blue-600 transition-colors truncate">{item.text}</p>
-            <p className="text-xs text-slate-500">{item.time}</p>
+            <p className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors truncate">{item.text}</p>
+            <p className="text-xs text-muted-foreground">{item.time}</p>
           </div>
         </Link>
       ))}
@@ -178,31 +169,28 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl lg:text-2xl font-bold text-slate-800">Bienvenido a {org.name}</h1>
-        <p className="text-slate-500 mt-1 text-sm">Resumen general de tu organización</p>
-      </div>
+      <PageHeader title={`Bienvenido a ${org.name}`} description="Resumen general de tu organización" />
 
       <Suspense fallback={<StatsSkeleton />}>
         <DashboardStats orgSlug={orgSlug} orgId={org.id} />
       </Suspense>
 
-      <Suspense fallback={<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />)}</div>}>
+      <Suspense fallback={<FinanceSkeleton />}>
         <FinanceKPIs orgId={org.id} />
       </Suspense>
 
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
-        {/* Activity */}
-        <div className="lg:col-span-4 bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-semibold mb-4 text-slate-800">Actividad Reciente</h3>
-          <Suspense fallback={<div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-8 bg-slate-100 rounded animate-pulse" />)}</div>}>
+        <SectionCard className="lg:col-span-4" title="Actividad Reciente">
+          <Suspense fallback={
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-8" />)}
+            </div>
+          }>
             <RecentActivity orgId={org.id} orgSlug={orgSlug} />
           </Suspense>
-        </div>
+        </SectionCard>
 
-        {/* Quick actions */}
-        <div className="lg:col-span-3 bg-white p-4 lg:p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="font-semibold mb-4 text-slate-800">Acciones Rápidas</h3>
+        <SectionCard className="lg:col-span-3" title="Acciones Rápidas">
           <div className="space-y-1">
             {[
               { href: `/${orgSlug}/vehicles/new`, label: '+ Nuevo Vehículo' },
@@ -215,13 +203,13 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
               <Link
                 key={a.href}
                 href={a.href}
-                className="block w-full text-left px-4 py-2.5 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                className="block w-full text-left px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
               >
                 {a.label}
               </Link>
             ))}
           </div>
-        </div>
+        </SectionCard>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegister } from "@/components/PwaRegister";
 import "./globals.css";
@@ -38,16 +39,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Toaster />
-        <PwaRegister />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {children}
+          <Toaster />
+          <PwaRegister />
+        </ThemeProvider>
       </body>
     </html>
   );

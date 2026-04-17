@@ -4,6 +4,9 @@ import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createTenant, updateTenant, type TenantFormState } from '@/features/terrain/actions';
 import type { LandTenant } from '@/types/database';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface TenantFormProps {
   orgSlug: string;
@@ -30,56 +33,53 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
       {tenant && <input type="hidden" name="tenantId" value={tenant.id} />}
 
       {state?.error && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label htmlFor="name" className="field-label">
-            Nombre <span className="text-red-400">*</span>
-          </label>
-          <input
+          <Label htmlFor="name">
+            Nombre <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="name"
             name="name"
             type="text"
             required
             defaultValue={tenant?.name}
             placeholder="Ej: Juan Pérez"
-            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="phone" className="field-label">Teléfono</label>
-          <input
+          <Label htmlFor="phone">Teléfono</Label>
+          <Input
             id="phone"
             name="phone"
             type="tel"
             defaultValue={tenant?.phone ?? ''}
             placeholder="Ej: 555-1234"
-            className="field-input"
           />
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label htmlFor="equipment_description" className="field-label">Descripción del equipo</label>
-          <input
+          <Label htmlFor="equipment_description">Descripción del equipo</Label>
+          <Input
             id="equipment_description"
             name="equipment_description"
             type="text"
             defaultValue={tenant?.equipment_description ?? ''}
             placeholder="Ej: Camión Kenworth T800, Remolque plataforma"
-            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="monthly_amount" className="field-label">
-            Monto mensual <span className="text-red-400">*</span>
-          </label>
-          <input
+          <Label htmlFor="monthly_amount">
+            Monto mensual <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="monthly_amount"
             name="monthly_amount"
             type="number"
@@ -88,15 +88,14 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
             required
             defaultValue={tenant?.monthly_amount ?? ''}
             placeholder="0.00"
-            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="due_day" className="field-label">
-            Día de vencimiento <span className="text-red-400">*</span>
-          </label>
-          <input
+          <Label htmlFor="due_day">
+            Día de vencimiento <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="due_day"
             name="due_day"
             type="number"
@@ -105,32 +104,30 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
             required
             defaultValue={tenant?.due_day ?? 1}
             placeholder="1"
-            className="field-input"
           />
-          <p className="text-xs text-slate-500">Día del mes en que vence el cobro (1–31)</p>
+          <p className="text-xs text-muted-foreground">Día del mes en que vence el cobro (1–31)</p>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="start_date" className="field-label">
-            Fecha de inicio <span className="text-red-400">*</span>
-          </label>
-          <input
+          <Label htmlFor="start_date">
+            Fecha de inicio <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="start_date"
             name="start_date"
             type="date"
             required
             defaultValue={tenant?.start_date ?? today}
-            className="field-input"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="status" className="field-label">Estado</label>
+          <Label htmlFor="status">Estado</Label>
           <select
             id="status"
             name="status"
             defaultValue={tenant?.status ?? 'active'}
-            className="field-input"
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             <option value="active">Activo</option>
             <option value="inactive">Inactivo</option>
@@ -138,33 +135,25 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label htmlFor="notes" className="field-label">Notas</label>
+          <Label htmlFor="notes">Notas</Label>
           <textarea
             id="notes"
             name="notes"
             rows={3}
             defaultValue={tenant?.notes ?? ''}
             placeholder="Observaciones adicionales..."
-            className="field-input resize-none"
+            className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
           />
         </div>
       </div>
 
       <div className="flex items-center gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
-        >
+        <Button type="submit" disabled={isPending} className="bg-blue-600 hover:bg-blue-500">
           {isPending ? 'Guardando...' : tenant ? 'Actualizar inquilino' : 'Crear inquilino'}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-sm font-medium transition-colors"
-        >
+        </Button>
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );

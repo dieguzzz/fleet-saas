@@ -5,6 +5,7 @@ import { generateMonthlyPayments, markPaymentPending } from '@/features/terrain/
 import { MarkPaidForm } from './MarkPaidForm';
 import type { LandPayment, LandTenant } from '@/types/database';
 import Link from 'next/link';
+import { StaggerList, StaggerItem } from '@/components/ui/motion';
 
 type PaymentWithTenant = LandPayment & {
   tenant?: Pick<LandTenant, 'id' | 'name' | 'equipment_description' | 'phone'>;
@@ -23,6 +24,30 @@ const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
+
+const statusBadge = (status: string) => {
+  if (status === 'paid')
+    return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Pagado</span>;
+  if (status === 'overdue')
+    return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Vencido</span>;
+  return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Pendiente</span>;
+};
+
+const methodLabel: Record<string, string> = {
+  cash: 'Efectivo',
+  transfer: 'Transferencia',
+  check: 'Cheque',
+  card: 'Tarjeta',
+};
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+}
+
+function formatDate(dateStr: string) {
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+}
 
 export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActiveTenants }: MonthlyPaymentsProps) {
   const [selectedPayment, setSelectedPayment] = useState<PaymentWithTenant | null>(null);
@@ -46,28 +71,6 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
     startReverting(() => markPaymentPending(paymentId, orgSlug));
   }
 
-  function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
-  }
-
-  function formatDate(dateStr: string) {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;
-  }
-
-  const statusBadge = (status: string) => {
-    if (status === 'paid') return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">Pagado</span>;
-    if (status === 'overdue') return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-400">Vencido</span>;
-    return <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">Pendiente</span>;
-  };
-
-  const methodLabel: Record<string, string> = {
-    cash: 'Efectivo',
-    transfer: 'Transferencia',
-    check: 'Cheque',
-    card: 'Tarjeta',
-  };
-
   const totalCobrado = payments.filter(p => p.status === 'paid').reduce((s, p) => s + (p.paid_amount ?? p.amount), 0);
   const totalPendiente = payments.filter(p => p.status !== 'paid').reduce((s, p) => s + p.amount, 0);
 
@@ -76,12 +79,12 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-slate-400">Cobrado: <span className="text-slate-200 font-medium">{formatCurrency(totalCobrado)}</span></span>
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-muted-foreground">Cobrado: <span className="text-foreground font-medium">{formatCurrency(totalCobrado)}</span></span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-amber-400" />
-            <span className="text-slate-400">Pendiente: <span className="text-slate-200 font-medium">{formatCurrency(totalPendiente)}</span></span>
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
+            <span className="text-muted-foreground">Pendiente: <span className="text-foreground font-medium">{formatCurrency(totalPendiente)}</span></span>
           </div>
         </div>
         {hasActiveTenants && (
@@ -111,57 +114,57 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
       </div>
 
       {generateResult && (
-        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm">
+        <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm dark:bg-blue-950/30 dark:border-blue-800 dark:text-blue-400">
           {generateResult}
         </div>
       )}
 
       {payments.length === 0 ? (
-        <div className="text-center py-10 text-slate-500">
+        <div className="text-center py-10 text-muted-foreground">
           <p className="text-sm">No hay cobros generados para {MONTH_NAMES[month - 1]} {year}.</p>
           {hasActiveTenants && (
             <p className="text-xs mt-1">Usa el botón &quot;Generar cobros&quot; para crear los registros del mes.</p>
           )}
           {!hasActiveTenants && (
-            <p className="text-xs mt-1">No hay inquilinos activos. <Link href={`/${orgSlug}/terreno/new`} className="text-blue-400 hover:underline">Agrega uno</Link>.</p>
+            <p className="text-xs mt-1">No hay inquilinos activos. <Link href={`/${orgSlug}/terreno/new`} className="text-blue-600 hover:underline dark:text-blue-400">Agrega uno</Link>.</p>
           )}
         </div>
       ) : (
         <>
-          {/* Desktop */}
-          <div className="hidden md:block overflow-x-auto rounded-xl border border-slate-700/50">
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700/50 bg-slate-800/50">
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Inquilino</th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Equipo</th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Monto</th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Vencimiento</th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Estado</th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">Pagó</th>
-                  <th className="text-right px-4 py-3 text-slate-400 font-medium">Acciones</th>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Inquilino</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Equipo</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Monto</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Vencimiento</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Estado</th>
+                  <th className="text-left px-4 py-3 text-muted-foreground font-medium">Pagó</th>
+                  <th className="text-right px-4 py-3 text-muted-foreground font-medium">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-border">
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-200">{p.tenant?.name ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs">{p.tenant?.equipment_description ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-200">
+                  <tr key={p.id} className="hover:bg-muted/40 transition-colors">
+                    <td className="px-4 py-3 font-medium text-foreground">{p.tenant?.name ?? '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{p.tenant?.equipment_description ?? '—'}</td>
+                    <td className="px-4 py-3 text-foreground">
                       <div>{formatCurrency(p.amount)}</div>
                       {p.status === 'paid' && p.paid_amount !== null && p.paid_amount !== p.amount && (
-                        <div className="text-xs text-emerald-400">Recibido: {formatCurrency(p.paid_amount)}</div>
+                        <div className="text-xs text-emerald-600 dark:text-emerald-400">Recibido: {formatCurrency(p.paid_amount)}</div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-400">{formatDate(p.due_date)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{formatDate(p.due_date)}</td>
                     <td className="px-4 py-3">{statusBadge(p.status)}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs">
+                    <td className="px-4 py-3 text-muted-foreground text-xs">
                       {p.status === 'paid' ? (
                         <div>
                           <div>{formatDate(p.paid_date!)}</div>
-                          <div className="text-slate-500">{p.payment_method ? methodLabel[p.payment_method] : ''}</div>
+                          <div className="text-muted-foreground/60">{p.payment_method ? methodLabel[p.payment_method] : ''}</div>
                           {p.receipt_url && (
-                            <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                            <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
                               Ver comprobante
                             </a>
                           )}
@@ -173,7 +176,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
                         {p.status !== 'paid' ? (
                           <button
                             onClick={() => setSelectedPayment(p)}
-                            className="px-3 py-1.5 text-xs bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-colors"
+                            className="px-3 py-1.5 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 rounded-lg transition-colors"
                           >
                             Marcar pagado
                           </button>
@@ -181,7 +184,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
                           <button
                             onClick={() => handleRevertPaid(p.id)}
                             disabled={reverting}
-                            className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-400 rounded-lg transition-colors"
+                            className="px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg transition-colors"
                           >
                             Revertir
                           </button>
@@ -195,66 +198,68 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
           </div>
 
           {/* Mobile cards */}
-          <div className="md:hidden space-y-3">
+          <StaggerList className="md:hidden space-y-3">
             {payments.map((p) => (
-              <div key={p.id} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-slate-200">{p.tenant?.name ?? '—'}</p>
-                    {p.tenant?.equipment_description && (
-                      <p className="text-xs text-slate-500 mt-0.5">{p.tenant.equipment_description}</p>
-                    )}
-                  </div>
-                  {statusBadge(p.status)}
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">Monto</span>
-                  <span className="font-medium text-slate-200">{formatCurrency(p.amount)}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">Vence</span>
-                  <span className="text-slate-300">{formatDate(p.due_date)}</span>
-                </div>
-                {p.status === 'paid' && (
-                  <div className="space-y-1 text-sm border-t border-slate-700/40 pt-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Pagó el</span>
-                      <span className="text-slate-300">{formatDate(p.paid_date!)}</span>
+              <StaggerItem key={p.id}>
+                <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-foreground">{p.tenant?.name ?? '—'}</p>
+                      {p.tenant?.equipment_description && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{p.tenant.equipment_description}</p>
+                      )}
                     </div>
-                    {p.payment_method && (
+                    {statusBadge(p.status)}
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Monto</span>
+                    <span className="font-medium text-foreground">{formatCurrency(p.amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Vence</span>
+                    <span className="text-foreground">{formatDate(p.due_date)}</span>
+                  </div>
+                  {p.status === 'paid' && (
+                    <div className="space-y-1 text-sm border-t border-border pt-2">
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Método</span>
-                        <span className="text-slate-300">{methodLabel[p.payment_method]}</span>
+                        <span className="text-muted-foreground">Pagó el</span>
+                        <span className="text-foreground">{formatDate(p.paid_date!)}</span>
                       </div>
-                    )}
-                    {p.receipt_url && (
-                      <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-400 hover:underline pt-1">
-                        Ver comprobante
-                      </a>
+                      {p.payment_method && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Método</span>
+                          <span className="text-foreground">{methodLabel[p.payment_method]}</span>
+                        </div>
+                      )}
+                      {p.receipt_url && (
+                        <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-600 hover:underline dark:text-blue-400 pt-1">
+                          Ver comprobante
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  <div className="pt-1">
+                    {p.status !== 'paid' ? (
+                      <button
+                        onClick={() => setSelectedPayment(p)}
+                        className="w-full py-2 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 rounded-lg transition-colors"
+                      >
+                        Marcar como pagado
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleRevertPaid(p.id)}
+                        disabled={reverting}
+                        className="w-full py-2 text-xs bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg transition-colors"
+                      >
+                        Revertir a pendiente
+                      </button>
                     )}
                   </div>
-                )}
-                <div className="pt-1">
-                  {p.status !== 'paid' ? (
-                    <button
-                      onClick={() => setSelectedPayment(p)}
-                      className="w-full py-2 text-xs bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-colors"
-                    >
-                      Marcar como pagado
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleRevertPaid(p.id)}
-                      disabled={reverting}
-                      className="w-full py-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-400 rounded-lg transition-colors"
-                    >
-                      Revertir a pendiente
-                    </button>
-                  )}
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerList>
         </>
       )}
 
