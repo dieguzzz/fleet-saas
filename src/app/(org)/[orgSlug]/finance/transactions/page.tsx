@@ -3,6 +3,8 @@ import { FinancialTransactionList } from '@/features/finance/components/Financia
 import { getFinancialTransactions } from '@/features/finance/actions';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
+import { PageHeader } from '@/components/ui/page-header';
+import { SkeletonRow } from '@/components/ui/skeleton';
 
 async function TransactionsListContainer({ orgId }: { orgId: string }) {
   const { data: transactions, error } = await getFinancialTransactions(orgId);
@@ -28,14 +30,11 @@ export default async function TransactionsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Transacciones Financieras</h1>
-          <p className="text-muted-foreground">Registro de ingresos y gastos de la organización.</p>
-        </div>
-      </div>
-
-      <Suspense fallback={<div>Cargando transacciones...</div>}>
+      <PageHeader
+        title="Transacciones Financieras"
+        description="Registro de ingresos y gastos de la organización."
+      />
+      <Suspense fallback={<div className="space-y-2">{[1,2,3,4].map(i=><SkeletonRow key={i}/>)}</div>}>
         <TransactionsListContainer orgId={org.id} />
       </Suspense>
     </div>

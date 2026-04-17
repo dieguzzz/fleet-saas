@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { createVehicle, updateVehicle, type CreateVehicleState } from '../actions';
 import Link from 'next/link';
 import { useFormStatus } from 'react-dom';
+import { Button } from '@/components/ui/button';
 
 interface VehicleFormProps {
   orgSlug: string;
@@ -19,21 +20,14 @@ interface VehicleFormProps {
   };
 }
 
-const initialState: CreateVehicleState = {
-  error: '',
-  success: false,
-};
+const initialState: CreateVehicleState = { error: '', success: false };
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
-    >
+    <Button type="submit" disabled={pending} className="bg-blue-600 hover:bg-blue-500">
       {pending ? 'Guardando...' : isEditing ? 'Actualizar Vehículo' : 'Crear Vehículo'}
-    </button>
+    </Button>
   );
 }
 
@@ -46,53 +40,29 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
   return (
     <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
-      
+
       {state?.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
           {state.error}
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium text-slate-700">
-            Nombre / Identificador *
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            defaultValue={vehicle?.name}
-            placeholder="Ej. Camión 01"
-            className="field-input"
-          />
+          <label htmlFor="name" className="field-label">Nombre / Identificador *</label>
+          <input id="name" name="name" type="text" required defaultValue={vehicle?.name}
+            placeholder="Ej. Camión 01" className="field-input" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="plate_number" className="text-sm font-medium text-slate-700">
-            Placa / Matrícula
-          </label>
-          <input
-            id="plate_number"
-            name="plate_number"
-            type="text"
-            defaultValue={vehicle?.plate_number || ''}
-            placeholder="ABC-123"
-            className="field-input"
-          />
+          <label htmlFor="plate_number" className="field-label">Placa / Matrícula</label>
+          <input id="plate_number" name="plate_number" type="text"
+            defaultValue={vehicle?.plate_number || ''} placeholder="ABC-123" className="field-input" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="type" className="text-sm font-medium text-slate-700">
-            Tipo de Vehículo
-          </label>
-          <select
-            id="type"
-            name="type"
-            defaultValue={vehicle?.type || ''}
-            className="field-input"
-          >
+          <label htmlFor="type" className="field-label">Tipo de Vehículo</label>
+          <select id="type" name="type" defaultValue={vehicle?.type || ''} className="field-input">
             <option value="">Seleccionar tipo</option>
             <option value="truck">Camión</option>
             <option value="van">Furgoneta</option>
@@ -103,15 +73,8 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="status" className="text-sm font-medium text-slate-700">
-            Estado
-          </label>
-          <select
-            id="status"
-            name="status"
-            defaultValue={vehicle?.status || 'active'}
-            className="field-input"
-          >
+          <label htmlFor="status" className="field-label">Estado</label>
+          <select id="status" name="status" defaultValue={vehicle?.status || 'active'} className="field-input">
             <option value="active">Activo</option>
             <option value="maintenance">En Mantenimiento</option>
             <option value="inactive">Inactivo</option>
@@ -119,54 +82,28 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="brand" className="text-sm font-medium text-slate-700">
-            Marca
-          </label>
-          <input
-            id="brand"
-            name="brand"
-            type="text"
-            defaultValue={vehicle?.brand || ''}
-            placeholder="Toyota, Ford..."
-            className="field-input"
-          />
+          <label htmlFor="brand" className="field-label">Marca</label>
+          <input id="brand" name="brand" type="text" defaultValue={vehicle?.brand || ''}
+            placeholder="Toyota, Ford..." className="field-input" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="model" className="text-sm font-medium text-slate-700">
-            Modelo
-          </label>
-          <input
-            id="model"
-            name="model"
-            type="text"
-            defaultValue={vehicle?.model || ''}
-            placeholder="Hilux, F-150..."
-            className="field-input"
-          />
+          <label htmlFor="model" className="field-label">Modelo</label>
+          <input id="model" name="model" type="text" defaultValue={vehicle?.model || ''}
+            placeholder="Hilux, F-150..." className="field-input" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="year" className="text-sm font-medium text-slate-700">
-            Año
-          </label>
-          <input
-            id="year"
-            name="year"
-            type="number"
-            defaultValue={vehicle?.year || new Date().getFullYear()}
-            className="field-input"
-          />
+          <label htmlFor="year" className="field-label">Año</label>
+          <input id="year" name="year" type="number"
+            defaultValue={vehicle?.year || new Date().getFullYear()} className="field-input" />
         </div>
       </div>
 
       <div className="flex items-center gap-4 pt-4">
-        <Link
-          href={`/${orgSlug}/vehicles`}
-          className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
-        >
-          Cancelar
-        </Link>
+        <Button variant="outline" asChild>
+          <Link href={`/${orgSlug}/vehicles`}>Cancelar</Link>
+        </Button>
         <SubmitButton isEditing={!!vehicle} />
       </div>
     </form>

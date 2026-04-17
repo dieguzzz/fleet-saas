@@ -25,7 +25,8 @@
       "Bash(npm install *)",
       "Bash(node -e \"require\\('react-pdf'\\); console.log\\('ok'\\)\")",
       "WebFetch(domain:github.com)",
-      "Bash(npx skills *)"
+      "Bash(npx skills *)",
+      "Bash(grep \"\\\\.tsx$\")"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -14,22 +14,16 @@ export default async function SettingsPage({
     notFound();
   }
 
-  if (!org) {
-    notFound();
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Configuración</h1>
-          <p className="text-muted-foreground">
-            Administra la configuración general de tu organización.
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Configuración</h1>
+        <p className="text-muted-foreground mt-0.5">
+          Administra la configuración general de tu organización.
+        </p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
         <OrganizationSettingsForm orgSlug={orgSlug} orgName={org.name} />
       </div>
     </div>

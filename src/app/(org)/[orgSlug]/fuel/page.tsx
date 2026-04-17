@@ -4,6 +4,8 @@ import { getFuelRecords, getFuelStats } from '@/features/fuel/actions';
 import { getEmployees } from '@/features/employees/actions';
 import FuelList from '@/features/fuel/components/FuelList';
 import NewFuelRecordModal from '@/features/fuel/components/NewFuelRecordModal';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatCard } from '@/components/ui/stat-card';
 
 function fmt(n: number) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -34,35 +36,31 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Combustible</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Control de diesel y nafta por vehículo</p>
-        </div>
-        <NewFuelRecordModal orgSlug={orgSlug} vehicles={vehicles ?? []} employees={employees} />
-      </div>
+      <PageHeader
+        title="Combustible"
+        description="Control de diesel y gasolina por vehículo"
+        action={<NewFuelRecordModal orgSlug={orgSlug} vehicles={vehicles ?? []} employees={employees} />}
+      />
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Gasto este mes</p>
-          <p className="text-xl font-bold text-slate-900 mt-1">${fmt(stats.totalCostMonth)}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{fmt(stats.totalLitersMonth)} L cargados</p>
-        </div>
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-blue-600 font-medium">🚛 Diesel (total)</p>
-          <p className="text-xl font-bold text-blue-800 mt-1">${fmt(stats.totalCostDiesel)}</p>
-          <p className="text-xs text-blue-500 mt-0.5">{fmt(stats.totalLitersDiesel)} L</p>
-        </div>
-        <div className="bg-green-50 border border-green-100 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-green-600 font-medium">🚗 Gasolina (total)</p>
-          <p className="text-xl font-bold text-green-800 mt-1">${fmt(stats.totalCostGasoline)}</p>
-          <p className="text-xs text-green-500 mt-0.5">{fmt(stats.totalLitersGasoline)} L</p>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <p className="text-xs text-slate-500">Registros totales</p>
-          <p className="text-xl font-bold text-slate-900 mt-1">{(records ?? []).length}</p>
-        </div>
+        <StatCard
+          label="Gasto este mes"
+          value={`$${fmt(stats.totalCostMonth)}`}
+        />
+        <StatCard
+          label="🚛 Diesel (total)"
+          value={`$${fmt(stats.totalCostDiesel)}`}
+          tone="info"
+        />
+        <StatCard
+          label="🚗 Gasolina (total)"
+          value={`$${fmt(stats.totalCostGasoline)}`}
+          tone="success"
+        />
+        <StatCard
+          label="Registros totales"
+          value={(records ?? []).length}
+        />
       </div>
 
       <FuelList orgSlug={orgSlug} records={fuelRecords} />

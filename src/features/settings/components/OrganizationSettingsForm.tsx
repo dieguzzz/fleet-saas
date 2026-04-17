@@ -1,36 +1,22 @@
 'use client';
 
 import { useActionState } from 'react';
-// We need an updateOrganization action.
-// For now, I'll mock it or create it inline/nearby.
-// I'll create a new actions file for settings or reuse organizations actions if they check permissions.
-// Let's assume we need to create `src/features/settings/actions.ts`.
-
 import { updateOrganizationSettings } from '../actions';
 import { useFormStatus } from 'react-dom';
+import { Button } from '@/components/ui/button';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
-    >
+    <Button type="submit" disabled={pending} className="bg-blue-600 hover:bg-blue-500">
       {pending ? 'Guardando...' : 'Guardar Cambios'}
-    </button>
+    </Button>
   );
 }
 
-const initialState = {
-  error: '',
-  success: false,
-};
+const initialState = { error: '', success: false };
 
-interface SettingsFormProps {
-  orgSlug: string;
-  orgName: string;
-}
+interface SettingsFormProps { orgSlug: string; orgName: string; }
 
 export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsFormProps) {
   const [state, formAction] = useActionState(updateOrganizationSettings, initialState);
@@ -38,32 +24,23 @@ export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsF
   return (
     <form action={formAction} className="form-card space-y-5">
       <input type="hidden" name="orgSlug" value={orgSlug} />
-      
+
       {state?.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
           {state.error}
         </div>
       )}
-      
+
       {state?.success && (
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-green-400">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400">
           Configuración actualizada correctamente.
         </div>
       )}
 
       <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium text-slate-700">
-          Nombre de la Organización
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          defaultValue={orgName}
-          className="field-input"
-        />
-        <p className="text-xs text-slate-500">
+        <label htmlFor="name" className="field-label">Nombre de la Organización</label>
+        <input id="name" name="name" type="text" required defaultValue={orgName} className="field-input" />
+        <p className="text-xs text-muted-foreground">
           Este nombre es visible para todos los miembros del equipo.
         </p>
       </div>

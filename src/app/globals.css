@@ -125,17 +125,17 @@
 }
 
 @layer components {
-  /* Campos de formulario — estilo unificado */
+  /* Campos de formulario — estilo unificado con tokens semánticos */
   .field-input {
-    @apply w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply w-full px-3 py-2 bg-background border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .field-label {
-    @apply block text-sm font-medium text-slate-700 mb-1;
+    @apply block text-sm font-medium text-foreground mb-1;
   }
 
   /* Tarjeta de formulario */
   .form-card {
-    @apply bg-white rounded-xl shadow-sm border border-slate-200 p-5 lg:p-6;
+    @apply bg-card rounded-xl shadow-sm border border-border p-5 lg:p-6;
   }
 }
