@@ -69,10 +69,10 @@ export function TripList({ trips, orgSlug }: TripListProps) {
               <TableCell>
                 <span
                   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset
-                    ${trip.status === 'completed' ? 'bg-green-50 text-green-700 ring-green-600/20' : ''}
-                    ${trip.status === 'in_progress' ? 'bg-blue-50 text-blue-700 ring-blue-700/10' : ''}
-                    ${trip.status === 'planned' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' : ''}
-                    ${trip.status === 'cancelled' ? 'bg-red-50 text-red-700 ring-red-600/10' : ''}
+                    ${trip.status === 'completed' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20' : ''}
+                    ${trip.status === 'in_progress' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-500/20' : ''}
+                    ${trip.status === 'planned' ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-500/20' : ''}
+                    ${trip.status === 'cancelled' ? 'bg-destructive/10 text-destructive ring-destructive/20' : ''}
                   `}
                 >
                   {trip.status === 'completed' ? 'Completado' :
