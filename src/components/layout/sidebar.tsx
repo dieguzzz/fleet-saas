@@ -89,6 +89,15 @@ const getNavSections = (orgSlug: string): NavSection[] => [
     label: 'Operaciones',
     items: [
       {
+        href: `/${orgSlug}/terreno`,
+        label: 'Terreno',
+        icon: (
+          <svg className="w-4.5 h-4.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h1v11H4zm6 0h1v11h-1zm5 0h1v11h-1zm5 0h1v11h-1z" />
+          </svg>
+        ),
+      },
+      {
         href: `/${orgSlug}/fuel`,
         label: 'Combustible',
         icon: (

@@ -267,6 +267,45 @@ export interface InventoryMovement {
   performer?: Profile;
 }
 
+export type LandTenantStatus = 'active' | 'inactive';
+export type LandPaymentStatus = 'pending' | 'paid' | 'overdue';
+export type LandPaymentMethod = 'cash' | 'transfer' | 'check' | 'card';
+
+export interface LandTenant {
+  id: string;
+  organization_id: string;
+  name: string;
+  phone: string | null;
+  equipment_description: string | null;
+  monthly_amount: number;
+  due_day: number;
+  start_date: string;
+  status: LandTenantStatus;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface LandPayment {
+  id: string;
+  organization_id: string;
+  tenant_id: string;
+  period_year: number;
+  period_month: number;
+  due_date: string;
+  amount: number;
+  status: LandPaymentStatus;
+  paid_date: string | null;
+  paid_amount: number | null;
+  payment_method: LandPaymentMethod | null;
+  receipt_url: string | null;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  // Joined
+  tenant?: LandTenant;
+}
+
 export interface TripExpense {
   id: string;
   organization_id: string;
@@ -384,6 +423,18 @@ export interface Database {
         Row: FuelRecord;
         Insert: Omit<FuelRecord, 'id' | 'created_at' | 'updated_at' | 'vehicle' | 'employee'>;
         Update: Partial<Omit<FuelRecord, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'vehicle' | 'employee'>>;
+        Relationships: [];
+      };
+      land_tenants: {
+        Row: LandTenant;
+        Insert: Omit<LandTenant, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<LandTenant, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
+        Relationships: [];
+      };
+      land_payments: {
+        Row: LandPayment;
+        Insert: Omit<LandPayment, 'id' | 'created_at' | 'updated_at' | 'tenant'>;
+        Update: Partial<Omit<LandPayment, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'tenant'>>;
         Relationships: [];
       };
     };
