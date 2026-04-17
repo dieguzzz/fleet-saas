@@ -25,7 +25,7 @@ const initialState: CreateVehicleState = { error: '', success: false };
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="bg-blue-600 hover:bg-blue-500">
+    <Button type="submit" disabled={pending} >
       {pending ? 'Guardando...' : isEditing ? 'Actualizar Vehículo' : 'Crear Vehículo'}
     </Button>
   );

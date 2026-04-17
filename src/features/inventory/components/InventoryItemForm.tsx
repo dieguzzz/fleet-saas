@@ -82,7 +82,7 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
         <Button variant="outline" asChild>
           <Link href={`/${orgSlug}/inventory/items`}>Cancelar</Link>
         </Button>
-        <Button type="submit" disabled={isPending} className="bg-blue-600 hover:bg-blue-500">
+        <Button type="submit" disabled={isPending} >
           {isPending ? 'Guardando...' : 'Guardar Ítem'}
         </Button>
       </div>

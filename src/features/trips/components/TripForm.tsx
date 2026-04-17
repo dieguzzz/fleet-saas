@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   ssr: false,
-  loading: () => <div className="h-[300px] w-full bg-slate-800 rounded-lg animate-pulse flex items-center justify-center text-slate-500">Cargando mapa...</div>,
+  loading: () => <div className="h-[300px] w-full bg-muted rounded-lg animate-pulse flex items-center justify-center text-muted-foreground">Cargando mapa...</div>,
 });
 
 const initialState = {
@@ -59,7 +59,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         <input type="hidden" name="destination_coords" value={destCoords ? JSON.stringify(destCoords) : ''} />
         
         {state?.error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
             {state.error}
           </div>
         )}
@@ -69,7 +69,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         {/* I'll use the original content and wrap it. */}
         
         <div className="space-y-2">
-          <label htmlFor="vehicle_id" className="text-sm font-medium text-slate-700">
+          <label htmlFor="vehicle_id" className="text-sm font-medium text-foreground">
             Vehículo *
           </label>
           <select
@@ -88,7 +88,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="driver_id" className="text-sm font-medium text-slate-700">
+          <label htmlFor="driver_id" className="text-sm font-medium text-foreground">
             Conductor *
           </label>
           <select
@@ -107,12 +107,12 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="origin" className="text-sm font-medium text-slate-700 flex justify-between">
+          <label htmlFor="origin" className="text-sm font-medium text-foreground flex justify-between">
             <span>Origen *</span>
             <button 
               type="button"
               onClick={() => setSelecting(selecting === 'origin' ? null : 'origin')}
-              className={`text-xs px-2 py-0.5 rounded ${selecting === 'origin' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+              className={`text-xs px-2 py-0.5 rounded ${selecting === 'origin' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
             >
               {selecting === 'origin' ? 'Seleccionando en mapa...' : 'Seleccionar en mapa'}
             </button>
@@ -131,12 +131,12 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="destination" className="text-sm font-medium text-slate-700 flex justify-between">
+          <label htmlFor="destination" className="text-sm font-medium text-foreground flex justify-between">
              <span>Destino *</span>
              <button 
               type="button"
               onClick={() => setSelecting(selecting === 'destination' ? null : 'destination')}
-              className={`text-xs px-2 py-0.5 rounded ${selecting === 'destination' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+              className={`text-xs px-2 py-0.5 rounded ${selecting === 'destination' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
             >
               {selecting === 'destination' ? 'Seleccionando en mapa...' : 'Seleccionar en mapa'}
             </button>
@@ -155,7 +155,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="status" className="text-sm font-medium text-slate-700">
+          <label htmlFor="status" className="text-sm font-medium text-foreground">
             Estado
           </label>
           <select
@@ -171,7 +171,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="notes" className="text-sm font-medium text-slate-700">
+          <label htmlFor="notes" className="text-sm font-medium text-foreground">
             Notas
           </label>
           <textarea
@@ -186,21 +186,21 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
         <div className="flex items-center gap-4 pt-4">
           <Link
             href={`/${orgSlug}/trips`}
-            className="px-6 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
+            className="px-6 py-2 border border-border rounded-lg text-muted-foreground hover:bg-accent transition-colors"
           >
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={isPending}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {isPending ? 'Guardando...' : 'Crear Viaje'}
           </button>
         </div>
       </form>
 
-      <div className="relative rounded-xl overflow-hidden border border-slate-700">
+      <div className="relative rounded-xl overflow-hidden border border-border">
          <TripMap
             interactive={!!selecting}
             origin={originCoords ? { ...originCoords, label: 'Origen Seleccionado' } : undefined}
@@ -211,7 +211,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
             className="h-[450px] w-full"
          />
          {!selecting && !originCoords && !destCoords && (
-             <div className="absolute bottom-0 left-0 right-0 p-3 text-sm text-slate-300 text-center bg-slate-900/70 backdrop-blur-sm">
+             <div className="absolute bottom-0 left-0 right-0 p-3 text-sm text-white text-center bg-black/60 backdrop-blur-sm">
                  Seleccioná &quot;Origen&quot; o &quot;Destino&quot; arriba y hacé clic en el mapa para fijar la ubicación.
              </div>
          )}

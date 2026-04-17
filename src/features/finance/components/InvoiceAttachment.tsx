@@ -99,15 +99,15 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-gray-700">
+      <p className="text-sm font-medium text-foreground">
         {hasAttachment ? 'Reemplazar adjunto' : 'Adjuntar archivo'}{' '}
-        <span className="font-normal text-slate-400">(PDF o imagen)</span>
+        <span className="font-normal text-muted-foreground">(PDF o imagen)</span>
       </p>
 
       {/* Estado actual del adjunto */}
       {hasAttachment && !justUploaded && (
-        <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border text-xs text-muted-foreground">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-muted-foreground shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
           </svg>
           <span>{isPdf(currentUrl) ? 'PDF adjunto' : 'Imagen adjunta'} — se muestra abajo</span>
@@ -133,16 +133,16 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
           className="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
         >
           {uploading ? (
-            <p className="text-sm text-gray-500">Subiendo...</p>
+            <p className="text-sm text-muted-foreground">Subiendo...</p>
           ) : (
             <>
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-muted-foreground/30 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Arrastrá o <span className="text-blue-600 underline">seleccioná archivo</span>
               </p>
-              <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP o PDF — máx. 10 MB</p>
+              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF — máx. 10 MB</p>
             </>
           )}
           <input
@@ -159,7 +159,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
           type="button"
           onClick={() => cameraRef.current?.click()}
           disabled={uploading}
-          className="flex flex-col items-center justify-center gap-1 px-4 py-4 border-2 border-dashed border-gray-300 rounded-lg text-slate-500 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors disabled:opacity-50"
+          className="flex flex-col items-center justify-center gap-1 px-4 py-4 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors disabled:opacity-50"
           title="Tomar foto"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

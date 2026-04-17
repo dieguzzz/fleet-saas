@@ -26,7 +26,12 @@
       "Bash(node -e \"require\\('react-pdf'\\); console.log\\('ok'\\)\")",
       "WebFetch(domain:github.com)",
       "Bash(npx skills *)",
-      "Bash(grep \"\\\\.tsx$\")"
+      "Bash(grep \"\\\\.tsx$\")",
+      "Skill(update-config)",
+      "Bash(sed -i -e 's/text-gray-700\"/text-foreground\"/g' -e 's/text-slate-400\">\\(PDF/text-muted-foreground\">\\(PDF/g' -e 's/bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600/bg-muted\\\\/50 rounded-lg border border-border text-xs text-muted-foreground/g' -e 's/w-4 h-4 text-slate-400 shrink-0/w-4 h-4 text-muted-foreground shrink-0/g' -e 's/text-sm text-gray-500\">Subiendo/text-sm text-muted-foreground\">Subiendo/g' -e 's/w-6 h-6 mx-auto text-slate-300 mb-2/w-6 h-6 mx-auto text-muted-foreground\\\\/30 mb-2/g' -e 's/text-sm text-gray-500\">/text-sm text-muted-foreground\">/g' -e 's/text-xs text-gray-400 mt-1/text-xs text-muted-foreground mt-1/g' -e 's/border-2 border-dashed border-gray-300 rounded-lg text-slate-500 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600/border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:bg-primary\\\\/5 hover:text-primary/g' src/features/finance/components/InvoiceAttachment.tsx)",
+      "Bash(sed -i -e 's/text-sm text-slate-500\"/text-sm text-muted-foreground\"/g' -e 's/text-sm text-slate-400 text-center/text-sm text-muted-foreground text-center/g' src/features/finance/components/PdfViewer.tsx)",
+      "Bash(sed -i -e 's/text-slate-100 font-medium/text-white font-medium/g' src/features/trips/components/TripMap.tsx)",
+      "Bash(sed -i -e 's/bg-slate-900 rounded-lg animate-pulse flex items-center justify-center text-slate-500/bg-muted rounded-lg animate-pulse flex items-center justify-center text-muted-foreground/g' src/features/trips/components/TripMapWrapper.tsx)"
     ]
   },
   "enableAllProjectMcpServers": true,

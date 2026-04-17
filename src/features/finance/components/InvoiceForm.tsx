@@ -98,7 +98,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
   return (
     <form action={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200">{error}</div>
+        <div className="bg-destructive/10 text-destructive p-3 rounded-lg text-sm border border-destructive/20">{error}</div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -110,7 +110,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${invoiceType === 'cobro' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                 {invoiceType === 'cobro' ? '↑ Cobro' : '↓ Pago'}
               </span>
-              <h2 className="text-base font-semibold text-slate-800">
+              <h2 className="text-base font-semibold text-foreground">
                 {isEditing ? 'Editar Factura' : `Nueva Factura de ${invoiceType === 'cobro' ? 'Cobro' : 'Pago'}`}
               </h2>
             </div>
@@ -127,7 +127,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
                     className="field-input"
                   />
                 ) : (
-                  <div className="field-input bg-slate-50 text-slate-400 cursor-not-allowed select-none">
+                  <div className="field-input bg-muted text-muted-foreground cursor-not-allowed select-none">
                     Se generará automáticamente
                   </div>
                 )}
@@ -179,7 +179,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
 
           {/* Importes */}
           <div className="form-card space-y-4">
-            <h3 className="text-sm font-semibold text-slate-700">Importes</h3>
+            <h3 className="text-sm font-semibold text-foreground">Importes</h3>
             <div>
               <label className="field-label">Subtotal ($)</label>
               <input
@@ -204,27 +204,27 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
                 className="field-input"
               />
             </div>
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600">Total</span>
-              <span className="text-2xl font-bold text-slate-900">${total.toFixed(2)}</span>
+            <div className="pt-3 border-t border-border flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">Total</span>
+              <span className="text-2xl font-bold text-foreground">${total.toFixed(2)}</span>
             </div>
           </div>
 
           {/* Adjunto */}
           <div className="form-card space-y-3">
-            <h3 className="text-sm font-semibold text-slate-700">
-              Adjunto <span className="font-normal text-slate-400">(PDF o imagen)</span>
+            <h3 className="text-sm font-semibold text-foreground">
+              Adjunto <span className="font-normal text-muted-foreground">(PDF o imagen)</span>
             </h3>
 
             {existingAttachment && !file && (
-              <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border">
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
                 <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex-1 truncate">
                   Ver adjunto actual
                 </a>
-                <button type="button" onClick={() => setExistingAttachment(null)} className="text-slate-400 hover:text-red-500 text-xs">Quitar</button>
+                <button type="button" onClick={() => setExistingAttachment(null)} className="text-muted-foreground hover:text-destructive text-xs">Quitar</button>
               </div>
             )}
 
@@ -237,8 +237,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 )}
-                <span className="text-xs text-slate-700 flex-1 truncate">{file.name}</span>
-                <button type="button" onClick={clearFile} className="text-slate-400 hover:text-red-500 text-xs shrink-0">Quitar</button>
+                <span className="text-xs text-foreground flex-1 truncate">{file.name}</span>
+                <button type="button" onClick={clearFile} className="text-muted-foreground hover:text-destructive text-xs shrink-0">Quitar</button>
               </div>
             )}
 
@@ -251,13 +251,13 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
                   const f = e.dataTransfer.files?.[0];
                   if (f) handleFileChange({ target: { files: [f] } } as unknown as React.ChangeEvent<HTMLInputElement>);
                 }}
-                className="border-2 border-dashed border-slate-200 rounded-lg p-5 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                className="border-2 border-dashed border-border rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-slate-300 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                <p className="text-xs text-slate-500">Arrastrá o <span className="text-blue-600 underline">seleccioná</span></p>
-                <p className="text-xs text-slate-400 mt-0.5">JPG, PNG, WEBP o PDF · máx. 10 MB</p>
+                <p className="text-xs text-muted-foreground">Arrastrá o <span className="text-primary underline">seleccioná</span></p>
+                <p className="text-xs text-muted-foreground mt-0.5">JPG, PNG, WEBP o PDF · máx. 10 MB</p>
               </div>
             )}
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={handleFileChange} />
@@ -268,14 +268,14 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="w-full bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
               {loading ? (isEditing ? 'Guardando...' : 'Creando...') : (isEditing ? 'Guardar Cambios' : 'Crear Factura')}
             </button>
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full px-5 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="w-full px-5 py-2.5 border border-border text-muted-foreground rounded-lg text-sm font-medium hover:bg-accent transition-colors"
             >
               Cancelar
             </button>

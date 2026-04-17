@@ -79,7 +79,7 @@ export function TripMap({
           <Popup className="premium-popup">
             <div className="p-1">
               <strong className="text-blue-400 block mb-1 uppercase text-[10px] tracking-wider font-bold">Origen</strong>
-              <span className="text-slate-100 font-medium">{origin.label}</span>
+              <span className="text-white font-medium">{origin.label}</span>
             </div>
           </Popup>
         </Marker>
@@ -90,7 +90,7 @@ export function TripMap({
           <Popup className="premium-popup">
             <div className="p-1">
               <strong className="text-emerald-400 block mb-1 uppercase text-[10px] tracking-wider font-bold">Destino</strong>
-              <span className="text-slate-100 font-medium">{destination.label}</span>
+              <span className="text-white font-medium">{destination.label}</span>
             </div>
           </Popup>
         </Marker>

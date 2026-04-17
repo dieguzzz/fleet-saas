@@ -101,7 +101,7 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
         </div>
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full bg-blue-600 hover:bg-blue-500">
+      <Button type="submit" disabled={isPending} className="w-full">
         {isPending ? 'Guardando...' : employee ? 'Guardar cambios' : 'Crear empleado'}
       </Button>
     </form>

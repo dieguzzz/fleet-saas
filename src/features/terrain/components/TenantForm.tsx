@@ -148,7 +148,7 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
       </div>
 
       <div className="flex items-center gap-3 pt-2">
-        <Button type="submit" disabled={isPending} className="bg-blue-600 hover:bg-blue-500">
+        <Button type="submit" disabled={isPending} >
           {isPending ? 'Guardando...' : tenant ? 'Actualizar inquilino' : 'Crear inquilino'}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.back()}>

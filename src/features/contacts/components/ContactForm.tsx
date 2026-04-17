@@ -11,7 +11,7 @@ const initialState = { error: '', success: false };
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="bg-blue-600 hover:bg-blue-500">
+    <Button type="submit" disabled={pending} >
       {pending ? 'Guardando...' : 'Guardar Contacto'}
     </Button>
   );
