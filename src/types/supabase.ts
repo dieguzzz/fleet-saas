@@ -611,6 +611,128 @@ export type Database = {
           },
         ]
       }
+      land_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          due_date: string
+          id: string
+          notes: string | null
+          organization_id: string
+          paid_amount: number | null
+          paid_date: string | null
+          payment_method: string | null
+          period_month: number
+          period_year: number
+          receipt_url: string | null
+          status: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          due_date: string
+          id?: string
+          notes?: string | null
+          organization_id: string
+          paid_amount?: number | null
+          paid_date?: string | null
+          payment_method?: string | null
+          period_month: number
+          period_year: number
+          receipt_url?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          due_date?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          paid_amount?: number | null
+          paid_date?: string | null
+          payment_method?: string | null
+          period_month?: number
+          period_year?: number
+          receipt_url?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "land_payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "land_payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "land_tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      land_tenants: {
+        Row: {
+          created_at: string | null
+          due_day: number
+          equipment_description: string | null
+          id: string
+          monthly_amount: number
+          name: string
+          notes: string | null
+          organization_id: string
+          phone: string | null
+          start_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          due_day?: number
+          equipment_description?: string | null
+          id?: string
+          monthly_amount?: number
+          name: string
+          notes?: string | null
+          organization_id: string
+          phone?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          due_day?: number
+          equipment_description?: string | null
+          id?: string
+          monthly_amount?: number
+          name?: string
+          notes?: string | null
+          organization_id?: string
+          phone?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "land_tenants_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_records: {
         Row: {
           attachments: Json | null
