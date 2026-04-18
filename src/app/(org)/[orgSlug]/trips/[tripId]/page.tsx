@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { getTrip } from '@/features/trips/actions';
 import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
+import { CompleteTripButton } from '@/features/trips/components/CompleteTripButton';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -49,7 +50,7 @@ export default async function TripDetailPage({
             {trip.vehicle?.name} ({trip.vehicle?.plate_number})
           </p>
         </div>
-        <div>
+        <div className="flex items-center gap-3">
           <span
             className={`px-3 py-1 rounded-full text-sm font-semibold capitalize
               ${trip.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
@@ -63,6 +64,9 @@ export default async function TripDetailPage({
              trip.status === 'planned' ? 'Planificado' :
              trip.status === 'cancelled' ? 'Cancelado' : trip.status}
           </span>
+          {(trip.status === 'in_progress' || trip.status === 'planned') && (
+            <CompleteTripButton tripId={trip.id} orgSlug={orgSlug} />
+          )}
         </div>
       </div>
       
@@ -121,7 +125,45 @@ export default async function TripDetailPage({
                <span className="text-gray-500 text-sm">Combustible Consumido</span>
                <span className="font-medium">{trip.fuel_consumed || 0} L</span>
              </div>
-             {/* We could calculate total cost here if we had fuel price, or just sum expenses */}
+          </div>
+
+          {/* Facturas */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4 border-b pb-2">Facturas</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Factura de Inicio</p>
+                {trip.start_invoice_url ? (
+                  <a
+                    href={trip.start_invoice_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    Ver factura de inicio
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-400">Sin factura</p>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Factura Final</p>
+                {trip.end_invoice_url ? (
+                  <a
+                    href={trip.end_invoice_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    Ver factura final
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    {trip.status === 'completed' ? 'Sin factura final' : 'Se pedirá al completar'}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -98,6 +98,8 @@ export interface Trip {
   fuel_consumed: number | null;
   notes: string | null;
   status: TripStatus | null;
+  start_invoice_url: string | null;
+  end_invoice_url: string | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined data

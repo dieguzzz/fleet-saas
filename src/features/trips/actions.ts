@@ -90,6 +90,7 @@ export async function createTrip(prevState: unknown, formData: FormData) {
       status: (formData.get('status') as 'planned' | 'in_progress' | 'completed' | 'cancelled') || 'planned',
       notes: formData.get('notes') as string,
       started_at: formData.get('status') === 'in_progress' ? new Date().toISOString() : null,
+      start_invoice_url: (formData.get('start_invoice_url') as string) || null,
     });
 
   if (error) {
@@ -144,6 +145,28 @@ export async function createTripExpense(prevState: unknown, formData: FormData) 
 
   revalidatePath(`/${orgSlug}/trips/${tripId}`);
   redirect(`/${orgSlug}/trips/${tripId}`);
+}
+
+export async function markTripCompleted(tripId: string, orgSlug: string, endInvoiceUrl: string | null) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('trips')
+    .update({
+      status: 'completed',
+      ended_at: new Date().toISOString(),
+      ...(endInvoiceUrl ? { end_invoice_url: endInvoiceUrl } : {}),
+    })
+    .eq('id', tripId);
+
+  if (error) {
+    console.error('Error completing trip:', error);
+    return { error: error.message };
+  }
+
+  revalidatePath('/[orgSlug]/trips/[tripId]', 'page');
+  revalidatePath(`/${orgSlug}/trips`);
+  return { success: true };
 }
 
 export async function deleteTripExpense(id: string, orgId: string, tripId: string) {

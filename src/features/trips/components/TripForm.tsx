@@ -3,9 +3,10 @@
 import { useActionState } from 'react';
 import { createTrip } from '@/features/trips/actions';
 import Link from 'next/link';
+import { createClient } from '@/services/supabase/client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   ssr: false,
@@ -31,6 +32,30 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
   const [originCoords, setOriginCoords] = useState<{lat: number, lng: number} | undefined>(undefined);
   const [destCoords, setDestCoords] = useState<{lat: number, lng: number} | undefined>(undefined);
   const [selecting, setSelecting] = useState<'origin' | 'destination' | null>(null);
+  const [startInvoiceUrl, setStartInvoiceUrl] = useState<string>('');
+  const [uploadingInvoice, setUploadingInvoice] = useState(false);
+  const [invoiceFileName, setInvoiceFileName] = useState<string>('');
+  const invoiceInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInvoiceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingInvoice(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop();
+      const path = `invoices/start-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
+      setStartInvoiceUrl(data.publicUrl);
+      setInvoiceFileName(file.name);
+    } catch {
+      alert('Error subiendo la factura');
+    } finally {
+      setUploadingInvoice(false);
+    }
+  };
 
   const handleMapClick = (type: 'origin' | 'destination', lat: number, lng: number) => {
     if (selecting === 'origin') {
@@ -180,6 +205,33 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
             rows={3}
             placeholder="Detalles adicionales del viaje..."
             className="field-input"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">
+            Factura de Inicio <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <input type="hidden" name="start_invoice_url" value={startInvoiceUrl} />
+          <div
+            className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+            onClick={() => invoiceInputRef.current?.click()}
+          >
+            {invoiceFileName ? (
+              <p className="text-sm text-green-600 font-medium">{invoiceFileName}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {uploadingInvoice ? 'Subiendo...' : 'Clic para adjuntar factura (PDF, imagen)'}
+              </p>
+            )}
+          </div>
+          <input
+            ref={invoiceInputRef}
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            className="hidden"
+            onChange={handleInvoiceUpload}
+            disabled={uploadingInvoice}
           />
         </div>
 

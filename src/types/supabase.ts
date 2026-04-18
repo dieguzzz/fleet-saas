@@ -1019,6 +1019,7 @@ export type Database = {
           destination_coords: Json | null
           distance_km: number | null
           driver_id: string | null
+          end_invoice_url: string | null
           ended_at: string | null
           fuel_consumed: number | null
           id: string
@@ -1026,6 +1027,7 @@ export type Database = {
           organization_id: string
           origin: string
           origin_coords: Json | null
+          start_invoice_url: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["trip_status"] | null
           updated_at: string | null
@@ -1037,6 +1039,7 @@ export type Database = {
           destination_coords?: Json | null
           distance_km?: number | null
           driver_id?: string | null
+          end_invoice_url?: string | null
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
@@ -1044,6 +1047,7 @@ export type Database = {
           organization_id: string
           origin: string
           origin_coords?: Json | null
+          start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
           updated_at?: string | null
@@ -1055,6 +1059,7 @@ export type Database = {
           destination_coords?: Json | null
           distance_km?: number | null
           driver_id?: string | null
+          end_invoice_url?: string | null
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
@@ -1062,6 +1067,7 @@ export type Database = {
           organization_id?: string
           origin?: string
           origin_coords?: Json | null
+          start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
           updated_at?: string | null
