@@ -12,7 +12,7 @@ export default async function NewTenantPage({ params }: { params: Promise<{ orgS
   if (!org) notFound();
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Link
           href={`/${orgSlug}/terreno`}

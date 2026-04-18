@@ -22,7 +22,7 @@ export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsF
   const [state, formAction] = useActionState(updateOrganizationSettings, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5">
+    <form action={formAction} className="form-card form-section">
       <input type="hidden" name="orgSlug" value={orgSlug} />
 
       {state?.error && (
@@ -37,15 +37,15 @@ export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsF
         </div>
       )}
 
-      <div className="space-y-2">
+      <div>
         <label htmlFor="name" className="field-label">Nombre de la Organización</label>
-        <input id="name" name="name" type="text" required defaultValue={orgName} className="field-input" />
-        <p className="text-xs text-muted-foreground">
+        <input id="name" name="name" type="text" required defaultValue={orgName} className="field-input sm:max-w-sm" />
+        <p className="text-xs text-muted-foreground mt-1">
           Este nombre es visible para todos los miembros del equipo.
         </p>
       </div>
 
-      <div className="pt-4">
+      <div className="form-footer justify-start border-0 pt-0 mt-0">
         <SubmitButton />
       </div>
     </form>

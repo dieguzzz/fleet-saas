@@ -15,9 +15,9 @@ export default async function NewMaintenancePage({
   const { data: vehicles } = await getVehicles(org.id);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-xl lg:text-2xl font-bold text-slate-800">Registrar Mantenimiento</h1>
+        <h1 className="text-lg font-semibold text-foreground">Registrar Mantenimiento</h1>
         <p className="text-slate-500 text-sm mt-1">Registra un nuevo servicio de mantenimiento.</p>
       </div>
       <MaintenanceForm orgSlug={orgSlug} vehicles={vehicles || []} />

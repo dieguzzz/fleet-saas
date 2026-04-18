@@ -119,7 +119,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </button>
         </div>
 
-        <form action={formAction} className="p-6 space-y-4">
+        <form action={formAction} className="p-5 space-y-3">
           <input type="hidden" name="paymentId" value={payment.id} />
           <input type="hidden" name="orgSlug" value={orgSlug} />
 

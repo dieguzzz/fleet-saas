@@ -96,16 +96,16 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6">
+    <form action={handleSubmit} className="space-y-4">
       {error && (
         <div className="bg-destructive/10 text-destructive p-3 rounded-lg text-sm border border-destructive/20">{error}</div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         {/* LEFT — campos principales (2/3) */}
         <div className="lg:col-span-2">
-          <div className="form-card space-y-5">
+          <div className="form-card form-section">
             <div className="flex items-center gap-3">
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${invoiceType === 'cobro' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                 {invoiceType === 'cobro' ? '↑ Cobro' : '↓ Pago'}
@@ -115,7 +115,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="form-grid-2">
               <div>
                 <label className="field-label">Número de Factura</label>
                 {isEditing ? (
@@ -142,9 +142,6 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
                   <option value="cancelled">Cancelada</option>
                 </select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="field-label">Fecha</label>
                 <input
@@ -165,7 +162,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
               <label className="field-label">Notas</label>
               <textarea
                 name="notes"
-                rows={4}
+                rows={2}
                 defaultValue={invoice?.notes ?? ''}
                 className="field-input resize-none"
                 placeholder="Notas opcionales..."
@@ -175,10 +172,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
         </div>
 
         {/* RIGHT — importes + adjunto + botones (1/3) */}
-        <div className="space-y-4">
+        <div className="space-y-3">
 
           {/* Importes */}
-          <div className="form-card space-y-4">
+          <div className="form-card space-y-3">
             <h3 className="text-sm font-semibold text-foreground">Importes</h3>
             <div>
               <label className="field-label">Subtotal ($)</label>
@@ -211,7 +208,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
           </div>
 
           {/* Adjunto */}
-          <div className="form-card space-y-3">
+          <div className="form-card space-y-2">
             <h3 className="text-sm font-semibold text-foreground">
               Adjunto <span className="font-normal text-muted-foreground">(PDF o imagen)</span>
             </h3>

@@ -24,7 +24,7 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
   const [state, formAction] = useActionState(createMaintenanceRecord, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5">
+    <form action={formAction} className="form-card form-section">
       <input type="hidden" name="orgSlug" value={orgSlug} />
 
       {state?.error && (
@@ -33,8 +33,8 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="space-y-2">
+      <div className="form-grid">
+        <div>
           <label htmlFor="vehicle_id" className="field-label">Vehículo *</label>
           <select id="vehicle_id" name="vehicle_id" required className="field-input">
             <option value="">Seleccionar vehículo</option>
@@ -44,7 +44,7 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
           </select>
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="type" className="field-label">Tipo de Mantenimiento *</label>
           <select id="type" name="type" required className="field-input">
             <option value="">Seleccionar tipo</option>
@@ -55,49 +55,49 @@ export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormPr
           </select>
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="performed_at" className="field-label">Fecha Realizada *</label>
           <input id="performed_at" name="performed_at" type="date" required
             defaultValue={new Date().toISOString().split('T')[0]} className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="cost" className="field-label">Costo Total *</label>
           <input id="cost" name="cost" type="number" step="0.01" min="0"
             placeholder="0.00" required className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="odometer_reading" className="field-label">Lectura Odómetro (km)</label>
           <input id="odometer_reading" name="odometer_reading" type="number"
             min="0" placeholder="Ej. 50000" className="field-input" />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="performed_by" className="field-label">Realizado por (Taller/Mecánico)</label>
+        <div>
+          <label htmlFor="performed_by" className="field-label">Realizado por</label>
           <input id="performed_by" name="performed_by" type="text"
             placeholder="Ej. Taller Central" className="field-input" />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="next_due_at" className="field-label">Próximo Mantenimiento (Fecha)</label>
+        <div>
+          <label htmlFor="next_due_at" className="field-label">Próximo Mant. (Fecha)</label>
           <input id="next_due_at" name="next_due_at" type="date" className="field-input" />
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="next_due_km" className="field-label">Próximo Mantenimiento (Km)</label>
+        <div>
+          <label htmlFor="next_due_km" className="field-label">Próximo Mant. (Km)</label>
           <input id="next_due_km" name="next_due_km" type="number"
             min="0" placeholder="Ej. 60000" className="field-input" />
         </div>
+
+        <div className="sm:col-span-2 lg:col-span-3">
+          <label htmlFor="description" className="field-label">Descripción / Detalles</label>
+          <textarea id="description" name="description" rows={2}
+            placeholder="Detalles del trabajo realizado..." className="field-input" />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="description" className="field-label">Descripción / Detalles</label>
-        <textarea id="description" name="description" rows={3}
-          placeholder="Detalles del trabajo realizado..." className="field-input" />
-      </div>
-
-      <div className="flex items-center gap-4 pt-4">
+      <div className="form-footer">
         <Button variant="outline" asChild>
           <Link href={`/${orgSlug}/maintenance`}>Cancelar</Link>
         </Button>

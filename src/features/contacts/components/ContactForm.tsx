@@ -21,7 +21,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
   const [state, formAction] = useActionState(createContact, initialState);
 
   return (
-    <form action={formAction} className="form-card space-y-5">
+    <form action={formAction} className="form-card form-section">
       <input type="hidden" name="orgSlug" value={orgSlug} />
 
       {state?.error && (
@@ -30,13 +30,13 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="space-y-2">
+      <div className="form-grid">
+        <div>
           <label htmlFor="name" className="field-label">Nombre Completo *</label>
           <input id="name" name="name" type="text" required placeholder="Ej. Juan Pérez" className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="role" className="field-label">Rol / Tipo</label>
           <select id="role" name="role" className="field-input">
             <option value="">Seleccionar rol</option>
@@ -48,41 +48,41 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
           </select>
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="company" className="field-label">Empresa</label>
           <input id="company" name="company" type="text" placeholder="Ej. Transportes SA" className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="email" className="field-label">Email</label>
           <input id="email" name="email" type="email" placeholder="juan@ejemplo.com" className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="phone" className="field-label">Teléfono</label>
           <input id="phone" name="phone" type="tel" placeholder="+1 234 567 890" className="field-input" />
         </div>
 
-        <div className="space-y-2">
+        <div>
           <label htmlFor="address" className="field-label">Dirección</label>
           <input id="address" name="address" type="text" placeholder="Calle Principal 123" className="field-input" />
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <label htmlFor="notes" className="field-label">Notas</label>
-        <textarea id="notes" name="notes" rows={3} className="field-input" />
+        <div className="sm:col-span-2 lg:col-span-3">
+          <label htmlFor="notes" className="field-label">Notas</label>
+          <textarea id="notes" name="notes" rows={2} className="field-input" />
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
         <input id="is_emergency" name="is_emergency" type="checkbox"
-          className="w-4 h-4 text-blue-600 border-input rounded focus:ring-blue-500" />
+          className="w-4 h-4 border-input rounded" />
         <label htmlFor="is_emergency" className="text-sm font-medium text-foreground">
           Es contacto de emergencia
         </label>
       </div>
 
-      <div className="flex items-center gap-4 pt-4">
+      <div className="form-footer">
         <Button variant="outline" asChild>
           <Link href={`/${orgSlug}/contacts`}>Cancelar</Link>
         </Button>

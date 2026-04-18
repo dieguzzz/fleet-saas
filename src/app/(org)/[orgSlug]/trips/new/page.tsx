@@ -52,9 +52,9 @@ export default async function NewTripPage({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h1 className="text-xl lg:text-2xl font-bold text-slate-800">Planificar Nuevo Viaje</h1>
+        <h1 className="text-lg font-semibold text-foreground">Planificar Nuevo Viaje</h1>
         <p className="text-slate-500 text-sm mt-1">Asigna un vehículo y conductor a una ruta.</p>
       </div>
       <TripForm

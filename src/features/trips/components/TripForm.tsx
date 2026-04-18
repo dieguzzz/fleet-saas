@@ -53,7 +53,7 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <form action={formAction} className="space-y-6">
+      <form action={formAction} className="space-y-3">
         <input type="hidden" name="orgSlug" value={orgSlug} />
         <input type="hidden" name="origin_coords" value={originCoords ? JSON.stringify(originCoords) : ''} />
         <input type="hidden" name="destination_coords" value={destCoords ? JSON.stringify(destCoords) : ''} />
@@ -183,17 +183,17 @@ export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) 
           />
         </div>
 
-        <div className="flex items-center gap-4 pt-4">
+        <div className="form-footer">
           <Link
             href={`/${orgSlug}/trips`}
-            className="px-6 py-2 border border-border rounded-lg text-muted-foreground hover:bg-accent transition-colors"
+            className="px-4 py-1.5 border border-border rounded-lg text-muted-foreground hover:bg-accent transition-colors text-sm"
           >
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={isPending}
-            className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
           >
             {isPending ? 'Guardando...' : 'Crear Viaje'}
           </button>

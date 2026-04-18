@@ -26,7 +26,7 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
   const [state, formAction, isPending] = useActionState(action, {});
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form action={formAction} className="form-section">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       {employee && <input type="hidden" name="employeeId" value={employee.id} />}
 
@@ -36,8 +36,8 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2">
+      <div className="form-grid">
+        <div>
           <label className="field-label">Nombre completo *</label>
           <input name="full_name" type="text" required defaultValue={employee?.full_name}
             className="field-input" placeholder="Juan García" />
@@ -68,6 +68,15 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
         </div>
 
         <div>
+          <label className="field-label">Estado</label>
+          <select name="status" defaultValue={employee?.status ?? 'active'} className="field-input">
+            <option value="active">Activo</option>
+            <option value="inactive">Inactivo</option>
+            <option value="on_leave">De licencia</option>
+          </select>
+        </div>
+
+        <div>
           <label className="field-label">Nº de licencia de conducir</label>
           <input name="license_number" type="text" defaultValue={employee?.license_number ?? ''}
             className="field-input" placeholder="12345678" />
@@ -85,25 +94,18 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
             defaultValue={employee?.hire_date?.split('T')[0] ?? ''} className="field-input" />
         </div>
 
-        <div>
-          <label className="field-label">Estado</label>
-          <select name="status" defaultValue={employee?.status ?? 'active'} className="field-input">
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="on_leave">De licencia</option>
-          </select>
-        </div>
-
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2 lg:col-span-3">
           <label className="field-label">Notas</label>
-          <textarea name="notes" rows={3} defaultValue={employee?.notes ?? ''}
+          <textarea name="notes" rows={2} defaultValue={employee?.notes ?? ''}
             className="field-input" placeholder="Observaciones adicionales..." />
         </div>
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? 'Guardando...' : employee ? 'Guardar cambios' : 'Crear empleado'}
-      </Button>
+      <div className="form-footer">
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Guardando...' : employee ? 'Guardar cambios' : 'Crear empleado'}
+        </Button>
+      </div>
     </form>
   );
 }

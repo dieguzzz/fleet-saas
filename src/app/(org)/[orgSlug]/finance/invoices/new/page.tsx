@@ -17,8 +17,8 @@ export default async function NewInvoicePage({
   if (!org) notFound();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl lg:text-2xl font-bold tracking-tight text-slate-800">
+    <div className="space-y-4">
+      <h1 className="text-lg font-semibold text-foreground">
         Nueva Factura de {invoiceType === 'cobro' ? 'Cobro' : 'Pago'}
       </h1>
       <InvoiceForm
