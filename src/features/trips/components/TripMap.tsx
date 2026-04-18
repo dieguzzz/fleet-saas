@@ -39,6 +39,20 @@ function MapUpdater({ center }: { center: [number, number] }) {
   return null;
 }
 
+function GeolocateOnMount({ skip }: { skip: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (skip || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+      },
+      () => { /* permiso denegado — mantiene centro por defecto */ }
+    );
+  }, [map, skip]);
+  return null;
+}
+
 function MapClickHandler({ onClick }: { onClick?: (lat: number, lng: number) => void }) {
   useMapEvents({
     click(e) {
@@ -97,6 +111,7 @@ export function TripMap({
       )}
 
       <MapUpdater center={center as [number, number]} />
+      <GeolocateOnMount skip={!!(origin || destination)} />
       {interactive && <MapClickHandler onClick={onMapClick} />}
     </Map>
   );
