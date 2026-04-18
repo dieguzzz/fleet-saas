@@ -3,6 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { logAudit } from '@/lib/audit';
 
 const fuelSchema = z.object({
   vehicle_id: z.string().uuid().optional().or(z.literal('')),
@@ -61,14 +62,18 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
     return { error: 'Error al guardar registro de combustible' };
   }
 
+  await logAudit({ organizationId: org.id, action: 'create', resourceType: 'fuel_record', resourceLabel: `${validated.data.liters}L - ${validated.data.fuel_type}` });
+
   revalidatePath(`/${orgSlug}/fuel`);
   return { success: true };
 }
 
 export async function deleteFuelRecord(id: string, orgSlug: string) {
   const supabase = await createClient();
+  const { data: rec } = await supabase.from('fuel_records').select('organization_id, fuel_type, liters').eq('id', id).single();
   const { error } = await supabase.from('fuel_records').delete().eq('id', id);
   if (error) throw new Error('Error al eliminar registro');
+  if (rec) await logAudit({ organizationId: rec.organization_id, action: 'delete', resourceType: 'fuel_record', resourceId: id, resourceLabel: `${rec.liters}L - ${rec.fuel_type}` });
   revalidatePath(`/${orgSlug}/fuel`);
 }
 

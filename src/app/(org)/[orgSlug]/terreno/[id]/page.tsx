@@ -9,8 +9,9 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ o
   const { orgSlug, id } = await params;
   const supabase = await createClient();
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) notFound();
+  const { data: orgData } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!orgData) notFound();
+  const org = orgData as unknown as { id: string };
 
   const { data: tenant } = await getTenant(id);
   if (!tenant || tenant.organization_id !== org.id) notFound();

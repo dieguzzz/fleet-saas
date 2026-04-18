@@ -18,8 +18,9 @@ export default async function InvoicePage({
     .single();
 
   if (!org) notFound();
+  const orgId = (org as unknown as { id: string }).id;
 
-  const { data: invoice } = await getInvoice(invoiceId, org.id);
+  const { data: invoice } = await getInvoice(invoiceId, orgId);
 
   if (!invoice) {
     notFound();

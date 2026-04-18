@@ -104,10 +104,14 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
       .limit(3),
   ]);
 
+  type TripRow = { id: string; origin: string; destination: string; status: string | null; started_at: string | null; updated_at: string | null };
+  type MaintRow = { id: string; type: string; performed_at: string; vehicle_id: string };
+  type InvRow = { id: string; invoice_number: string; status: string | null; date: string; invoice_type: string };
+
   type ActivityItem = { id: string; text: string; time: string; type: 'success' | 'warning' | 'info'; href: string };
   const items: ActivityItem[] = [];
 
-  for (const t of trips ?? []) {
+  for (const t of (trips as unknown as TripRow[] | null) ?? []) {
     items.push({
       id: `trip-${t.id}`,
       text: `Viaje: ${t.origin} → ${t.destination}`,
@@ -117,7 +121,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     });
   }
 
-  for (const m of maintenance ?? []) {
+  for (const m of (maintenance as unknown as MaintRow[] | null) ?? []) {
     items.push({
       id: `maint-${m.id}`,
       text: `Mantenimiento: ${m.type}`,
@@ -127,7 +131,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     });
   }
 
-  for (const inv of invoices ?? []) {
+  for (const inv of (invoices as unknown as InvRow[] | null) ?? []) {
     items.push({
       id: `inv-${inv.id}`,
       text: `Factura ${inv.invoice_number} (${inv.invoice_type === 'pago' ? 'Pago' : 'Cobro'})`,

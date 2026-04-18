@@ -503,3 +503,23 @@ file public/manifest.json  # debe decir "ASCII text" no "with CRLF line terminat
 ```
 
 **Regla:** Los archivos en `public/` (manifest.json, sw.js, etc.) deben tener LF. Configurar `.gitattributes` si es necesario para forzar LF en esos archivos.
+
+---
+
+## REGLA 19 — Documentación Obsidian: actualizar junto con el código
+
+**Vault:** `C:\Users\Diegu\Obisdian-BlackdogAPP\Proyectos\Fleet SaaS\`
+
+**Estructura:**
+```
+00 - Index.md          ← tabla de módulos + links a docs base
+01 - Arquitectura.md   ← auth, middleware, rutas, zustand
+02 - Base de Datos.md  ← tablas, enums, funciones PL/pgSQL
+03 - Patrones.md       ← server actions, forms, errores, checklist
+Módulos/
+  Vehículos.md · Viajes.md · Mantenimiento.md · Combustible.md
+  Finanzas.md · Inventario.md · Empleados.md · Contactos.md
+  Terreno.md · Equipo.md · Ajustes.md
+```
+
+**Regla:** Cada vez que se crea o modifica un módulo, actualizar el archivo `.md` correspondiente en el vault de Obsidian. Si se agrega un módulo nuevo, crear su archivo en `Módulos/` y agregarlo al índice en `00 - Index.md`. Los links entre notas usan sintaxis `[[NombreNota]]` de Obsidian.

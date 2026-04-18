@@ -117,7 +117,7 @@ export async function updateProfile(prevState: unknown, formData: FormData) {
   }
 
   if (fullName) {
-    const { error } = await supabase.from('profiles').update({ full_name: fullName }).eq('id', user.id);
+    const { error } = await supabase.from('profiles').update({ full_name: fullName } as never).eq('id', user.id);
     if (error) return { error: error.message };
   }
 

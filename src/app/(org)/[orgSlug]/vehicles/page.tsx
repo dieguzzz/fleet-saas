@@ -13,7 +13,7 @@ export default async function VehiclesPage({ params }: { params: Promise<{ orgSl
   if (!org) notFound();
 
   const { data: vehiclesData } = await getVehicles(org.id);
-  const vehicles = (vehiclesData || []).map((v) => ({
+  const vehicles = ((vehiclesData as unknown as import('@/types/database').Vehicle[] | null) || []).map((v) => ({
     ...v,
     status: (v.status as 'active' | 'maintenance' | 'inactive') || 'active',
   }));

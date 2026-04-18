@@ -10,10 +10,12 @@ export default async function EmployeesPage({ params }: { params: Promise<{ orgS
   const { orgSlug } = await params;
   const supabase = await createClient();
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) notFound();
+  const { data: orgData } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!orgData) notFound();
+  const org = orgData as { id: string };
 
-  const { data: employees } = await getEmployees(org.id);
+  const { data: rawEmployees } = await getEmployees(org.id);
+  const employees = rawEmployees as unknown as import('@/types/database').Employee[] | null;
 
   const active = (employees ?? []).filter(e => e.status === 'active').length;
   const withExpiringLicense = (employees ?? []).filter(e => {

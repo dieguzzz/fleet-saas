@@ -10,15 +10,16 @@ export default async function NewTripPage({
   const supabase = await createClient();
 
   // 1. Get Org ID from Slug
-  const { data: org } = await supabase
+  const { data: orgRaw } = await supabase
     .from('organizations')
     .select('id')
     .eq('slug', orgSlug)
     .single();
 
-  if (!org) {
+  if (!orgRaw) {
     return <div>Organización no encontrada</div>;
   }
+  const org = orgRaw as unknown as { id: string };
 
   // 2. Fetch Vehicles
   const { data: vehiclesData } = await supabase
@@ -27,7 +28,8 @@ export default async function NewTripPage({
     .eq('organization_id', org.id)
     .order('name');
 
-  const vehicles = (vehiclesData || []).map((v) => ({
+  type VehicleRow = { id: string; name: string; plate_number: string | null };
+  const vehicles = ((vehiclesData as unknown as VehicleRow[] | null) || []).map((v) => ({
     ...v,
     plate_number: v.plate_number || '',
   }));

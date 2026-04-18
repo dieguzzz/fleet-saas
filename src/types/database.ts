@@ -196,6 +196,20 @@ export interface FuelRecord {
   employee?: Employee;
 }
 
+export interface AuditLog {
+  id: string;
+  organization_id: string;
+  user_id: string | null;
+  action: 'create' | 'update' | 'delete';
+  resource_type: string;
+  resource_id: string | null;
+  resource_label: string | null;
+  metadata: Json | null;
+  created_at: string;
+  // joined
+  user?: { full_name: string | null; email: string };
+}
+
 export interface ImpersonationLog {
   id: string;
   super_admin_id: string;
@@ -339,6 +353,12 @@ export interface Database {
         Row: FinancialTransaction;
         Insert: Omit<FinancialTransaction, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<FinancialTransaction, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
+        Relationships: [];
+      };
+      audit_logs: {
+        Row: AuditLog;
+        Insert: Omit<AuditLog, 'id' | 'created_at' | 'user'>;
+        Update: never;
         Relationships: [];
       };
       impersonation_logs: {

@@ -4,6 +4,7 @@ import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { logAudit } from '@/lib/audit';
 
 const employeeSchema = z.object({
   full_name: z.string().min(1, 'El nombre es obligatorio'),
@@ -42,17 +43,19 @@ export async function createEmployee(prevState: EmployeeFormState, formData: For
 
   if (!validated.success) return { error: validated.error.issues[0].message };
 
-  const { error } = await supabase.from('employees').insert({
+  const { data: employee, error } = await supabase.from('employees').insert({
     organization_id: org.id,
     ...validated.data,
     license_expiry: validated.data.license_expiry || null,
     hire_date: validated.data.hire_date || null,
-  });
+  }).select('id').single();
 
   if (error) {
     console.error('Error creating employee:', error);
     return { error: 'Error al crear empleado' };
   }
+
+  await logAudit({ organizationId: org.id, action: 'create', resourceType: 'employee', resourceId: employee?.id, resourceLabel: validated.data.full_name });
 
   revalidatePath(`/${orgSlug}/employees`);
   redirect(`/${orgSlug}/employees`);
@@ -90,14 +93,19 @@ export async function updateEmployee(prevState: EmployeeFormState, formData: For
     return { error: 'Error al actualizar empleado' };
   }
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (org) await logAudit({ organizationId: org.id, action: 'update', resourceType: 'employee', resourceId: employeeId, resourceLabel: validated.data.full_name });
+
   revalidatePath(`/${orgSlug}/employees`);
   redirect(`/${orgSlug}/employees`);
 }
 
 export async function deleteEmployee(employeeId: string, orgSlug: string) {
   const supabase = await createClient();
+  const { data: emp } = await supabase.from('employees').select('full_name, organization_id').eq('id', employeeId).single();
   const { error } = await supabase.from('employees').delete().eq('id', employeeId);
   if (error) throw new Error('Error al eliminar empleado');
+  if (emp) await logAudit({ organizationId: emp.organization_id, action: 'delete', resourceType: 'employee', resourceId: employeeId, resourceLabel: emp.full_name });
   revalidatePath(`/${orgSlug}/employees`);
 }
 

@@ -4,6 +4,7 @@ import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { logAudit } from '@/lib/audit';
 
 const vehicleSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),
@@ -24,18 +25,14 @@ export async function createVehicle(prevState: CreateVehicleState, formData: For
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
-  // 1. Get Organization ID
   const { data: org } = await supabase
     .from('organizations')
     .select('id')
     .eq('slug', orgSlug)
     .single();
 
-  if (!org) {
-    return { error: 'Organización no encontrada' };
-  }
+  if (!org) return { error: 'Organización no encontrada' };
 
-  // 2. Validate Data
   const rawData = {
     name: formData.get('name'),
     type: formData.get('type'),
@@ -47,26 +44,31 @@ export async function createVehicle(prevState: CreateVehicleState, formData: For
   };
 
   const validatedFields = vehicleSchema.safeParse(rawData);
-
   if (!validatedFields.success) {
     return { error: validatedFields.error.flatten().fieldErrors.name?.[0] || 'Datos inválidos' };
   }
 
-  // 3. Insert Vehicle
-  const { error } = await supabase.from('vehicles').insert({
+  const { data: vehicle, error } = await supabase.from('vehicles').insert({
     organization_id: org.id,
     ...validatedFields.data,
-  });
+  }).select('id').single();
 
   if (error) {
     console.error('Error creating vehicle:', error);
     return { error: 'Error al crear el vehículo' };
   }
 
+  await logAudit({
+    organizationId: org.id,
+    action: 'create',
+    resourceType: 'vehicle',
+    resourceId: vehicle?.id,
+    resourceLabel: validatedFields.data.name,
+  });
+
   revalidatePath(`/${orgSlug}/vehicles`);
   redirect(`/${orgSlug}/vehicles`);
 }
-
 
 export async function updateVehicle(
   orgSlug: string,
@@ -87,12 +89,8 @@ export async function updateVehicle(
   };
 
   const validatedFields = vehicleSchema.safeParse(rawData);
+  if (!validatedFields.success) return { error: 'Datos inválidos' };
 
-  if (!validatedFields.success) {
-    return { error: 'Datos inválidos' };
-  }
-
-  // Get org ID to enforce ownership
   const { data: org } = await supabase
     .from('organizations')
     .select('id')
@@ -112,6 +110,14 @@ export async function updateVehicle(
     return { error: 'Error al actualizar el vehículo' };
   }
 
+  await logAudit({
+    organizationId: org.id,
+    action: 'update',
+    resourceType: 'vehicle',
+    resourceId: vehicleId,
+    resourceLabel: validatedFields.data.name,
+  });
+
   revalidatePath(`/${orgSlug}/vehicles`);
   redirect(`/${orgSlug}/vehicles`);
 }
@@ -119,7 +125,6 @@ export async function updateVehicle(
 export async function deleteVehicle(orgSlug: string, vehicleId: string) {
   const supabase = await createClient();
 
-  // Get org ID from slug to enforce ownership
   const { data: org } = await supabase
     .from('organizations')
     .select('id')
@@ -127,6 +132,12 @@ export async function deleteVehicle(orgSlug: string, vehicleId: string) {
     .single();
 
   if (!org) throw new Error('Organización no encontrada');
+
+  const { data: vehicle } = await supabase
+    .from('vehicles')
+    .select('name')
+    .eq('id', vehicleId)
+    .single();
 
   const { error } = await supabase
     .from('vehicles')
@@ -139,12 +150,19 @@ export async function deleteVehicle(orgSlug: string, vehicleId: string) {
     throw new Error('Error al eliminar el vehículo');
   }
 
+  await logAudit({
+    organizationId: org.id,
+    action: 'delete',
+    resourceType: 'vehicle',
+    resourceId: vehicleId,
+    resourceLabel: vehicle?.name,
+  });
+
   revalidatePath(`/${orgSlug}/vehicles`);
 }
 
 export async function getVehicles(orgId: string) {
   const supabase = await createClient();
-
   return await supabase
     .from('vehicles')
     .select('*')
@@ -154,7 +172,6 @@ export async function getVehicles(orgId: string) {
 
 export async function getVehicle(vehicleId: string) {
   const supabase = await createClient();
-
   return await supabase
     .from('vehicles')
     .select('*')

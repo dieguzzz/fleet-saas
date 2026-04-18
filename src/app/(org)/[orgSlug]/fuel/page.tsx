@@ -15,17 +15,18 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
   const { orgSlug } = await params;
   const supabase = await createClient();
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) notFound();
+  const { data: orgData } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!orgData) notFound();
+  const orgId = (orgData as unknown as { id: string }).id;
 
   const [{ data: records }, { data: vehicles }, { data: employeesData }, stats] = await Promise.all([
-    getFuelRecords(org.id),
-    supabase.from('vehicles').select('id, name, plate_number').eq('organization_id', org.id).eq('status', 'active').order('name'),
-    getEmployees(org.id),
-    getFuelStats(org.id),
+    getFuelRecords(orgId),
+    supabase.from('vehicles').select('id, name, plate_number').eq('organization_id', orgId).eq('status', 'active').order('name'),
+    getEmployees(orgId),
+    getFuelStats(orgId),
   ]);
 
-  const employees = (employeesData ?? []).filter(e => e.status === 'active');
+  const employees = (employeesData as unknown as import('@/types/database').Employee[] | null ?? []).filter(e => e.status === 'active');
 
   const fuelRecords = (records ?? []) as unknown as {
     id: string; fuel_type: string; liters: number; price_per_liter: number; total_cost: number;

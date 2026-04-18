@@ -22,8 +22,9 @@ export default async function TerrenoPage({ params }: { params: Promise<{ orgSlu
   const { orgSlug } = await params;
   const supabase = await createClient();
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) notFound();
+  const { data: orgData } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!orgData) notFound();
+  const org = orgData as unknown as { id: string };
 
   const now = new Date();
   const year = now.getFullYear();

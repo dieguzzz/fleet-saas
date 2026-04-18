@@ -8,8 +8,9 @@ export default async function EditVehiclePage({
   params: Promise<{ orgSlug: string; vehicleId: string }>;
 }) {
   const { orgSlug, vehicleId } = await params;
-  const { data: vehicle } = await getVehicle(vehicleId);
-  if (!vehicle) notFound();
+  const { data: raw } = await getVehicle(vehicleId);
+  if (!raw) notFound();
+  const vehicle = raw as unknown as import('@/types/database').Vehicle;
 
   return (
     <div className="space-y-6">
