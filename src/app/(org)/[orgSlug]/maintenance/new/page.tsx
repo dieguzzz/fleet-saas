@@ -18,7 +18,7 @@ export default async function NewMaintenancePage({
     <div className="space-y-4">
       <div>
         <h1 className="text-lg font-semibold text-foreground">Registrar Mantenimiento</h1>
-        <p className="text-slate-500 text-sm mt-1">Registra un nuevo servicio de mantenimiento.</p>
+        <p className="text-muted-foreground text-sm mt-1">Registra un nuevo servicio de mantenimiento.</p>
       </div>
       <MaintenanceForm orgSlug={orgSlug} vehicles={vehicles || []} />
     </div>

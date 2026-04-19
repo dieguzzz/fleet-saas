@@ -11,7 +11,7 @@ export default async function NewTripExpensePage({
     <div className="space-y-4">
       <div>
         <h1 className="text-lg font-semibold text-foreground">Registrar Gasto</h1>
-        <p className="text-slate-500 text-sm mt-1">Añade un nuevo gasto a este viaje.</p>
+        <p className="text-muted-foreground text-sm mt-1">Añade un nuevo gasto a este viaje.</p>
       </div>
       <TripExpenseForm orgSlug={orgSlug} tripId={tripId} />
     </div>

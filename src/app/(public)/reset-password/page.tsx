@@ -22,24 +22,24 @@ export default function ResetPasswordPage() {
   }, [state?.success, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
-            <span className="text-white font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-6">Nueva Contraseña</h1>
+        <div className="bg-card border border-border rounded-2xl p-8">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-6">Nueva Contraseña</h1>
 
           {state?.success ? (
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center space-y-2">
               <p className="text-green-400 font-medium">¡Contraseña actualizada!</p>
-              <p className="text-slate-400 text-sm">Redirigiendo al login...</p>
+              <p className="text-muted-foreground text-sm">Redirigiendo al login...</p>
             </div>
           ) : (
             <form action={formAction} className="space-y-5">
@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
               )}
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">
                   Nueva Contraseña
                 </label>
                 <div className="relative">
@@ -64,12 +64,12 @@ export default function ResetPasswordPage() {
                     placeholder="Mínimo 8 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-11 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     tabIndex={-1}
                   >
                     {showPassword ? '🙈' : '👁️'}
@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label htmlFor="confirm" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="confirm" className="block text-sm font-medium text-muted-foreground mb-2">
                   Confirmar Contraseña
                 </label>
                 <input
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                   placeholder="Repetí la contraseña"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className={`w-full px-4 py-3 bg-slate-900 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-slate-700 focus:ring-blue-500'}`}
+                  className={`w-full px-4 py-3 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-blue-500'}`}
                 />
                 {mismatch && <p className="text-xs text-red-400 mt-1">Las contraseñas no coinciden.</p>}
               </div>

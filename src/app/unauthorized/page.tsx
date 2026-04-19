@@ -2,13 +2,13 @@ import Link from 'next/link';
 
 export default function UnauthorizedPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="text-center">
         <div className="text-6xl mb-6">🚫</div>
-        <h1 className="text-3xl font-bold text-white mb-4">
+        <h1 className="text-3xl font-bold text-foreground mb-4">
           Acceso No Autorizado
         </h1>
-        <p className="text-slate-400 mb-8 max-w-md">
+        <p className="text-muted-foreground mb-8 max-w-md">
           No tienes permisos para acceder a esta página.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -20,7 +20,7 @@ export default function UnauthorizedPage() {
           </Link>
           <Link
             href="/login"
-            className="border border-slate-600 hover:border-slate-500 text-slate-300 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="border border-border hover:border-muted-foreground text-muted-foreground hover:text-foreground px-6 py-3 rounded-lg font-medium transition-colors"
           >
             Iniciar Sesión
           </Link>

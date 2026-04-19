@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-background">
       {/* Admin Header */}
       <header className="bg-purple-900 border-b border-purple-800 px-6 py-4">
         <div className="flex items-center justify-between">

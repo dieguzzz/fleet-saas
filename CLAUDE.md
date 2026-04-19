@@ -523,3 +523,42 @@ Módulos/
 ```
 
 **Regla:** Cada vez que se crea o modifica un módulo, actualizar el archivo `.md` correspondiente en el vault de Obsidian. Si se agrega un módulo nuevo, crear su archivo en `Módulos/` y agregarlo al índice en `00 - Index.md`. Los links entre notas usan sintaxis `[[NombreNota]]` de Obsidian.
+
+---
+
+## REGLA 20 — Dark mode: usar solo tokens semánticos, nunca colores hardcoded
+
+**Error que ocurre:** El modo oscuro se ve incoherente — algunos paneles quedan en blanco, textos ilegibles sobre fondos oscuros, navbar sin cambiar, badges con colores que rompen el contraste.
+
+**Causa:** Uso de clases Tailwind con paleta fija (`bg-white`, `bg-slate-800`, `text-gray-900`, `text-white`, `border-gray-200`, `bg-green-100 text-green-800`). Estas clases NO responden al toggle de tema porque `next-themes` cambia solo la clase `dark` en `<html>` y las variables CSS en `:root` / `.dark`.
+
+**Solución — usar exclusivamente los tokens de `globals.css`:**
+
+| En vez de | Usar |
+|---|---|
+| `bg-white`, `bg-slate-800/900` (cards) | `bg-card` |
+| `bg-slate-50/100`, `bg-gray-50` (shell) | `bg-background` |
+| `text-gray-900`, `text-white` (cuerpo) | `text-foreground` |
+| `text-gray-400/500`, `text-slate-400` | `text-muted-foreground` |
+| `border-gray-100/200`, `border-slate-700` | `border-border` |
+| `bg-gray-50`, `bg-slate-800/50` (muted) | `bg-muted` |
+| `text-blue-600` (links) | `text-primary` |
+| hover `bg-gray-50`, `bg-slate-700` | `hover:bg-accent` |
+| Sidebar `bg-slate-900`, `text-white` | `bg-sidebar`, `text-sidebar-foreground` |
+
+**Badges de estado:** usar pair con `dark:`:
+```tsx
+<span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Activo</span>
+```
+
+**Prohibido en componentes nuevos:** `bg-white`, `text-white`, `bg-black`, `text-black`, `bg-slate-*`, `text-slate-*`, `border-slate-*`, `bg-gray-*`, `text-gray-*`, `border-gray-*`, y badges `bg-*-100` sin `dark:` pair.
+
+Excepción permitida: botones de acción con color fijo (`bg-blue-600`, `bg-green-600`, `bg-red-600`) y logos/avatares con gradiente.
+
+**Verificación al crear o modificar un módulo:**
+```bash
+grep -rE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" src/features/<modulo>
+```
+Debe devolver 0 resultados.
+
+**Regla:** Toda UI nueva usa tokens semánticos del sistema. Antes de dar por terminado un módulo, ejecutar el grep de verificación y resolver cualquier ocurrencia.

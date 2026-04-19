@@ -58,10 +58,10 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_CLASSES: Record<string, string> = {
   paid: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  sent: 'bg-blue-100 text-blue-800',
+  sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
   overdue: 'bg-destructive/10 text-destructive',
   draft: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-yellow-100 text-yellow-800',
+  cancelled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
 };
 
 export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) {
@@ -128,7 +128,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
                 <th className="py-3 px-4 font-semibold text-muted-foreground text-sm text-right">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {!invoice.items || invoice.items.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-4 text-center text-muted-foreground italic">

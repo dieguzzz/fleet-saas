@@ -18,19 +18,19 @@ export default function SignUpPage() {
   const mismatch = confirm.length > 0 && password !== confirm;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
-            <span className="text-white font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-6">Crear Cuenta</h1>
+        <div className="bg-card border border-border rounded-2xl p-8">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-6">Crear Cuenta</h1>
 
           <form action={formAction} className="space-y-5">
             {state?.error && (
@@ -40,7 +40,7 @@ export default function SignUpPage() {
             )}
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium text-muted-foreground mb-2">
                 Nombre Completo
               </label>
               <input
@@ -50,12 +50,12 @@ export default function SignUpPage() {
                 required
                 autoComplete="name"
                 placeholder="Juan Pérez"
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
                 Email
               </label>
               <input
@@ -65,12 +65,12 @@ export default function SignUpPage() {
                 required
                 autoComplete="email"
                 placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">
                 Contraseña
               </label>
               <div className="relative">
@@ -84,12 +84,12 @@ export default function SignUpPage() {
                   placeholder="Mínimo 8 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
                 >
                   {showPassword ? '🙈' : '👁️'}
@@ -99,7 +99,7 @@ export default function SignUpPage() {
                 <div className="mt-2 space-y-1">
                   <div className="flex gap-1">
                     {[1, 2, 3].map((s) => (
-                      <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${strength >= s ? strengthColor[strength] : 'bg-slate-700'}`} />
+                      <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${strength >= s ? strengthColor[strength] : 'bg-border'}`} />
                     ))}
                   </div>
                   <p className={`text-xs ${strength === 1 ? 'text-red-400' : strength === 2 ? 'text-yellow-400' : 'text-green-400'}`}>
@@ -110,7 +110,7 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label htmlFor="confirm" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="confirm" className="block text-sm font-medium text-muted-foreground mb-2">
                 Confirmar Contraseña
               </label>
               <input
@@ -122,7 +122,7 @@ export default function SignUpPage() {
                 placeholder="Repetí la contraseña"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className={`w-full px-4 py-3 bg-slate-900 border rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-slate-700 focus:ring-blue-500'}`}
+                className={`w-full px-4 py-3 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-blue-500'}`}
               />
               {mismatch && <p className="text-xs text-red-400 mt-1">Las contraseñas no coinciden.</p>}
             </div>
@@ -137,7 +137,7 @@ export default function SignUpPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-slate-400">
+            <p className="text-muted-foreground">
               ¿Ya tienes cuenta?{' '}
               <Link href="/login" className="text-blue-400 hover:text-blue-300">
                 Iniciar sesión

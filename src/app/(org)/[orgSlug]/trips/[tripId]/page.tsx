@@ -53,10 +53,10 @@ export default async function TripDetailPage({
         <div className="flex items-center gap-3">
           <span
             className={`px-3 py-1 rounded-full text-sm font-semibold capitalize
-              ${trip.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-              ${trip.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : ''}
-              ${trip.status === 'planned' ? 'bg-yellow-100 text-yellow-800' : ''}
-              ${trip.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
+              ${trip.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : ''}
+              ${trip.status === 'in_progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' : ''}
+              ${trip.status === 'planned' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : ''}
+              ${trip.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : ''}
             `}
           >
             {trip.status === 'completed' ? 'Completado' :
@@ -71,7 +71,7 @@ export default async function TripDetailPage({
       </div>
       
       {/* Map Section */}
-      <div className="w-full h-[400px] bg-slate-50 border rounded-xl overflow-hidden shadow-sm">
+      <div className="w-full h-[400px] bg-muted border rounded-xl overflow-hidden shadow-sm">
          <TripMapWrapper 
             origin={originCoords ? { ...originCoords, label: trip.origin } : undefined}
             destination={destCoords ? { ...destCoords, label: trip.destination } : undefined}
@@ -81,58 +81,58 @@ export default async function TripDetailPage({
 
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow col-span-2">
+        <div className="bg-card p-6 rounded-lg shadow col-span-2">
           <h3 className="text-lg font-semibold mb-4 border-b pb-2">Detalles</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="block text-xs font-semibold text-gray-400 uppercase">
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
                 Origen
               </span>
-              <p className="text-gray-900">{trip.origin}</p>
+              <p className="text-foreground">{trip.origin}</p>
             </div>
             <div>
-              <span className="block text-xs font-semibold text-gray-400 uppercase">
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
                 Destino
               </span>
-              <p className="text-gray-900">{trip.destination}</p>
+              <p className="text-foreground">{trip.destination}</p>
             </div>
             <div>
-              <span className="block text-xs font-semibold text-gray-400 uppercase">
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
                 Conductor
               </span>
-              <p className="text-gray-900">{trip.driver?.full_name || 'Sin Asignar'}</p>
+              <p className="text-foreground">{trip.driver?.full_name || 'Sin Asignar'}</p>
             </div>
             <div>
-              <span className="block text-xs font-semibold text-gray-400 uppercase">
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
                 Distancia
               </span>
-              <p className="text-gray-900">{trip.distance_km ? `${trip.distance_km} km` : '-'}</p>
+              <p className="text-foreground">{trip.distance_km ? `${trip.distance_km} km` : '-'}</p>
             </div>
           </div>
           <div className="mt-4">
-             <span className="block text-xs font-semibold text-gray-400 uppercase">
+             <span className="block text-xs font-semibold text-muted-foreground uppercase">
                 Notas
               </span>
-              <p className="text-gray-700 text-sm">{trip.notes || 'Sin notas.'}</p>
+              <p className="text-muted-foreground text-sm">{trip.notes || 'Sin notas.'}</p>
           </div>
         </div>
 
         {/* Stats / Actions Side Panel */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-card p-6 rounded-lg shadow">
              <h3 className="text-lg font-semibold mb-4 border-b pb-2">Estadísticas Rápidas</h3>
-             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-               <span className="text-gray-500 text-sm">Combustible Consumido</span>
+             <div className="flex justify-between items-center py-2 border-b border-border">
+               <span className="text-muted-foreground text-sm">Combustible Consumido</span>
                <span className="font-medium">{trip.fuel_consumed || 0} L</span>
              </div>
           </div>
 
           {/* Facturas */}
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-card p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold mb-4 border-b pb-2">Facturas</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Factura de Inicio</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura de Inicio</p>
                 {trip.start_invoice_url ? (
                   <a
                     href={trip.start_invoice_url}
@@ -143,11 +143,11 @@ export default async function TripDetailPage({
                     Ver factura de inicio
                   </a>
                 ) : (
-                  <p className="text-sm text-gray-400">Sin factura</p>
+                  <p className="text-sm text-muted-foreground">Sin factura</p>
                 )}
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Factura Final</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura Final</p>
                 {trip.end_invoice_url ? (
                   <a
                     href={trip.end_invoice_url}
@@ -158,7 +158,7 @@ export default async function TripDetailPage({
                     Ver factura final
                   </a>
                 ) : (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     {trip.status === 'completed' ? 'Sin factura final' : 'Se pedirá al completar'}
                   </p>
                 )}

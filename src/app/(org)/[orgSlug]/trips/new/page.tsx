@@ -55,7 +55,7 @@ export default async function NewTripPage({
     <div className="space-y-4">
       <div>
         <h1 className="text-lg font-semibold text-foreground">Planificar Nuevo Viaje</h1>
-        <p className="text-slate-500 text-sm mt-1">Asigna un vehículo y conductor a una ruta.</p>
+        <p className="text-muted-foreground text-sm mt-1">Asigna un vehículo y conductor a una ruta.</p>
       </div>
       <TripForm
         orgSlug={orgSlug}

@@ -216,25 +216,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-0 left-0 h-full w-64 bg-slate-900 text-white flex flex-col z-50 transition-transform duration-300 ease-in-out',
+          'fixed top-0 left-0 h-full w-64 bg-sidebar text-sidebar-foreground flex flex-col z-50 transition-transform duration-300 ease-in-out',
           'lg:static lg:translate-x-0 lg:z-auto lg:shrink-0',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Logo / Org */}
-        <div className="px-4 py-4 border-b border-slate-800/80 flex items-center justify-between">
+        <div className="px-4 py-4 border-b border-sidebar-border flex items-center justify-between">
           <Link href={`/${org.slug}`} className="flex items-center gap-3 min-w-0" onClick={onClose}>
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-lg flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
               {org.name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-white truncate leading-tight">{org.name}</p>
-              <p className="text-xs text-slate-400 capitalize leading-tight mt-0.5">{role}</p>
+              <p className="font-semibold text-sm text-sidebar-foreground truncate leading-tight">{org.name}</p>
+              <p className="text-xs text-sidebar-foreground/60 capitalize leading-tight mt-0.5">{role}</p>
             </div>
           </Link>
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-colors shrink-0"
+            className="lg:hidden p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors shrink-0"
             aria-label="Cerrar menú"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             return (
               <div key={si}>
                 {section.label && (
-                  <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-2 mb-1">
+                  <p className="text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-widest px-2 mb-1">
                     {section.label}
                   </p>
                 )}
@@ -270,10 +270,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             'flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm transition-colors',
                             active
                               ? 'bg-blue-600/20 text-blue-300 font-medium'
-                              : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                              : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
                           )}
                         >
-                          <span className={cn(active ? 'text-blue-400' : 'text-slate-500')}>
+                          <span className={cn(active ? 'text-blue-400' : 'text-muted-foreground')}>
                             {item.icon}
                           </span>
                           {item.label}
@@ -291,24 +291,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* User footer */}
-        <div className="px-3 py-3 border-t border-slate-800/80">
+        <div className="px-3 py-3 border-t border-sidebar-border">
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg">
             <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-medium text-xs shrink-0">
               {user?.full_name?.charAt(0).toUpperCase() || user?.email.charAt(0).toUpperCase() || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-slate-200 truncate leading-tight">
+              <p className="text-xs font-medium text-sidebar-foreground truncate leading-tight">
                 {user?.full_name || user?.email || 'Usuario'}
               </p>
               {user?.full_name && (
-                <p className="text-[11px] text-slate-500 truncate leading-tight">{user.email}</p>
+                <p className="text-[11px] text-sidebar-foreground/40 truncate leading-tight">{user.email}</p>
               )}
             </div>
             <button
               onClick={handleSignOut}
               disabled={isPending}
               title="Cerrar sesión"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition-colors shrink-0"
+              className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-red-400 hover:bg-sidebar-accent transition-colors shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

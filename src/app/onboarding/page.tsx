@@ -19,7 +19,7 @@ export default function OnboardingPage() {
   }, [state, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -27,16 +27,16 @@ export default function OnboardingPage() {
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
-            <span className="text-white font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
           </Link>
         </div>
 
         {/* Form Card */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-2">
+        <div className="bg-card border border-border rounded-2xl p-8">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-2">
             Crea tu Organización
           </h1>
-          <p className="text-slate-400 text-center mb-6">
+          <p className="text-muted-foreground text-center mb-6">
             Configura tu espacio de trabajo para gestionar tu flota
           </p>
 
@@ -48,7 +48,7 @@ export default function OnboardingPage() {
 
           <form action={formAction} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                 Nombre de la Organización
               </label>
               <input
@@ -57,16 +57,16 @@ export default function OnboardingPage() {
                 type="text"
                 required
                 placeholder="Mi Empresa"
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="slug" className="block text-sm font-medium text-foreground mb-2">
                 URL de la Organización
               </label>
               <div className="flex items-center">
-                <span className="text-slate-500 bg-slate-900 border border-r-0 border-slate-700 px-3 py-3 rounded-l-lg">
+                <span className="text-muted-foreground bg-muted border border-r-0 border-border px-3 py-3 rounded-l-lg">
                   fleet-saas.com/
                 </span>
                 <input
@@ -75,10 +75,10 @@ export default function OnboardingPage() {
                   type="text"
                   placeholder="mi-empresa"
                   pattern="[a-z0-9\-]+"
-                  className="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-r-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-3 bg-background border border-border rounded-r-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Solo minúsculas, números y guiones
               </p>
             </div>

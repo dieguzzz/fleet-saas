@@ -11,19 +11,19 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
-            <span className="text-white font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-6">Iniciar Sesión</h1>
+        <div className="bg-card border border-border rounded-2xl p-8">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-6">Iniciar Sesión</h1>
 
           <form action={formAction} className="space-y-5">
             {state?.error && (
@@ -33,7 +33,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
                 Correo Electrónico
               </label>
               <input
@@ -43,13 +43,13 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                <label htmlFor="password" className="block text-sm font-medium text-muted-foreground">
                   Contraseña
                 </label>
                 <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300">
@@ -64,12 +64,12 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-11 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
                 >
                   {showPassword ? '🙈' : '👁️'}
@@ -87,7 +87,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-slate-400">
+            <p className="text-muted-foreground">
               ¿No tienes cuenta?{' '}
               <Link href="/signup" className="text-blue-400 hover:text-blue-300">
                 Crear cuenta

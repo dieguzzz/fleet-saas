@@ -32,58 +32,58 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-white">Dashboard Global</h1>
+      <h1 className="text-3xl font-bold text-foreground">Dashboard Global</h1>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 text-sm">Total Organizaciones</p>
-          <p className="text-4xl font-bold text-white mt-2">{orgCount || 0}</p>
+        <div className="bg-card border border-border rounded-xl p-6">
+          <p className="text-muted-foreground text-sm">Total Organizaciones</p>
+          <p className="text-4xl font-bold text-foreground mt-2">{orgCount || 0}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 text-sm">Total Usuarios</p>
-          <p className="text-4xl font-bold text-white mt-2">{userCount || 0}</p>
+        <div className="bg-card border border-border rounded-xl p-6">
+          <p className="text-muted-foreground text-sm">Total Usuarios</p>
+          <p className="text-4xl font-bold text-foreground mt-2">{userCount || 0}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
-          <p className="text-slate-400 text-sm">Impersonaciones Hoy</p>
-          <p className="text-4xl font-bold text-white mt-2">
+        <div className="bg-card border border-border rounded-xl p-6">
+          <p className="text-muted-foreground text-sm">Impersonaciones Hoy</p>
+          <p className="text-4xl font-bold text-foreground mt-2">
             {impersonationLogs?.length || 0}
           </p>
         </div>
       </div>
 
       {/* Organizations Table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Organizaciones</h2>
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Organizaciones</h2>
         </div>
         <table className="w-full">
-          <thead className="bg-slate-900">
+          <thead className="bg-background">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                 Nombre
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                 Slug
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                 Creada
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-700">
+          <tbody className="divide-y divide-border">
             {organizations?.map((org: { id: string; name: string; slug: string; created_at: string }) => (
-              <tr key={org.id} className="hover:bg-slate-700/50">
-                <td className="px-6 py-4 whitespace-nowrap text-white font-medium">
+              <tr key={org.id} className="hover:bg-accent/50">
+                <td className="px-6 py-4 whitespace-nowrap text-foreground font-medium">
                   {org.name}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                   {org.slug}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                   {new Date(org.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -101,43 +101,43 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Impersonation Logs */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-white">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="text-lg font-semibold text-foreground">
             Historial de Impersonación
           </h2>
         </div>
         {impersonationLogs && impersonationLogs.length > 0 ? (
           <table className="w-full">
-            <thead className="bg-slate-900">
+            <thead className="bg-background">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                   Super Admin
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                   Organización
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                   Inicio
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                   Fin
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-border">
               {impersonationLogs.map((log: { id: string; super_admin: { full_name: string } | null; organization: { name: string } | null; started_at: string; ended_at: string | null }) => (
                 <tr key={log.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-foreground">
                     {log.super_admin?.full_name || 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                     {log.organization?.name || 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                     {new Date(log.started_at).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-slate-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                     {log.ended_at
                       ? new Date(log.ended_at).toLocaleString()
                       : 'Activo'}
@@ -147,7 +147,7 @@ export default async function AdminDashboardPage() {
             </tbody>
           </table>
         ) : (
-          <p className="text-slate-400 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No hay historial de impersonación.
           </p>
         )}

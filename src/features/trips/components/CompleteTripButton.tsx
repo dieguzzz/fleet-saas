@@ -67,20 +67,20 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-lg font-semibold">Completar Viaje</h2>
-            <p className="text-sm text-gray-600">
+          <div className="bg-card rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Completar Viaje</h2>
+            <p className="text-sm text-muted-foreground">
               Adjuntá la factura final del viaje antes de marcarlo como completado.
             </p>
 
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-green-400 transition-colors"
+              className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-green-400 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
               {fileName ? (
                 <p className="text-sm text-green-600 font-medium">{fileName}</p>
               ) : (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   {uploading ? 'Subiendo...' : 'Clic para adjuntar factura final (PDF, imagen)'}
                 </p>
               )}
@@ -99,7 +99,7 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
             <div className="flex gap-3 justify-end pt-2">
               <button
                 onClick={() => { setOpen(false); setError(''); setFileName(''); setEndInvoiceUrl(''); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+                className="px-4 py-2 border border-border rounded-lg text-sm text-muted-foreground hover:bg-accent"
                 disabled={saving}
               >
                 Cancelar

@@ -107,7 +107,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
         <div className="lg:col-span-2">
           <div className="form-card form-section">
             <div className="flex items-center gap-3">
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${invoiceType === 'cobro' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${invoiceType === 'cobro' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'}`}>
                 {invoiceType === 'cobro' ? '↑ Cobro' : '↓ Pago'}
               </span>
               <h2 className="text-base font-semibold text-foreground">

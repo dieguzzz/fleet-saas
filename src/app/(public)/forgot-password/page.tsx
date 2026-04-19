@@ -9,27 +9,27 @@ export default function ForgotPasswordPage() {
   const [state, formAction, isPending] = useActionState(forgotPassword, null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
-            <span className="text-white font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-2">Olvidé mi contraseña</h1>
-          <p className="text-slate-400 text-sm text-center mb-6">
+        <div className="bg-card border border-border rounded-2xl p-8">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-2">Olvidé mi contraseña</h1>
+          <p className="text-muted-foreground text-sm text-center mb-6">
             Ingresá tu email y te enviamos un enlace para restablecer tu contraseña.
           </p>
 
           {state?.success ? (
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center space-y-2">
               <p className="text-green-400 font-medium">¡Email enviado!</p>
-              <p className="text-slate-400 text-sm">Revisá tu bandeja de entrada y seguí el enlace.</p>
+              <p className="text-muted-foreground text-sm">Revisá tu bandeja de entrada y seguí el enlace.</p>
               <Link href="/login" className="block mt-3 text-blue-400 hover:text-blue-300 text-sm">
                 Volver al login
               </Link>
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">
                   Email
                 </label>
                 <input
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
                   required
                   autoComplete="email"
                   placeholder="tu@email.com"
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
               </button>
 
               <div className="text-center">
-                <Link href="/login" className="text-slate-400 hover:text-slate-300 text-sm">
+                <Link href="/login" className="text-muted-foreground hover:text-muted-foreground text-sm">
                   ← Volver al login
                 </Link>
               </div>

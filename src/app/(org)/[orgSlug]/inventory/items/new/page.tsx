@@ -11,7 +11,7 @@ export default async function NewInventoryItemPage({
     <div className="space-y-4">
       <div>
         <h1 className="text-lg font-semibold text-foreground">Nuevo Ítem de Inventario</h1>
-        <p className="text-slate-500 text-sm mt-1">Registra un nuevo repuesto, fluido o herramienta.</p>
+        <p className="text-muted-foreground text-sm mt-1">Registra un nuevo repuesto, fluido o herramienta.</p>
       </div>
       <InventoryItemForm orgSlug={orgSlug} />
     </div>

@@ -130,7 +130,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => inputRef.current?.click()}
-          className="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+          className="flex-1 border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-accent transition-colors"
         >
           {uploading ? (
             <p className="text-sm text-muted-foreground">Subiendo...</p>
