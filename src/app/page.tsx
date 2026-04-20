@@ -1,7 +1,62 @@
 import Link from 'next/link';
+import { Building2, Truck, DollarSign, ShieldCheck, Mail, Eye } from 'lucide-react';
+import { createClient } from '@/services/supabase/server';
 import DatabaseStatus from '@/components/debug/DatabaseStatus';
 
-export default function HomePage() {
+async function getAuthState() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('organizations(slug)')
+    .eq('user_id', user.id)
+    .limit(1)
+    .single();
+
+  const org = membership?.organizations as { slug: string } | null;
+  return { orgSlug: org?.slug ?? null };
+}
+
+export default async function HomePage() {
+  const auth = await getAuthState();
+  const isLoggedIn = auth !== null;
+  const dashboardHref = auth?.orgSlug ? `/${auth.orgSlug}` : '/onboarding';
+
+  const features = [
+    {
+      title: 'Multi-Tenant',
+      description: 'Cada organización con datos completamente aislados mediante Row Level Security.',
+      icon: <Building2 className="w-7 h-7" />,
+    },
+    {
+      title: 'Gestión de Flotas',
+      description: 'Vehículos, viajes, mantenimiento y conductores en un solo lugar.',
+      icon: <Truck className="w-7 h-7" />,
+    },
+    {
+      title: 'Finanzas Integradas',
+      description: 'Control de ingresos, gastos y balances por organización.',
+      icon: <DollarSign className="w-7 h-7" />,
+    },
+    {
+      title: 'Roles y Permisos',
+      description: 'Owner, Admin, Collaborator y Viewer con permisos granulares.',
+      icon: <ShieldCheck className="w-7 h-7" />,
+    },
+    {
+      title: 'Invitaciones por Email',
+      description: 'Invita a tu equipo con roles específicos de forma segura.',
+      icon: <Mail className="w-7 h-7" />,
+    },
+    {
+      title: 'Super Admin',
+      description: 'Impersonación de organizaciones para soporte y auditoría.',
+      icon: <Eye className="w-7 h-7" />,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -14,18 +69,29 @@ export default function HomePage() {
             <span className="text-foreground font-semibold text-xl">Fleet SaaS</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Iniciar Sesión
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              Comenzar Gratis
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href={dashboardHref}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Ir al Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Comenzar Gratis
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -44,12 +110,21 @@ export default function HomePage() {
             Cada organización con su propio espacio seguro y aislado.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/signup"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
-            >
-              Crear Cuenta Gratis
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href={dashboardHref}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
+              >
+                Ir al Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/signup"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
+              >
+                Crear Cuenta Gratis
+              </Link>
+            )}
             <Link
               href="#features"
               className="border border-border hover:border-muted-foreground text-muted-foreground hover:text-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
@@ -61,43 +136,12 @@ export default function HomePage() {
 
         {/* Features */}
         <div id="features" className="mt-32 grid md:grid-cols-3 gap-8">
-          {[
-            {
-              title: 'Multi-Tenant',
-              description: 'Cada organización con datos completamente aislados mediante Row Level Security.',
-              icon: '🏢',
-            },
-            {
-              title: 'Gestión de Flotas',
-              description: 'Vehículos, viajes, mantenimiento y conductores en un solo lugar.',
-              icon: '🚗',
-            },
-            {
-              title: 'Finanzas Integradas',
-              description: 'Control de ingresos, gastos y balances por organización.',
-              icon: '💰',
-            },
-            {
-              title: 'Roles y Permisos',
-              description: 'Owner, Admin, Collaborator y Viewer con permisos granulares.',
-              icon: '🔐',
-            },
-            {
-              title: 'Invitaciones por Email',
-              description: 'Invita a tu equipo con roles específicos de forma segura.',
-              icon: '✉️',
-            },
-            {
-              title: 'Super Admin',
-              description: 'Impersonación de organizaciones para soporte y auditoría.',
-              icon: '👁️',
-            },
-          ].map((feature) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
               className="bg-card border border-border rounded-2xl p-6 hover:border-muted-foreground transition-colors"
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
+              <div className="text-blue-500 mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
               <p className="text-muted-foreground">{feature.description}</p>
             </div>
