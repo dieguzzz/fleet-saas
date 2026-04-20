@@ -1150,6 +1150,56 @@ export type Database = {
           },
         ]
       }
+      vehicle_documents: {
+        Row: {
+          id: string
+          organization_id: string
+          vehicle_id: string
+          document_type: "insurance" | "vtv" | "registration" | "other"
+          label: string
+          expiry_date: string
+          notes: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          vehicle_id: string
+          document_type: "insurance" | "vtv" | "registration" | "other"
+          label: string
+          expiry_date: string
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          vehicle_id?: string
+          document_type?: "insurance" | "vtv" | "registration" | "other"
+          label?: string
+          expiry_date?: string
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_documents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1182,6 +1232,7 @@ export type Database = {
       org_role: "owner" | "admin" | "collaborator" | "viewer"
       transaction_type: "income" | "expense"
       trip_status: "planned" | "in_progress" | "completed" | "cancelled"
+      vehicle_document_type: "insurance" | "vtv" | "registration" | "other"
       vehicle_status: "active" | "maintenance" | "inactive"
     }
     CompositeTypes: {
@@ -1316,6 +1367,7 @@ export const Constants = {
       org_role: ["owner", "admin", "collaborator", "viewer"],
       transaction_type: ["income", "expense"],
       trip_status: ["planned", "in_progress", "completed", "cancelled"],
+      vehicle_document_type: ["insurance", "vtv", "registration", "other"],
       vehicle_status: ["active", "maintenance", "inactive"],
     },
   },

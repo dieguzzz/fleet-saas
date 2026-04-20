@@ -8,6 +8,7 @@ import { StatCard } from '@/components/ui/stat-card';
 import { SkeletonCard } from '@/components/ui/skeleton';
 import { SectionCard } from '@/components/ui/section-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import ExpiryAlertsWidget from '@/features/vehicle-documents/components/ExpiryAlertsWidget';
 
 interface DashboardPageProps {
   params: Promise<{ orgSlug: string }>;
@@ -228,7 +229,15 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
           </Suspense>
         </SectionCard>
 
-        <SectionCard className="lg:col-span-3" title="Acciones Rápidas">
+        <SectionCard className="lg:col-span-3" title="Vencimientos próximos">
+          <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
+            <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
+          </Suspense>
+        </SectionCard>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
+        <SectionCard className="lg:col-span-4" title="Acciones Rápidas">
           <div className="space-y-1">
             {[
               { href: `/${orgSlug}/vehicles/new`, label: '+ Nuevo Vehículo' },
