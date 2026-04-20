@@ -1097,6 +1097,57 @@ export type Database = {
           },
         ]
       }
+      vehicle_documents: {
+        Row: {
+          created_at: string | null
+          document_type: Database["public"]["Enums"]["vehicle_document_type"]
+          expiry_date: string
+          id: string
+          label: string
+          notes: string | null
+          organization_id: string
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: Database["public"]["Enums"]["vehicle_document_type"]
+          expiry_date: string
+          id?: string
+          label: string
+          notes?: string | null
+          organization_id: string
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: Database["public"]["Enums"]["vehicle_document_type"]
+          expiry_date?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          organization_id?: string
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_documents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           brand: string | null
@@ -1146,56 +1197,6 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vehicle_documents: {
-        Row: {
-          id: string
-          organization_id: string
-          vehicle_id: string
-          document_type: "insurance" | "vtv" | "registration" | "other"
-          label: string
-          expiry_date: string
-          notes: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          organization_id: string
-          vehicle_id: string
-          document_type: "insurance" | "vtv" | "registration" | "other"
-          label: string
-          expiry_date: string
-          notes?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          organization_id?: string
-          vehicle_id?: string
-          document_type?: "insurance" | "vtv" | "registration" | "other"
-          label?: string
-          expiry_date?: string
-          notes?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vehicle_documents_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vehicle_documents_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
