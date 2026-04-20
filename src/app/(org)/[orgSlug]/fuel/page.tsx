@@ -49,12 +49,12 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
           value={`$${fmt(stats.totalCostMonth)}`}
         />
         <StatCard
-          label="🚛 Diesel (total)"
+          label="Diesel (total)"
           value={`$${fmt(stats.totalCostDiesel)}`}
           tone="info"
         />
         <StatCard
-          label="🚗 Gasolina (total)"
+          label="Gasolina (total)"
           value={`$${fmt(stats.totalCostGasoline)}`}
           tone="success"
         />

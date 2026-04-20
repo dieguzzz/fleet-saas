@@ -291,7 +291,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* User footer */}
-        <div className="px-3 py-3 border-t border-sidebar-border">
+        <div className="px-3 py-3 border-t border-sidebar-border space-y-1">
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg">
             <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-medium text-xs shrink-0">
               {user?.full_name?.charAt(0).toUpperCase() || user?.email.charAt(0).toUpperCase() || '?'}
@@ -304,17 +304,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <p className="text-[11px] text-sidebar-foreground/40 truncate leading-tight">{user.email}</p>
               )}
             </div>
-            <button
-              onClick={handleSignOut}
-              disabled={isPending}
-              title="Cerrar sesión"
-              className="p-1.5 rounded-lg text-sidebar-foreground/40 hover:text-red-400 hover:bg-sidebar-accent transition-colors shrink-0"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
           </div>
+          <button
+            onClick={handleSignOut}
+            disabled={isPending}
+            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-sidebar-foreground/50 hover:text-red-400 hover:bg-sidebar-accent transition-colors"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {isPending ? 'Cerrando sesión...' : 'Cerrar sesión'}
+          </button>
         </div>
       </aside>
     </>
