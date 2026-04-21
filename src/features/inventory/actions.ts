@@ -3,7 +3,100 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
+import { z } from 'zod';
 import type { InventoryItem, InventoryMovementType } from '@/types/database';
+
+export type InventoryItemFormState = { error?: string; success?: boolean; id?: string };
+
+const itemSchema = z.object({
+  name: z.string().min(1, 'El nombre es obligatorio'),
+  category: z.string().min(1, 'La categoría es obligatoria'),
+  sku: z.string().optional(),
+  current_stock: z.coerce.number().min(0).optional(),
+  min_stock_level: z.coerce.number().min(0).optional(),
+  unit: z.string().optional(),
+  cost_per_unit: z.coerce.number().min(0).optional(),
+  location: z.string().optional(),
+  description: z.string().optional(),
+});
+
+async function resolveOrg(supabase: Awaited<ReturnType<typeof createClient>>, orgSlug: string) {
+  const { data } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  return data;
+}
+
+function parseItemForm(formData: FormData) {
+  return {
+    name: formData.get('name') as string,
+    category: formData.get('category') as string,
+    sku: (formData.get('sku') as string) || undefined,
+    current_stock: formData.get('current_stock') ? Number(formData.get('current_stock')) : undefined,
+    min_stock_level: formData.get('min_stock_level') ? Number(formData.get('min_stock_level')) : undefined,
+    unit: (formData.get('unit') as string) || undefined,
+    cost_per_unit: formData.get('cost_per_unit') ? Number(formData.get('cost_per_unit')) : undefined,
+    location: (formData.get('location') as string) || undefined,
+    description: (formData.get('description') as string) || undefined,
+  };
+}
+
+export async function createInventoryItemAction(
+  prevState: InventoryItemFormState,
+  formData: FormData
+): Promise<InventoryItemFormState> {
+  const supabase = await createClient();
+  const orgSlug = formData.get('orgSlug') as string;
+  const org = await resolveOrg(supabase, orgSlug);
+  if (!org) return { error: 'Organización no encontrada' };
+
+  const validated = itemSchema.safeParse(parseItemForm(formData));
+  if (!validated.success) return { error: validated.error.issues[0].message };
+
+  const { data: item, error } = await supabase
+    .from('inventory_items')
+    .insert({ organization_id: org.id, ...validated.data })
+    .select('id')
+    .single();
+
+  if (error) return { error: 'Error al crear el ítem' };
+
+  revalidatePath(`/${orgSlug}/inventory/items`);
+  return { success: true, id: item?.id };
+}
+
+export async function updateInventoryItemAction(
+  itemId: string,
+  orgSlug: string,
+  prevState: InventoryItemFormState,
+  formData: FormData
+): Promise<InventoryItemFormState> {
+  const supabase = await createClient();
+  const org = await resolveOrg(supabase, orgSlug);
+  if (!org) return { error: 'Organización no encontrada' };
+
+  const validated = itemSchema.safeParse(parseItemForm(formData));
+  if (!validated.success) return { error: validated.error.issues[0].message };
+
+  const { current_stock: _, ...updateData } = validated.data;
+  const { error } = await supabase
+    .from('inventory_items')
+    .update({ ...updateData, updated_at: new Date().toISOString() })
+    .eq('id', itemId)
+    .eq('organization_id', org.id);
+
+  if (error) return { error: 'Error al actualizar el ítem' };
+
+  revalidatePath(`/${orgSlug}/inventory/items`);
+  return { success: true };
+}
+
+export async function deleteInventoryItemAction(itemId: string, orgSlug: string): Promise<void> {
+  const supabase = await createClient();
+  const org = await resolveOrg(supabase, orgSlug);
+  if (!org) return;
+
+  await supabase.from('inventory_items').delete().eq('id', itemId).eq('organization_id', org.id);
+  revalidatePath(`/${orgSlug}/inventory/items`);
+}
 
 export async function getInventoryItems(orgId: string) {
   const supabase = await createClient();

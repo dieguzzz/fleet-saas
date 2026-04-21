@@ -1,10 +1,8 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { InventoryList } from '@/features/inventory/components/InventoryList';
 import { getOrganization } from '@/features/organizations/queries';
+import { getInventoryItems } from '@/features/inventory/actions';
 import { notFound } from 'next/navigation';
-import { PageHeader } from '@/components/ui/page-header';
-import { SkeletonRow } from '@/components/ui/skeleton';
+import InventoryTabView from '@/features/inventory/components/InventoryTabView';
+import type { InventoryItem } from '@/types/database';
 
 export default async function InventoryItemsPage({
   params,
@@ -15,23 +13,16 @@ export default async function InventoryItemsPage({
   const org = await getOrganization(orgSlug);
   if (!org) notFound();
 
+  const { data: itemsRaw } = await getInventoryItems(org!.id);
+  const items = (itemsRaw as unknown as InventoryItem[] | null) ?? [];
+
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Inventario"
-        description="Gestiona los niveles de existencias y repuestos de tu organización."
-        action={
-          <Link
-            href={`/${orgSlug}/inventory/items/new`}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
-          >
-            + Nuevo Ítem
-          </Link>
-        }
-      />
-      <Suspense fallback={<div className="space-y-2">{[1,2,3,4].map(i=><SkeletonRow key={i}/>)}</div>}>
-        <InventoryList orgId={org.id} orgSlug={org.slug} />
-      </Suspense>
+      <div>
+        <h1 className="text-lg font-semibold text-foreground">Inventario</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Gestiona los niveles de existencias y repuestos de tu organización.</p>
+      </div>
+      <InventoryTabView orgId={org!.id} orgSlug={orgSlug} items={items} />
     </div>
   );
 }
