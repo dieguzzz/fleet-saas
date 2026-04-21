@@ -283,6 +283,29 @@ export interface InventoryMovement {
   performer?: Profile;
 }
 
+export type VehicleDocumentType = 'insurance' | 'vtv' | 'registration' | 'other';
+
+export const VEHICLE_DOCUMENT_LABELS: Record<VehicleDocumentType, string> = {
+  insurance: 'Seguro',
+  vtv: 'Rev. Técnica (VTV)',
+  registration: 'Patente',
+  other: 'Otro',
+};
+
+export interface VehicleDocument {
+  id: string;
+  organization_id: string;
+  vehicle_id: string;
+  document_type: VehicleDocumentType;
+  label: string;
+  expiry_date: string;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  // Joined
+  vehicle?: Vehicle;
+}
+
 export type LandTenantStatus = 'active' | 'inactive';
 export type LandPaymentStatus = 'pending' | 'paid' | 'overdue';
 export type LandPaymentMethod = 'cash' | 'transfer' | 'check' | 'card';
@@ -459,6 +482,12 @@ export interface Database {
         Update: Partial<Omit<LandPayment, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'tenant'>>;
         Relationships: [];
       };
+      vehicle_documents: {
+        Row: VehicleDocument;
+        Insert: Omit<VehicleDocument, 'id' | 'created_at' | 'updated_at' | 'vehicle'>;
+        Update: Partial<Omit<VehicleDocument, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'vehicle'>>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -488,6 +517,7 @@ export interface Database {
       inventory_movement_type: InventoryMovementType;
       employee_status: EmployeeStatus;
       fuel_type: FuelType;
+      vehicle_document_type: VehicleDocumentType;
     };
     CompositeTypes: Record<string, never>;
   };

@@ -1,3 +1,70 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Comandos
+
+```bash
+npm run dev      # Dev server con Turbopack en localhost:3000
+npm run build    # Build de producción (TypeScript strict — falla en type errors)
+npm run lint     # ESLint
+```
+
+No hay test runner configurado.
+
+---
+
+## Arquitectura
+
+**Stack:** Next.js 16 App Router · Supabase (PostgreSQL + Auth + RLS) · Zustand · Tailwind CSS · Railway (deploy)
+
+### Estructura de rutas
+
+```
+src/app/
+├── page.tsx                        # Landing pública
+├── (public)/                       # login, signup, forgot-password, reset-password
+├── (org)/[orgSlug]/                # Todas las rutas protegidas con contexto de org
+│   ├── layout.tsx                  # Carga tenant en Zustand, renderiza Sidebar + Header
+│   └── vehicles/ trips/ maintenance/ employees/ fuel/ finance/ contacts/ team/ settings/ ...
+├── (admin)/                        # Super admin — requiere is_super_admin = true
+└── api/auth/callback/ · api/pdf-proxy/
+```
+
+### Flujo de auth y multi-tenancy
+
+1. **Middleware** (`src/middleware.ts`): en cada request verifica sesión Supabase. Si la ruta es `/(org)/[orgSlug]/*`, consulta `organization_members` para confirmar que el usuario pertenece a esa org. Inyecta headers `x-org-id`, `x-org-role`, `x-org-slug`.
+2. **Org layout** (`src/app/(org)/[orgSlug]/layout.tsx`): Client Component que al montar carga el perfil del usuario y sus orgs, y los escribe en el store de Zustand.
+3. **Zustand** (`src/store/tenant-store.ts`): expone `useCurrentOrg()`, `useCurrentRole()`, `useCurrentUser()`. Solo disponible en Client Components bajo el org layout.
+4. **RLS**: toda tabla tiene `organization_id`. Las políticas usan `get_user_org_ids()` (función SECURITY DEFINER) para evitar recursión.
+
+### Patrón de features
+
+Cada módulo vive en `src/features/<modulo>/`:
+- `actions.ts` — server actions (`'use server'`), Zod validation, retornan `{ error: string } | { success: true }`, llaman `revalidatePath` y `logAudit`
+- `components/` — Client Components con `useActionState(action, null)`
+- `queries.ts` — queries de solo lectura para Server Components (opcional)
+
+Las páginas en `src/app/(org)/[orgSlug]/<modulo>/` son Server Components que llaman queries directamente.
+
+### Supabase clients
+
+- `src/services/supabase/server.ts` → usar en Server Components y actions
+- `src/services/supabase/client.ts` → usar en Client Components (storage uploads, realtime)
+
+### Tipos
+
+- `src/types/supabase.ts` — auto-generado con `mcp__supabase__generate_typescript_types`
+- `src/types/database.ts` — mantenido manualmente; interfaces de negocio que importa el resto del código
+
+**Regla crítica:** al cambiar el schema de DB, actualizar **ambos** archivos.
+
+### Permisos
+
+`src/lib/permissions.ts` — `hasPermission(role, 'vehicles:create')`. Roles: `owner > admin > collaborator > viewer`.
+
+---
+
 # Reglas y errores documentados — Fleet SaaS
 
 ## Stack
