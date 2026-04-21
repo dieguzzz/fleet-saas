@@ -1,24 +1,37 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/services/supabase/client';
 import { createInvoice, updateInvoice, updateInvoiceAttachmentUrl, type CreateInvoiceInput } from '../actions';
 import type { Invoice } from '@/types/database';
+import ContactModal from '@/features/contacts/components/ContactModal';
+
+interface ContactOption { id: string; name: string; company: string | null }
 
 interface InvoiceFormProps {
   orgId: string;
   orgSlug: string;
   invoiceType: 'cobro' | 'pago';
   invoice?: Invoice;
+  contacts?: ContactOption[];
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = [] }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [subtotal, setSubtotal] = useState(Number(invoice?.subtotal ?? 0));
   const [tax, setTax] = useState(Number(invoice?.tax ?? 0));
+  const [contactId, setContactId] = useState<string>(
+    invoiceType === 'cobro' ? (invoice?.customer_id ?? '') : (invoice?.supplier_id ?? '')
+  );
+  const [contacts, setContacts] = useState<ContactOption[]>(initialContacts);
+
+  const handleNewContact = useCallback((id: string, name: string) => {
+    setContacts(prev => [...prev, { id, name, company: null }]);
+    setContactId(id);
+  }, []);
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [existingAttachment, setExistingAttachment] = useState<string | null>(invoice?.attachment_url ?? null);
@@ -71,8 +84,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
       total,
       items: invoice?.items ?? [],
       notes: (formData.get('notes') as string) || null,
-      customer_id: null,
-      supplier_id: null,
+      customer_id: invoiceType === 'cobro' ? (contactId || null) : null,
+      supplier_id: invoiceType === 'pago' ? (contactId || null) : null,
       attachment_url: existingAttachment,
     };
     try {
@@ -113,6 +126,37 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice }: InvoiceFor
               <h2 className="text-base font-semibold text-foreground">
                 {isEditing ? 'Editar Factura' : `Nueva Factura de ${invoiceType === 'cobro' ? 'Cobro' : 'Pago'}`}
               </h2>
+            </div>
+
+            {/* Contacto (cliente o proveedor) */}
+            <div>
+              <label className="field-label">
+                {invoiceType === 'cobro' ? 'Cliente' : 'Proveedor'}
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={contactId}
+                  onChange={e => setContactId(e.target.value)}
+                  className="field-input flex-1"
+                >
+                  <option value="">Sin asignar</option>
+                  {contacts.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}{c.company ? ` — ${c.company}` : ''}
+                    </option>
+                  ))}
+                </select>
+                <ContactModal
+                  orgSlug={orgSlug}
+                  defaultRole={invoiceType === 'cobro' ? 'customer' : 'supplier'}
+                  onSuccess={handleNewContact}
+                  trigger={
+                    <button type="button" className="shrink-0 px-3 py-2 border border-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap">
+                      + Nuevo
+                    </button>
+                  }
+                />
+              </div>
             </div>
 
             <div className="form-grid-2">
