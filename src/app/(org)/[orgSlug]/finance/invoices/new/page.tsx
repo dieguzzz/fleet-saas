@@ -1,5 +1,6 @@
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm';
 import { getOrganization } from '@/features/organizations/queries';
+import { getCustomersAndSuppliers } from '@/features/contacts/actions';
 import { notFound } from 'next/navigation';
 
 export default async function NewInvoicePage({
@@ -16,6 +17,12 @@ export default async function NewInvoicePage({
   const org = await getOrganization(orgSlug);
   if (!org) notFound();
 
+  const { data: contactsRaw } = await getCustomersAndSuppliers(org.id);
+  const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
+  const contacts = (contactsRaw ?? [])
+    .filter(c => c.role === role)
+    .map(c => ({ id: c.id, name: c.name, company: c.company }));
+
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-semibold text-foreground">
@@ -25,6 +32,7 @@ export default async function NewInvoicePage({
         orgId={org.id}
         orgSlug={orgSlug}
         invoiceType={invoiceType as 'cobro' | 'pago'}
+        contacts={contacts}
       />
     </div>
   );

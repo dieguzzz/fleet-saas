@@ -142,6 +142,34 @@ export interface FinancialTransaction {
   updated_at: string | null;
 }
 
+export type ContactRole =
+  | 'customer' | 'supplier'
+  | 'mechanic' | 'workshop' | 'tow_truck' | 'tire_service' | 'insurance' | 'other';
+
+export const CONTACT_ROLE_LABELS: Record<string, string> = {
+  customer: 'Cliente',
+  supplier: 'Proveedor',
+  mechanic: 'Mecánico',
+  workshop: 'Taller',
+  tow_truck: 'Grúa',
+  tire_service: 'Gomería',
+  insurance: 'Seguro',
+  other: 'Otro',
+  driver: 'Conductor',
+};
+
+export const SERVICE_ROLES: ContactRole[] = ['mechanic', 'workshop', 'tow_truck', 'tire_service', 'insurance', 'other'];
+
+export const SERVICE_ROLE_COLORS: Record<string, string> = {
+  mechanic: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  workshop: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
+  tow_truck: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+  tire_service: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+  insurance: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
+  other: 'bg-muted text-muted-foreground',
+  driver: 'bg-muted text-muted-foreground',
+};
+
 export interface Contact {
   id: string;
   organization_id: string;
