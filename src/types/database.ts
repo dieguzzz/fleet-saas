@@ -18,6 +18,16 @@ export type TransactionType = 'income' | 'expense';
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
 export type InventoryMovementType = 'in' | 'out' | 'adjustment';
+export type InventoryCategory = 'parts' | 'fluids' | 'tires' | 'tools' | 'consumables' | 'other';
+
+export const INVENTORY_CATEGORY_LABELS: Record<InventoryCategory, string> = {
+  parts: 'Repuestos',
+  fluids: 'Fluidos',
+  tires: 'Neumáticos',
+  tools: 'Herramientas',
+  consumables: 'Consumibles',
+  other: 'Otro',
+};
 
 // Entity interfaces for easier usage
 export interface Organization {
