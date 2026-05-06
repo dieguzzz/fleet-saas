@@ -32,18 +32,30 @@ export async function signUp(prevState: unknown, formData: FormData) {
 
 export async function loginAmd(prevState: unknown, formData: FormData) {
   const password = formData.get('password') as string;
-  if (password !== 'tata01') return { error: 'Contraseña incorrecta' };
+  if (!password) return { error: 'Ingresá tu contraseña' };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email: process.env.AMD_AUTH_EMAIL!,
-    password: process.env.AMD_AUTH_PASSWORD!,
+    password,
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: 'Contraseña incorrecta' };
 
   revalidatePath('/', 'layout');
   redirect('/amd');
+}
+
+export async function sendAmdPasswordReset() {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    process.env.AMD_AUTH_EMAIL!,
+    {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/auth/callback?next=/reset-password`,
+    }
+  );
+  if (error) return { error: error.message };
+  return { success: true };
 }
 
 export async function login(prevState: unknown, formData: FormData) {

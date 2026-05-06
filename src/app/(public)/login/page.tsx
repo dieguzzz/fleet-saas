@@ -3,13 +3,23 @@
 import { useActionState, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { loginAmd } from '@/features/auth/actions';
+import { loginAmd, sendAmdPasswordReset } from '@/features/auth/actions';
 
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<'select' | 'amd'>('select');
   const [state, formAction, isPending] = useActionState(loginAmd, null);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetMsg, setResetMsg] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+
+  async function handleReset() {
+    setResetting(true);
+    setResetMsg(null);
+    const res = await sendAmdPasswordReset();
+    setResetting(false);
+    setResetMsg(res.error ? `Error: ${res.error}` : 'Email enviado. Revisá tu bandeja de entrada.');
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -122,6 +132,20 @@ export default function LoginPage() {
                 >
                   {isPending ? 'Ingresando...' : 'Ingresar'}
                 </button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    disabled={resetting}
+                    className="text-sm text-blue-500 hover:text-blue-400 disabled:opacity-50"
+                  >
+                    {resetting ? 'Enviando...' : '¿Olvidaste tu contraseña? Setear contraseña'}
+                  </button>
+                  {resetMsg && (
+                    <p className="text-xs text-muted-foreground mt-2">{resetMsg}</p>
+                  )}
+                </div>
               </form>
             </>
           )}
