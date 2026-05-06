@@ -37,7 +37,7 @@ function parseContactForm(formData: FormData) {
 }
 
 export async function createContact(
-  prevState: ContactFormState,
+  prevState: ContactFormState | null,
   formData: FormData
 ): Promise<ContactFormState> {
   const supabase = await createClient();
@@ -72,7 +72,7 @@ export async function createContact(
 export async function updateContact(
   contactId: string,
   orgSlug: string,
-  prevState: ContactFormState,
+  prevState: ContactFormState | null,
   formData: FormData
 ): Promise<ContactFormState> {
   const supabase = await createClient();

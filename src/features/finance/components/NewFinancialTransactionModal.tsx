@@ -4,8 +4,6 @@ import { useState, useActionState } from 'react';
 import { createFinancialTransaction } from '@/features/finance/actions';
 import { Button } from '@/components/ui/button';
 
-const initialState = { error: '', success: false };
-
 export default function NewFinancialTransactionModal({
   isOpen,
   onClose,
@@ -16,7 +14,7 @@ export default function NewFinancialTransactionModal({
   orgId: string;
 }) {
   const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [state, formAction, isPending] = useActionState(createFinancialTransaction, initialState);
+  const [state, formAction, isPending] = useActionState(createFinancialTransaction, null);
 
   if (!isOpen) return null;
 

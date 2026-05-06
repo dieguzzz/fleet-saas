@@ -13,11 +13,6 @@ const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   loading: () => <div className="h-[300px] w-full bg-muted rounded-lg animate-pulse flex items-center justify-center text-muted-foreground">Cargando mapa...</div>,
 });
 
-const initialState = {
-  error: '',
-  success: false,
-};
-
 // We need to fetch vehicles and drivers to populate the dropdowns.
 // Since this is a client component, we should pass them as props.
 interface TripFormProps {
@@ -27,7 +22,7 @@ interface TripFormProps {
 }
 
 export default function TripForm({ orgSlug, vehicles, drivers }: TripFormProps) {
-  const [state, formAction, isPending] = useActionState(createTrip, initialState);
+  const [state, formAction, isPending] = useActionState(createTrip, null);
   
   const [originCoords, setOriginCoords] = useState<{lat: number, lng: number} | undefined>(undefined);
   const [destCoords, setDestCoords] = useState<{lat: number, lng: number} | undefined>(undefined);

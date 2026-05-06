@@ -13,7 +13,7 @@ export type SettingsState = {
   success?: boolean;
 };
 
-export async function updateOrganizationSettings(prevState: SettingsState, formData: FormData): Promise<SettingsState> {
+export async function updateOrganizationSettings(prevState: SettingsState | null, formData: FormData): Promise<SettingsState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 

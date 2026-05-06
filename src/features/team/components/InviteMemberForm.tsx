@@ -15,17 +15,15 @@ function SubmitButton() {
   );
 }
 
-const initialState = { error: '', success: false };
-
 export default function InviteMemberForm({ orgSlug }: { orgSlug: string }) {
-  const [state, formAction] = useActionState(inviteMember, initialState);
+  const [state, formAction] = useActionState(inviteMember, null);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state.success && formRef.current) {
+    if (state?.success && formRef.current) {
       formRef.current.reset();
     }
-  }, [state.success]);
+  }, [state?.success]);
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col sm:flex-row gap-4 items-start sm:items-end bg-muted/40 p-4 rounded-lg border border-border">

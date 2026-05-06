@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 
-const initialState = { error: '', success: false };
-
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -18,7 +16,7 @@ function SubmitButton() {
 }
 
 export default function ContactForm({ orgSlug }: { orgSlug: string }) {
-  const [state, formAction] = useActionState(createContact, initialState);
+  const [state, formAction] = useActionState(createContact, null);
 
   return (
     <form action={formAction} className="form-card form-section">

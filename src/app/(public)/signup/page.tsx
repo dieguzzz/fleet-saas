@@ -5,10 +5,8 @@ import { useActionState, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { signUp } from '@/features/auth/actions';
 
-const initialState = { error: '' };
-
 export default function SignUpPage() {
-  const [state, formAction, isPending] = useActionState(signUp, initialState);
+  const [state, formAction, isPending] = useActionState(signUp, null);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
