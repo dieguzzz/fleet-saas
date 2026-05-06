@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 interface EmployeeFormProps {
   orgSlug: string;
-  action: (prevState: EmployeeFormState, formData: FormData) => Promise<EmployeeFormState>;
+  action: (prevState: EmployeeFormState | null, formData: FormData) => Promise<EmployeeFormState>;
   employee?: {
     id: string;
     full_name: string;

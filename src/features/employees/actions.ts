@@ -21,7 +21,7 @@ const employeeSchema = z.object({
 
 export type EmployeeFormState = { error?: string; success?: boolean };
 
-export async function createEmployee(prevState: EmployeeFormState, formData: FormData): Promise<EmployeeFormState> {
+export async function createEmployee(prevState: EmployeeFormState | null, formData: FormData): Promise<EmployeeFormState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
@@ -61,7 +61,7 @@ export async function createEmployee(prevState: EmployeeFormState, formData: For
   redirect(`/${orgSlug}/employees`);
 }
 
-export async function updateEmployee(prevState: EmployeeFormState, formData: FormData): Promise<EmployeeFormState> {
+export async function updateEmployee(prevState: EmployeeFormState | null, formData: FormData): Promise<EmployeeFormState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
   const employeeId = formData.get('employeeId') as string;
