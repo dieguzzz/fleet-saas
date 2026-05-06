@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { loginAmd, sendAmdPasswordReset } from '@/features/auth/actions';
 
+type Mode = 'select' | 'otra' | 'amd';
+
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<'select' | 'amd'>('select');
+  const [mode, setMode] = useState<Mode>('select');
   const [state, formAction, isPending] = useActionState(loginAmd, null);
   const [showPassword, setShowPassword] = useState(false);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
@@ -35,7 +37,9 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
-          {mode === 'select' ? (
+
+          {/* ── SELECTOR PRINCIPAL ── */}
+          {mode === 'select' && (
             <>
               <h1 className="text-xl font-bold text-foreground text-center mb-2">
                 ¿Con quién ingresás?
@@ -47,7 +51,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <button
                   onClick={() => setMode('amd')}
-                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500 rounded-xl hover:bg-blue-500/5 transition-colors text-left group"
+                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500 rounded-xl hover:bg-blue-500/5 transition-colors text-left"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-lg">A</span>
@@ -59,7 +63,7 @@ export default function LoginPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push('/signup')}
+                  onClick={() => setMode('otra')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
                   <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
@@ -67,12 +71,63 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">Otra empresa</p>
-                    <p className="text-xs text-muted-foreground">Crear cuenta nueva</p>
+                    <p className="text-xs text-muted-foreground">Iniciar sesión o crear cuenta</p>
                   </div>
                 </button>
               </div>
             </>
-          ) : (
+          )}
+
+          {/* ── OTRA EMPRESA ── */}
+          {mode === 'otra' && (
+            <>
+              <button
+                onClick={() => setMode('select')}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Volver
+              </button>
+
+              <h1 className="text-xl font-bold text-foreground text-center mb-2">
+                Otra empresa
+              </h1>
+              <p className="text-muted-foreground text-sm text-center mb-8">
+                ¿Qué querés hacer?
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => router.push('/login-empresa')}
+                  className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
+                >
+                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-muted-foreground text-lg">→</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">Iniciar sesión</p>
+                    <p className="text-xs text-muted-foreground">Ya tengo cuenta en otra empresa</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => router.push('/signup')}
+                  className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
+                >
+                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-muted-foreground text-lg">+</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">Crear empresa</p>
+                    <p className="text-xs text-muted-foreground">Registrar nueva organización</p>
+                  </div>
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* ── AMD PASSWORD ── */}
+          {mode === 'amd' && (
             <>
               <button
                 onClick={() => setMode('select')}
@@ -149,6 +204,7 @@ export default function LoginPage() {
               </form>
             </>
           )}
+
         </div>
       </div>
     </div>
