@@ -45,7 +45,8 @@
       "Bash(sed -n '50,75p' src/features/vehicles/actions.ts)",
       "Bash(sed -n '100,145p' src/features/vehicles/actions.ts)",
       "Bash(node *)",
-      "mcp__18bfff64-df54-414f-93aa-c3f7de2a4fc8__apply_migration"
+      "mcp__18bfff64-df54-414f-93aa-c3f7de2a4fc8__apply_migration",
+      "mcp__18bfff64-df54-414f-93aa-c3f7de2a4fc8__list_projects"
     ]
   },
   "enableAllProjectMcpServers": true,
