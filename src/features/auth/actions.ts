@@ -36,8 +36,8 @@ export async function loginAmd(prevState: unknown, formData: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
-    email: 'amd@amdlogistics.app',
-    password: 'tata01',
+    email: process.env.AMD_AUTH_EMAIL!,
+    password: process.env.AMD_AUTH_PASSWORD!,
   });
 
   if (error) return { error: error.message };
