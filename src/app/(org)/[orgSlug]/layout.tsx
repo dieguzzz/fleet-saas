@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
-import { BottomNav } from '@/components/layout/bottom-nav';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
@@ -127,16 +126,13 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
         />
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <Header onMenuToggle={() => setIsMobileMenuOpen((v) => !v)} />
-          {/* pb-16 on mobile to clear the bottom nav */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-20 lg:pb-6">
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
             <div className="w-full">
               {children}
             </div>
           </main>
         </div>
       </div>
-
-      <BottomNav onMoreClick={() => setIsMobileMenuOpen(true)} />
     </div>
   );
 }
