@@ -5,13 +5,8 @@ import { createTripExpense } from '@/features/trips/actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-const initialState = {
-  error: '',
-  success: false,
-};
-
 export default function TripExpenseForm({ orgSlug, tripId }: { orgSlug: string; tripId: string }) {
-  const [state, formAction, isPending] = useActionState(createTripExpense, initialState);
+  const [state, formAction, isPending] = useActionState(createTripExpense, null);
 
   return (
     <form action={formAction} className="form-card form-section">

@@ -14,12 +14,10 @@ function SubmitButton() {
   );
 }
 
-const initialState = { error: '', success: false };
-
 interface SettingsFormProps { orgSlug: string; orgName: string; }
 
 export default function OrganizationSettingsForm({ orgSlug, orgName }: SettingsFormProps) {
-  const [state, formAction] = useActionState(updateOrganizationSettings, initialState);
+  const [state, formAction] = useActionState(updateOrganizationSettings, null);
 
   return (
     <form action={formAction} className="form-card form-section">

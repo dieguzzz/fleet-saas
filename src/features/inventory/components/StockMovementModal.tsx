@@ -4,8 +4,6 @@ import { useState, useActionState } from 'react';
 import { recordStockMovement } from '@/features/inventory/actions';
 import { Button } from '@/components/ui/button';
 
-const initialState = { error: '', success: false };
-
 export default function StockMovementModal({ isOpen, onClose, orgId, itemId, itemName, currentStock }: {
   isOpen: boolean;
   onClose: () => void;
@@ -15,7 +13,7 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
   currentStock: number;
 }) {
   const [type, setType] = useState<'in' | 'out' | 'adjustment'>('in');
-  const [state, formAction, isPending] = useActionState(recordStockMovement, initialState);
+  const [state, formAction, isPending] = useActionState(recordStockMovement, null);
 
   if (!isOpen) return null;
 
@@ -34,7 +32,7 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
 
         <form action={async (formData) => {
           await formAction(formData);
-          if (!state.error) onClose();
+          if (!state?.error) onClose();
         }} className="space-y-4">
           <input type="hidden" name="orgId" value={orgId} />
           <input type="hidden" name="itemId" value={itemId} />

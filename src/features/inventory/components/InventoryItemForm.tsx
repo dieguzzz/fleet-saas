@@ -5,10 +5,8 @@ import { createInventoryItem } from '@/features/inventory/actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-const initialState = { error: '', success: false };
-
 export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
-  const [state, formAction, isPending] = useActionState(createInventoryItem, initialState);
+  const [state, formAction, isPending] = useActionState(createInventoryItem, null);
 
   return (
     <form action={formAction} className="form-card form-section">

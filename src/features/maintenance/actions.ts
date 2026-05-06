@@ -22,7 +22,7 @@ export type CreateMaintenanceState = {
   success?: boolean;
 };
 
-export async function createMaintenanceRecord(prevState: CreateMaintenanceState, formData: FormData): Promise<CreateMaintenanceState> {
+export async function createMaintenanceRecord(prevState: CreateMaintenanceState | null, formData: FormData): Promise<CreateMaintenanceState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 

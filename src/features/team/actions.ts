@@ -14,7 +14,7 @@ export type InviteState = {
   success?: boolean;
 };
 
-export async function inviteMember(prevState: InviteState, formData: FormData): Promise<InviteState> {
+export async function inviteMember(prevState: InviteState | null, formData: FormData): Promise<InviteState> {
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 

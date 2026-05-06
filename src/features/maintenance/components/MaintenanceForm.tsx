@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button';
 interface Vehicle { id: string; name: string; }
 interface MaintenanceFormProps { orgSlug: string; vehicles: Vehicle[]; }
 
-const initialState = { error: '', success: false };
-
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -21,7 +19,7 @@ function SubmitButton() {
 }
 
 export default function MaintenanceForm({ orgSlug, vehicles }: MaintenanceFormProps) {
-  const [state, formAction] = useActionState(createMaintenanceRecord, initialState);
+  const [state, formAction] = useActionState(createMaintenanceRecord, null);
 
   return (
     <form action={formAction} className="form-card form-section">
