@@ -50,7 +50,7 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
               <button type="button" onClick={() => setType('in')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${type === 'in' ? 'bg-emerald-600 text-white' : 'text-muted-foreground hover:text-foreground'}`}>
                 Entrada
               </button>
-              <button type="button" onClick={() => setType('out')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${type === 'out' ? 'bg-destructive text-white' : 'text-muted-foreground hover:text-foreground'}`}>
+              <button type="button" onClick={() => setType('out')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${type === 'out' ? 'bg-destructive text-destructive-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
                 Salida
               </button>
               <button type="button" onClick={() => setType('adjustment')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${type === 'adjustment' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>

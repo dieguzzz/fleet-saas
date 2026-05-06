@@ -23,16 +23,16 @@ interface EmployeeFormProps {
 }
 
 export default function EmployeeForm({ orgSlug, action, employee }: EmployeeFormProps) {
-  const [state, formAction, isPending] = useActionState(action, {});
+  const [state, formAction, isPending] = useActionState(action, null);
 
   return (
     <form action={formAction} className="form-section">
       <input type="hidden" name="orgSlug" value={orgSlug} />
       {employee && <input type="hidden" name="employeeId" value={employee.id} />}
 
-      {state.error && (
+      {state?.error && (
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-          <p className="text-destructive text-sm">{state.error}</p>
+          <p className="text-destructive text-sm">{state?.error}</p>
         </div>
       )}
 
