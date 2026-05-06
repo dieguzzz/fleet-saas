@@ -222,7 +222,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         {/* Logo / Org */}
-        <div className="px-4 py-4 border-b border-sidebar-border flex items-center justify-between">
+        <div className="h-14 px-4 border-b border-sidebar-border flex items-center justify-between shrink-0">
           <Link href={`/${org.slug}`} className="flex items-center gap-3 min-w-0" onClick={onClose}>
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-lg flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
               {org.name.charAt(0).toUpperCase()}
