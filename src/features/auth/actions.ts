@@ -30,15 +30,54 @@ export async function signUp(prevState: unknown, formData: FormData) {
   redirect('/onboarding');
 }
 
+export async function getAmdSetupState(): Promise<{ needsSetup: boolean; email: string | null }> {
+  const supabase = await createClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any).rpc('is_amd_setup');
+  return {
+    needsSetup: data?.needsSetup ?? true,
+    email: data?.email ?? null,
+  };
+}
+
+export async function setupAmd(prevState: unknown, formData: FormData) {
+  const email = (formData.get('email') as string)?.trim().toLowerCase();
+  const password = formData.get('password') as string;
+  const confirm = formData.get('confirm') as string;
+
+  if (!email || !email.includes('@')) return { error: 'Email invalido' };
+  if (!password || password.length < 6) return { error: 'La contraseña debe tener al menos 6 caracteres' };
+  if (password !== confirm) return { error: 'Las contraseñas no coinciden' };
+
+  const supabase = await createClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc('setup_amd_user', {
+    p_email: email,
+    p_password: password,
+  });
+
+  if (error) return { error: error.message };
+  if (data?.error) return { error: data.error };
+
+  // Sign in con las nuevas credenciales
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) return { error: signInError.message };
+
+  revalidatePath('/', 'layout');
+  redirect('/amd');
+}
+
 export async function loginAmd(prevState: unknown, formData: FormData) {
   const password = formData.get('password') as string;
   if (!password) return { error: 'Ingresá tu contraseña' };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: process.env.AMD_AUTH_EMAIL ?? 'yarisel0129@hotmail.com',
-    password,
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: state } = await (supabase as any).rpc('is_amd_setup');
+  const email = state?.email;
+  if (!email) return { error: 'Usuario AMD no configurado' };
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) return { error: 'Contraseña incorrecta' };
 

@@ -1,27 +1,29 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { loginAmd, sendAmdPasswordReset } from '@/features/auth/actions';
+import { loginAmd, setupAmd, getAmdSetupState } from '@/features/auth/actions';
 
 type Mode = 'select' | 'otra' | 'amd';
 
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('select');
-  const [state, formAction, isPending] = useActionState(loginAmd, null);
+  const [loginState, loginAction, loginPending] = useActionState(loginAmd, null);
+  const [setupState, setupAction, setupPending] = useActionState(setupAmd, null);
   const [showPassword, setShowPassword] = useState(false);
-  const [resetMsg, setResetMsg] = useState<string | null>(null);
-  const [resetting, setResetting] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
+  const [amdEmail, setAmdEmail] = useState<string | null>(null);
 
-  async function handleReset() {
-    setResetting(true);
-    setResetMsg(null);
-    const res = await sendAmdPasswordReset();
-    setResetting(false);
-    setResetMsg(res.error ? `Error: ${res.error}` : 'Email enviado. Revisá tu bandeja de entrada.');
-  }
+  useEffect(() => {
+    if (mode === 'amd' && needsSetup === null) {
+      getAmdSetupState().then((s) => {
+        setNeedsSetup(s.needsSetup);
+        setAmdEmail(s.email);
+      });
+    }
+  }, [mode, needsSetup]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -126,11 +128,11 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* ── AMD PASSWORD ── */}
+          {/* ── AMD ── */}
           {mode === 'amd' && (
             <>
               <button
-                onClick={() => setMode('select')}
+                onClick={() => { setMode('select'); setNeedsSetup(null); }}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -143,65 +145,140 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">AMD Logistics</p>
-                  <p className="text-xs text-muted-foreground">Ingresá tu contraseña</p>
+                  <p className="text-xs text-muted-foreground">
+                    {needsSetup === null ? 'Cargando...' : needsSetup ? 'Configura tu acceso' : 'Ingresá tu contraseña'}
+                  </p>
                 </div>
               </div>
 
-              <form action={formAction} className="space-y-4">
-                {state?.error && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <p className="text-red-400 text-sm text-center">{state.error}</p>
-                  </div>
-                )}
+              {needsSetup === null && (
+                <p className="text-sm text-muted-foreground text-center">Cargando...</p>
+              )}
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">
-                    Contraseña
-                  </label>
-                  <div className="relative">
+              {/* SETUP INICIAL */}
+              {needsSetup === true && (
+                <form action={setupAction} className="space-y-4">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                    <p className="text-blue-400 text-xs text-center">
+                      Primer ingreso: definí tu email y contraseña
+                    </p>
+                  </div>
+
+                  {setupState?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                      <p className="text-red-400 text-sm text-center">{setupState.error}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">Email</label>
                     <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
+                      id="email"
+                      name="email"
+                      type="email"
                       required
                       autoFocus
-                      autoComplete="current-password"
-                      placeholder="••••••••"
-                      className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      defaultValue={amdEmail ?? ''}
+                      autoComplete="email"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
                   </div>
-                </div>
 
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isPending ? 'Ingresando...' : 'Ingresar'}
-                </button>
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">Contraseña</label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        autoComplete="new-password"
+                        placeholder="Mínimo 6 caracteres"
+                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="text-center">
+                  <div>
+                    <label htmlFor="confirm" className="block text-sm font-medium text-muted-foreground mb-2">Confirmar contraseña</label>
+                    <input
+                      id="confirm"
+                      name="confirm"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
                   <button
-                    type="button"
-                    onClick={handleReset}
-                    disabled={resetting}
-                    className="text-sm text-blue-500 hover:text-blue-400 disabled:opacity-50"
+                    type="submit"
+                    disabled={setupPending}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {resetting ? 'Enviando...' : '¿Olvidaste tu contraseña? Setear contraseña'}
+                    {setupPending ? 'Configurando...' : 'Configurar y entrar'}
                   </button>
-                  {resetMsg && (
-                    <p className="text-xs text-muted-foreground mt-2">{resetMsg}</p>
+                </form>
+              )}
+
+              {/* LOGIN NORMAL */}
+              {needsSetup === false && (
+                <form action={loginAction} className="space-y-4">
+                  {amdEmail && (
+                    <div className="bg-muted rounded-lg p-3">
+                      <p className="text-muted-foreground text-xs text-center">{amdEmail}</p>
+                    </div>
                   )}
-                </div>
-              </form>
+
+                  {loginState?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                      <p className="text-red-400 text-sm text-center">{loginState.error}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-muted-foreground mb-2">Contraseña</label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        autoFocus
+                        autoComplete="current-password"
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loginPending}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loginPending ? 'Ingresando...' : 'Ingresar'}
+                  </button>
+                </form>
+              )}
             </>
           )}
 
