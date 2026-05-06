@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams, usePathname } from 'next/navigation';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
 import type { Organization, Profile, OrgRole } from '@/types/database';
+
+const SIDEBAR_WIDTH = 288; // w-72
 
 interface OrgLayoutProps {
   children: ReactNode;
@@ -24,44 +27,87 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   const isImpersonating = useTenantStore((s) => s.isImpersonating);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const mainRef = useRef<HTMLElement>(null);
 
-  // Swipe-to-open sidebar
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  // Motion value: 0 = sidebar closed, 1 = sidebar fully open
+  const sidebarProgress = useMotionValue(0);
+  const backdropOpacity = useTransform(sidebarProgress, [0, 1], [0, 0.55]);
+  const backdropBlurPx = useTransform(sidebarProgress, [0, 1], [0, 6]);
+  const backdropFilter = useTransform(backdropBlurPx, (v) => `blur(${v}px)`);
+
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartProgress = useRef(0);
+
+  function openSidebar() {
+    animate(sidebarProgress, 1, { type: 'spring', stiffness: 300, damping: 30 });
+    setIsMobileMenuOpen(true);
+  }
+
+  function closeSidebar() {
+    animate(sidebarProgress, 0, { type: 'spring', stiffness: 300, damping: 30 });
+    setIsMobileMenuOpen(false);
+  }
 
   function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
+    const touchX = e.touches[0].clientX;
+    const currentProgress = sidebarProgress.get();
+    // Drag from left edge to open, or drag sidebar to close
+    if (touchX < 40 || (isMobileMenuOpen && touchX < SIDEBAR_WIDTH + 20)) {
+      isDragging.current = true;
+      dragStartX.current = touchX;
+      dragStartProgress.current = currentProgress;
+    }
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (!isDragging.current) return;
+    const touchX = e.touches[0].clientX;
+    const delta = touchX - dragStartX.current;
+    const newProgress = Math.max(0, Math.min(1, dragStartProgress.current + delta / SIDEBAR_WIDTH));
+    sidebarProgress.set(newProgress);
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    // Swipe right from left edge (within 40px), mostly horizontal
-    if (dx > 60 && dy < 60 && touchStartX.current < 40) {
-      setIsMobileMenuOpen(true);
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const touchX = e.changedTouches[0].clientX;
+    const velocity = touchX - dragStartX.current;
+    const currentProgress = sidebarProgress.get();
+
+    // Snap based on position + velocity
+    if (currentProgress > 0.5 || velocity > 50) {
+      openSidebar();
+    } else {
+      closeSidebar();
     }
-    // Swipe left to close
-    if (dx < -60 && dy < 60 && isMobileMenuOpen) {
-      setIsMobileMenuOpen(false);
+  }
+
+  // Header scroll-hide
+  function handleScroll() {
+    const el = mainRef.current;
+    if (!el) return;
+    const currentY = el.scrollTop;
+    const delta = currentY - lastScrollY.current;
+    if (delta > 8 && currentY > 60) {
+      setIsHeaderVisible(false);
+    } else if (delta < -8) {
+      setIsHeaderVisible(true);
     }
-    touchStartX.current = null;
-    touchStartY.current = null;
+    lastScrollY.current = currentY;
   }
 
   // Close sidebar when navigating
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    closeSidebar();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
 
@@ -116,17 +162,50 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
     <div
       className={`h-screen flex flex-col bg-background overflow-hidden ${isImpersonating ? '' : ''}`}
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       <ImpersonationBanner />
       <div className="flex flex-1 min-h-0">
         <Sidebar
           isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
+          onClose={closeSidebar}
+          sidebarProgress={sidebarProgress}
         />
+
+        {/* Progressive backdrop (mobile only) */}
+        <motion.div
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{
+            opacity: backdropOpacity,
+            backdropFilter: backdropFilter,
+            backgroundColor: 'black',
+            pointerEvents: isMobileMenuOpen ? 'auto' : 'none',
+          }}
+          onClick={() => { if (isMobileMenuOpen) closeSidebar(); }}
+          onTouchStart={(e) => { if (isMobileMenuOpen) e.stopPropagation(); }}
+        />
+
+        {/* Edge handle — visible when sidebar closed on mobile */}
+        {!isMobileMenuOpen && (
+          <div
+            className="fixed left-0 top-1/2 -translate-y-1/2 z-50 lg:hidden"
+            style={{ width: 4, height: 48 }}
+          >
+            <div className="w-full h-full bg-foreground/20 rounded-r-full" />
+          </div>
+        )}
+
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
-          <Header onMenuToggle={() => setIsMobileMenuOpen((v) => !v)} />
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <Header
+            onMenuToggle={() => isMobileMenuOpen ? closeSidebar() : openSidebar()}
+            isVisible={isHeaderVisible}
+          />
+          <main
+            ref={mainRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto p-4 lg:p-6"
+          >
             <div className="w-full">
               {children}
             </div>

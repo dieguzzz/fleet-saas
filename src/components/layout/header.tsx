@@ -3,22 +3,28 @@
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 interface HeaderProps {
   onMenuToggle: () => void;
+  isVisible: boolean;
 }
 
-export function Header({ onMenuToggle }: HeaderProps) {
+export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const organizations = useTenantStore((s) => s.organizations);
   const currentOrg = useCurrentOrg();
   const user = useTenantStore((s) => s.user);
 
   return (
-    <header className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0">
+    <motion.header
+      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0"
+      animate={{ y: isVisible ? 0 : -56 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
       {/* Hamburger (mobile only) */}
       <button
         onClick={onMenuToggle}
-        className="lg:hidden p-2 -ml-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        className="lg:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label="Abrir menú"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +72,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
         {/* User avatar */}
         <div className="flex items-center gap-2 pl-1">
-          <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
             {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
           </div>
           <span className="hidden lg:block text-sm text-foreground font-medium max-w-[140px] truncate">
@@ -74,6 +80,6 @@ export function Header({ onMenuToggle }: HeaderProps) {
           </span>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
