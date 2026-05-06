@@ -30,6 +30,22 @@ export async function signUp(prevState: unknown, formData: FormData) {
   redirect('/onboarding');
 }
 
+export async function loginAmd(prevState: unknown, formData: FormData) {
+  const password = formData.get('password') as string;
+  if (password !== 'tata01') return { error: 'Contraseña incorrecta' };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email: 'amd@amdlogistics.app',
+    password: 'tata01',
+  });
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/', 'layout');
+  redirect('/amd');
+}
+
 export async function login(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
 
