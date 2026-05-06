@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { BottomNav } from '@/components/layout/bottom-nav';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
@@ -24,6 +25,31 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   const isImpersonating = useTenantStore((s) => s.isImpersonating);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Swipe-to-open sidebar
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    // Swipe right from left edge (within 40px), mostly horizontal
+    if (dx > 60 && dy < 60 && touchStartX.current < 40) {
+      setIsMobileMenuOpen(true);
+    }
+    // Swipe left to close
+    if (dx < -60 && dy < 60 && isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }
 
   // Close sidebar when navigating
   useEffect(() => {
@@ -88,7 +114,11 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   }, [orgSlug, setCurrentOrg, setUser, setOrganizations, setIsLoading]);
 
   return (
-    <div className={`h-screen flex flex-col bg-background overflow-hidden ${isImpersonating ? '' : ''}`}>
+    <div
+      className={`h-screen flex flex-col bg-background overflow-hidden ${isImpersonating ? '' : ''}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <ImpersonationBanner />
       <div className="flex flex-1 min-h-0">
         <Sidebar
@@ -97,13 +127,16 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
         />
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <Header onMenuToggle={() => setIsMobileMenuOpen((v) => !v)} />
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          {/* pb-16 on mobile to clear the bottom nav */}
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-20 lg:pb-6">
             <div className="w-full">
               {children}
             </div>
           </main>
         </div>
       </div>
+
+      <BottomNav onMoreClick={() => setIsMobileMenuOpen(true)} />
     </div>
   );
 }
