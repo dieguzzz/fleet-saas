@@ -53,7 +53,7 @@ export default function NewFinancialTransactionModal({
               type="button"
               onClick={() => setType('expense')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                type === 'expense' ? 'bg-destructive text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                type === 'expense' ? 'bg-destructive text-destructive-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Gasto
