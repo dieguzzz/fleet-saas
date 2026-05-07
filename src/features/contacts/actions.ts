@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/services/supabase/server';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { logAudit } from '@/lib/audit';
 
@@ -65,7 +65,6 @@ export async function createContact(
   });
 
   revalidatePath(`/${orgSlug}/contacts`);
-  revalidateTag(`contacts-${org.id}`);
   return { success: true, id: contact?.id, name: validated.data.name };
 }
 
@@ -91,7 +90,6 @@ export async function updateContact(
   if (error) return { error: 'Error al actualizar el contacto' };
 
   revalidatePath(`/${orgSlug}/contacts`);
-  revalidateTag(`contacts-${org.id}`);
   return { success: true };
 }
 
