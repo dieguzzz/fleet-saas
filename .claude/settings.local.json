@@ -51,7 +51,8 @@
       "mcp__supabase__list_tables",
       "mcp__supabase__get_advisors",
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__list-deployments",
-      "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__get-logs"
+      "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__get-logs",
+      "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__list-projects"
     ]
   },
   "enableAllProjectMcpServers": true,
