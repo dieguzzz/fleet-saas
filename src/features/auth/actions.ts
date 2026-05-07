@@ -57,8 +57,8 @@ export async function setupAmd(prevState: unknown, formData: FormData) {
     p_password: password,
   });
 
-  if (error) return { error: error.message };
-  if (data?.error) return { error: data.error };
+  if (error) return { error: error instanceof Error ? error.message : String(error) };
+  if (data?.error) return { error: String(data.error) };
 
   // Sign in con las nuevas credenciales
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
