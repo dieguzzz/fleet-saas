@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
 import { EmptyState } from '@/components/ui/empty-state';
 
@@ -42,7 +42,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 const ACTION_WIDTH = 80;
 
-function SwipeableVehicleCard({ vehicle, orgSlug }: { vehicle: Vehicle; orgSlug: string }) {
+const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSlug }: { vehicle: Vehicle; orgSlug: string }) {
   const x = useMotionValue(0);
   const [revealed, setRevealed] = useState(false);
   const dragStartX = useRef(0);
@@ -125,9 +125,9 @@ function SwipeableVehicleCard({ vehicle, orgSlug }: { vehicle: Vehicle; orgSlug:
       </motion.div>
     </div>
   );
-}
+});
 
-export default function VehicleList({ orgSlug, vehicles }: VehicleListProps) {
+const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleListProps) {
   if (vehicles.length === 0) {
     return (
       <EmptyState
@@ -197,4 +197,6 @@ export default function VehicleList({ orgSlug, vehicles }: VehicleListProps) {
       </div>
     </>
   );
-}
+});
+
+export default VehicleList;

@@ -24,7 +24,9 @@ export async function GET(request: NextRequest) {
     return new NextResponse('URL not allowed', { status: 403 });
   }
 
-  if (!parsed.pathname.includes('/storage/v1/object/public/invoice-attachments/')) {
+  // Strict regex to prevent path traversal — only allow files directly under invoice-attachments/
+  const validPath = /^\/storage\/v1\/object\/public\/invoice-attachments\/[^/].*$/;
+  if (!validPath.test(parsed.pathname)) {
     return new NextResponse('URL not allowed', { status: 403 });
   }
 

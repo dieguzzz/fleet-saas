@@ -32,11 +32,13 @@ export async function signUp(prevState: unknown, formData: FormData) {
 
 export async function getAmdSetupState(): Promise<{ needsSetup: boolean; email: string | null }> {
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any).rpc('is_amd_setup');
+  // AMD = sistema de acceso especial con usuario fijo (single-tenant dentro de la org).
+  // is_amd_setup / setup_amd_user son RPCs SECURITY DEFINER definidas en la DB.
+  // El cast a unknown + Record es necesario porque la RPC no está en los tipos autogenerados.
+  const { data } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: Record<string, unknown> | null }>)('is_amd_setup');
   return {
-    needsSetup: data?.needsSetup ?? true,
-    email: data?.email ?? null,
+    needsSetup: (data?.needsSetup as boolean) ?? true,
+    email: (data?.email as string) ?? null,
   };
 }
 
@@ -50,8 +52,7 @@ export async function setupAmd(prevState: unknown, formData: FormData) {
   if (password !== confirm) return { error: 'Las contraseñas no coinciden' };
 
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any).rpc('setup_amd_user', {
+  const { data, error } = await (supabase.rpc as unknown as (fn: string, args: Record<string, string>) => Promise<{ data: Record<string, unknown> | null; error: unknown }>) ('setup_amd_user', {
     p_email: email,
     p_password: password,
   });
@@ -72,9 +73,8 @@ export async function loginAmd(prevState: unknown, formData: FormData) {
   if (!password) return { error: 'Ingresá tu contraseña' };
 
   const supabase = await createClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: state } = await (supabase as any).rpc('is_amd_setup');
-  const email = state?.email;
+  const { data: state } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: Record<string, unknown> | null }>)('is_amd_setup');
+  const email = state?.email as string | undefined;
   if (!email) return { error: 'Usuario AMD no configurado' };
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -125,8 +125,7 @@ export async function login(prevState: unknown, formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: membership } = await (supabase as any)
+        const { data: membership } = await supabase
       .from('organization_members')
       .select('organization:organizations(slug)')
       .eq('user_id', user.id)
@@ -208,8 +207,7 @@ export async function getCurrentUser(): Promise<Profile | null> {
 
   if (!user) return null;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -227,13 +225,9 @@ export async function getUserOrganizations() {
 
   if (!user) return [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: memberships } = await (supabase as any)
+  const { data: memberships } = await supabase
     .from('organization_members')
-    .select(`
-      role,
-      organization:organizations(*)
-    `)
+    .select('role, organization:organizations(*)')
     .eq('user_id', user.id);
 
   return (

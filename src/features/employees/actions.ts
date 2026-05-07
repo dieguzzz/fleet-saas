@@ -3,6 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { tryResolveOrgId } from '@/lib/org-resolver';
 import { z } from 'zod';
 import { logAudit } from '@/lib/audit';
 
@@ -25,8 +26,9 @@ export async function createEmployee(prevState: EmployeeFormState | null, formDa
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) return { error: 'Organización no encontrada' };
+  const empOrgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!empOrgId) return { error: 'Organización no encontrada' };
+  const org = { id: empOrgId };
 
   const validated = employeeSchema.safeParse({
     full_name: formData.get('full_name'),
@@ -109,11 +111,12 @@ export async function deleteEmployee(employeeId: string, orgSlug: string) {
   revalidatePath(`/${orgSlug}/employees`);
 }
 
-export async function getEmployees(orgId: string) {
+export async function getEmployees(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
   return await supabase
     .from('employees')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('organization_id', orgId)
-    .order('full_name');
+    .order('full_name')
+    .range(offset, offset + limit - 1);
 }

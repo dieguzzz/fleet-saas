@@ -3,6 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { tryResolveOrgId } from '@/lib/org-resolver';
 import { logAudit } from '@/lib/audit';
 
 const fuelSchema = z.object({
@@ -24,8 +25,9 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (!org) return { error: 'Organización no encontrada' };
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+  const org = { id: orgId };
 
   const raw = {
     vehicle_id: formData.get('vehicle_id') || '',
@@ -77,13 +79,14 @@ export async function deleteFuelRecord(id: string, orgSlug: string) {
   revalidatePath(`/${orgSlug}/fuel`);
 }
 
-export async function getFuelRecords(orgId: string) {
+export async function getFuelRecords(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
   return await supabase
     .from('fuel_records')
-    .select('*, vehicle:vehicles(name, plate_number), employee:employees(full_name)')
+    .select('*, vehicle:vehicles(name, plate_number), employee:employees(full_name)', { count: 'exact' })
     .eq('organization_id', orgId)
-    .order('fuel_date', { ascending: false });
+    .order('fuel_date', { ascending: false })
+    .range(offset, offset + limit - 1);
 }
 
 export async function getFuelStats(orgId: string) {
