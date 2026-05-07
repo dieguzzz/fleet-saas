@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const publicRoutes = ['/', '/login', '/signup', '/invite', '/forgot-password', '/reset-password'];
+const publicRoutes = ['/', '/login', '/signup', '/invite', '/forgot-password', '/reset-password', '/select-org', '/login-empresa'];
 
 // Routes that require super_admin
 const adminRoutes = ['/admin'];
@@ -55,20 +55,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user exists and trying to access login/signup, redirect to dashboard
-  if (user && (pathname === '/login' || pathname === '/signup')) {
-    // Get user's first organization
-    const { data: membership } = await supabase
+  // If user exists and trying to access login/signup/login-empresa, redirect to dashboard
+  if (user && (pathname === '/login' || pathname === '/signup' || pathname === '/login-empresa')) {
+    const { data: memberships } = await supabase
       .from('organization_members')
       .select('organization:organizations(slug)')
-      .eq('user_id', user.id)
-      .limit(1)
-      .single();
+      .eq('user_id', user.id);
 
     const url = request.nextUrl.clone();
-    if (membership?.organization) {
-      const org = membership.organization as unknown as { slug: string };
-      url.pathname = `/${org.slug}`;
+    const slugs = (memberships ?? [])
+      .map((m: { organization: { slug: string } | null }) => (m.organization as { slug: string } | null)?.slug)
+      .filter(Boolean) as string[];
+
+    if (slugs.length === 1) {
+      url.pathname = `/${slugs[0]}`;
+    } else if (slugs.length > 1) {
+      url.pathname = '/select-org';
     } else {
       url.pathname = '/onboarding';
     }
