@@ -213,7 +213,7 @@ export async function getCurrentUser(): Promise<Profile | null> {
     .eq('id', user.id)
     .single();
 
-  return profile as Profile | null;
+  return profile as unknown as Profile | null;
 }
 
 export async function getUserOrganizations() {
