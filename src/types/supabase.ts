@@ -187,6 +187,7 @@ export type Database = {
           reference_type: string | null
           subcategory: string | null
           transaction_date: string
+          trip_id: string | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string | null
         }
@@ -203,6 +204,7 @@ export type Database = {
           reference_type?: string | null
           subcategory?: string | null
           transaction_date: string
+          trip_id?: string | null
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string | null
         }
@@ -219,6 +221,7 @@ export type Database = {
           reference_type?: string | null
           subcategory?: string | null
           transaction_date?: string
+          trip_id?: string | null
           type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string | null
         }
@@ -237,6 +240,13 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "financial_transactions_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
         ]
       }
       fuel_records: {
@@ -253,6 +263,7 @@ export type Database = {
           price_per_liter: number
           station: string | null
           total_cost: number
+          trip_id: string | null
           updated_at: string | null
           vehicle_id: string | null
         }
@@ -269,6 +280,7 @@ export type Database = {
           price_per_liter: number
           station?: string | null
           total_cost: number
+          trip_id?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
         }
@@ -285,6 +297,7 @@ export type Database = {
           price_per_liter?: number
           station?: string | null
           total_cost?: number
+          trip_id?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
         }
@@ -301,6 +314,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_records_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
           {
@@ -439,6 +459,7 @@ export type Database = {
           quantity: number
           reference_id: string | null
           reference_type: string | null
+          trip_id: string | null
           type: Database["public"]["Enums"]["inventory_movement_type"]
         }
         Insert: {
@@ -453,6 +474,7 @@ export type Database = {
           quantity: number
           reference_id?: string | null
           reference_type?: string | null
+          trip_id?: string | null
           type: Database["public"]["Enums"]["inventory_movement_type"]
         }
         Update: {
@@ -467,6 +489,7 @@ export type Database = {
           quantity?: number
           reference_id?: string | null
           reference_type?: string | null
+          trip_id?: string | null
           type?: Database["public"]["Enums"]["inventory_movement_type"]
         }
         Relationships: [
@@ -489,6 +512,13 @@ export type Database = {
             columns: ["performed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_movements_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -591,6 +621,7 @@ export type Database = {
           supplier_id: string | null
           tax: number | null
           total: number | null
+          trip_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -610,6 +641,7 @@ export type Database = {
           supplier_id?: string | null
           tax?: number | null
           total?: number | null
+          trip_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -629,6 +661,7 @@ export type Database = {
           supplier_id?: string | null
           tax?: number | null
           total?: number | null
+          trip_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -651,6 +684,13 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -1012,6 +1052,82 @@ export type Database = {
           },
         ]
       }
+      trip_incidents: {
+        Row: {
+          attachment_url: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          estimated_cost: number
+          id: string
+          incident_date: string
+          inventory_item_id: string | null
+          notes: string | null
+          organization_id: string
+          quantity: number | null
+          trip_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description: string
+          estimated_cost?: number
+          id?: string
+          incident_date: string
+          inventory_item_id?: string | null
+          notes?: string | null
+          organization_id: string
+          quantity?: number | null
+          trip_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          attachment_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          estimated_cost?: number
+          id?: string
+          incident_date?: string
+          inventory_item_id?: string | null
+          notes?: string | null
+          organization_id?: string
+          quantity?: number | null
+          trip_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_incidents_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_incidents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_incidents_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           created_at: string | null
@@ -1215,6 +1331,21 @@ export type Database = {
         }[]
       }
       get_next_invoice_number: { Args: { org_id: string }; Returns: string }
+      get_trip_financials: {
+        Args: { p_trip_id: string }
+        Returns: {
+          incidents_count: number
+          invoices_count: number
+          net_profit: number
+          purchases_count: number
+          total_costs: number
+          total_expenses_direct: number
+          total_fuel_cost: number
+          total_incidents_cost: number
+          total_income: number
+          total_invoices_supplier: number
+        }[]
+      }
       get_user_org_ids: { Args: never; Returns: string[] }
       has_org_role: {
         Args: {
@@ -1223,8 +1354,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_amd_setup: { Args: never; Returns: Json }
       is_first_org_member: { Args: { org_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      setup_amd_user: {
+        Args: { p_email: string; p_password: string }
+        Returns: Json
+      }
     }
     Enums: {
       inventory_movement_type: "in" | "out" | "adjustment"
