@@ -130,7 +130,10 @@ export async function login(prevState: unknown, formData: FormData) {
       .eq('user_id', user.id);
 
     const slugs = (memberships ?? [])
-      .map((m: { organization: { slug: string } | null }) => m.organization?.slug)
+      .map((m: any) => {
+        const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
+        return org?.slug;
+      })
       .filter(Boolean) as string[];
 
     if (slugs.length === 1) {
