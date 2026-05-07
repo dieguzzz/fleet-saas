@@ -3,23 +3,25 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
+import { tryResolveOrgId } from '@/lib/org-resolver';
 import type { Trip, TripExpense } from '@/types/database';
 
-export async function getTrips(orgId: string) {
+export async function getTrips(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('trips')
-    .select('*, vehicle:vehicles(name, plate_number), driver:profiles(full_name)')
+    .select('*, vehicle:vehicles(name, plate_number), driver:profiles(full_name)', { count: 'exact' })
     .eq('organization_id', orgId)
-    .order('started_at', { ascending: false });
+    .order('started_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error('Error fetching trips:', error);
     return { error: error.message };
   }
 
-  return { data: data as Trip[] };
+  return { data: data as Trip[], count };
 }
 
 export async function getTrip(id: string) {
@@ -65,17 +67,10 @@ export async function createTrip(prevState: unknown, formData: FormData) {
     return { error: 'Organization Slug is missing', success: false };
   }
 
-  const { data: org, error: orgError } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (orgError || !org) {
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) {
     return { error: 'Organization not found', success: false };
   }
-
-  const orgId = org.id;
 
   const { error } = await supabase
     .from('trips')
@@ -114,17 +109,10 @@ export async function createTripExpense(prevState: unknown, formData: FormData) 
     return { error: 'Trip ID is missing', success: false };
   }
 
-  const { data: org, error: orgError } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (orgError || !org) {
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) {
     return { error: 'Organization not found', success: false };
   }
-
-  const orgId = org.id;
 
   const { error } = await supabase
     .from('trip_expenses')

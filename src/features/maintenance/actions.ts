@@ -3,6 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { tryResolveOrgId } from '@/lib/org-resolver';
 import { z } from 'zod';
 
 const maintenanceSchema = z.object({
@@ -27,15 +28,9 @@ export async function createMaintenanceRecord(prevState: CreateMaintenanceState 
   const orgSlug = formData.get('orgSlug') as string;
 
   // 1. Get Organization ID
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (!org) {
-    return { error: 'Organización no encontrada' };
-  }
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+  const org = { id: orgId };
 
   // 2. Validate Data
   const rawData = {
@@ -73,15 +68,13 @@ export async function createMaintenanceRecord(prevState: CreateMaintenanceState 
   redirect(`/${orgSlug}/maintenance`);
 }
 
-export async function getMaintenanceRecords(orgId: string) {
+export async function getMaintenanceRecords(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
 
   return await supabase
     .from('maintenance_records')
-    .select(`
-      *,
-      vehicle:vehicles(name, plate_number)
-    `)
+    .select('*, vehicle:vehicles(name, plate_number)', { count: 'exact' })
     .eq('organization_id', orgId)
-    .order('performed_at', { ascending: false });
+    .order('performed_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 }

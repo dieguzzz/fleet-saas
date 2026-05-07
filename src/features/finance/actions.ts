@@ -5,12 +5,15 @@ import { createClient } from '@/services/supabase/server';
 import type { Invoice } from '@/types/database';
 
 
+const INVOICE_LIST_SELECT = '*, customer:contacts!invoices_customer_id_fkey(name), supplier:contacts!invoices_supplier_id_fkey(name)';
+const INVOICE_DETAIL_SELECT = '*, customer:contacts!invoices_customer_id_fkey(*), supplier:contacts!invoices_supplier_id_fkey(*)';
+
 export async function getInvoicesByType(orgId: string, type: 'cobro' | 'pago') {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('invoices')
-    .select('*, customer:contacts!invoices_customer_id_fkey(name), supplier:contacts!invoices_supplier_id_fkey(name)')
+    .select(INVOICE_LIST_SELECT)
     .eq('organization_id', orgId)
     .eq('invoice_type', type)
     .order('date', { ascending: false });
@@ -24,7 +27,7 @@ export async function getInvoices(orgId: string) {
 
   const { data, error } = await supabase
     .from('invoices')
-    .select('*, customer:contacts!invoices_customer_id_fkey(name), supplier:contacts!invoices_supplier_id_fkey(name)')
+    .select(INVOICE_LIST_SELECT)
     .eq('organization_id', orgId)
     .order('date', { ascending: false });
 
@@ -41,7 +44,7 @@ export async function getInvoice(id: string, orgId: string) {
 
   const { data, error } = await supabase
     .from('invoices')
-    .select('*, customer:contacts!invoices_customer_id_fkey(*), supplier:contacts!invoices_supplier_id_fkey(*)')
+    .select(INVOICE_DETAIL_SELECT)
     .eq('id', id)
     .eq('organization_id', orgId)
     .single();
@@ -188,7 +191,17 @@ export async function getFinanceKPIs(orgId: string) {
 
 // Transaction Actions
 
+import { z } from 'zod';
 import type { FinancialTransaction, TransactionType } from '@/types/database';
+
+const transactionSchema = z.object({
+  type: z.enum(['income', 'expense']),
+  category: z.string().min(1, 'La categoría es obligatoria').max(100),
+  subcategory: z.string().max(100).optional(),
+  amount: z.coerce.number().positive('El monto debe ser mayor a 0'),
+  description: z.string().max(500).optional(),
+  transaction_date: z.string().min(1, 'La fecha es obligatoria'),
+});
 
 export async function getFinancialTransactions(orgId: string) {
   const supabase = await createClient();
@@ -220,21 +233,29 @@ export async function createFinancialTransaction(prevState: unknown, formData: F
      return { error: 'Organization ID is missing', success: false };
   }
 
-  const transaction = {
-    type: formData.get('type') as TransactionType,
-    category: formData.get('category') as string,
-    subcategory: formData.get('subcategory') as string,
-    amount: Number(formData.get('amount')),
-    description: formData.get('description') as string,
-    transaction_date: formData.get('transaction_date') as string,
-    // attachments not handled yet
-  };
+  const validated = transactionSchema.safeParse({
+    type: formData.get('type'),
+    category: formData.get('category'),
+    subcategory: formData.get('subcategory') || undefined,
+    amount: formData.get('amount'),
+    description: formData.get('description') || undefined,
+    transaction_date: formData.get('transaction_date'),
+  });
+
+  if (!validated.success) {
+    return { error: validated.error.issues[0].message, success: false };
+  }
 
   const { error } = await supabase
     .from('financial_transactions')
     .insert({
       organization_id: orgId,
-      ...transaction
+      type: validated.data.type as TransactionType,
+      category: validated.data.category,
+      subcategory: validated.data.subcategory ?? null,
+      amount: validated.data.amount,
+      description: validated.data.description ?? null,
+      transaction_date: validated.data.transaction_date,
     });
 
   if (error) {

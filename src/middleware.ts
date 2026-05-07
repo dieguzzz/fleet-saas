@@ -117,9 +117,18 @@ export async function middleware(request: NextRequest) {
       .single();
 
     if (!membership) {
-      // Check if impersonating (super admin)
+      // Impersonation is only valid for super admins — verify before allowing access
       const impersonatingOrg = request.cookies.get('impersonating_org')?.value;
-      if (impersonatingOrg !== orgSlug) {
+      if (impersonatingOrg === orgSlug) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_super_admin')
+          .eq('id', user!.id)
+          .single();
+        if (!profile?.is_super_admin) {
+          return NextResponse.redirect(new URL('/unauthorized', request.url));
+        }
+      } else {
         return NextResponse.redirect(new URL('/unauthorized', request.url));
       }
     }

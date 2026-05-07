@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { logAudit } from '@/lib/audit';
+import { tryResolveOrgId } from '@/lib/org-resolver';
 
 const vehicleSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),
@@ -25,13 +26,9 @@ export async function createVehicle(prevState: CreateVehicleState, formData: For
   const supabase = await createClient();
   const orgSlug = formData.get('orgSlug') as string;
 
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (!org) return { error: 'Organización no encontrada' };
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+  const org = { id: orgId };
 
   const rawData = {
     name: formData.get('name'),
@@ -91,13 +88,9 @@ export async function updateVehicle(
   const validatedFields = vehicleSchema.safeParse(rawData);
   if (!validatedFields.success) return { error: 'Datos inválidos' };
 
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (!org) return { error: 'Organización no encontrada' };
+  const orgId2 = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId2) return { error: 'Organización no encontrada' };
+  const org = { id: orgId2 };
 
   const { error } = await supabase
     .from('vehicles')
@@ -125,13 +118,9 @@ export async function updateVehicle(
 export async function deleteVehicle(orgSlug: string, vehicleId: string) {
   const supabase = await createClient();
 
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('slug', orgSlug)
-    .single();
-
-  if (!org) throw new Error('Organización no encontrada');
+  const orgId3 = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId3) throw new Error('Organización no encontrada');
+  const org = { id: orgId3 };
 
   const { data: vehicle } = await supabase
     .from('vehicles')
@@ -161,13 +150,14 @@ export async function deleteVehicle(orgSlug: string, vehicleId: string) {
   revalidatePath(`/${orgSlug}/vehicles`);
 }
 
-export async function getVehicles(orgId: string) {
+export async function getVehicles(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
   return await supabase
     .from('vehicles')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('organization_id', orgId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 }
 
 export async function getVehicle(vehicleId: string) {
