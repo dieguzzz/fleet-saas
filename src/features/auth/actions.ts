@@ -119,21 +119,24 @@ export async function login(prevState: unknown, formData: FormData) {
     redirect(redirectTo);
   }
 
-  // Get user's first organization
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (user) {
-        const { data: membership } = await supabase
+    const { data: memberships } = await supabase
       .from('organization_members')
       .select('organization:organizations(slug)')
-      .eq('user_id', user.id)
-      .limit(1)
-      .single();
+      .eq('user_id', user.id);
 
-    if (membership?.organization?.slug) {
-      redirect(`/${membership.organization.slug}`);
+    const slugs = (memberships ?? [])
+      .map((m: { organization: { slug: string } | null }) => m.organization?.slug)
+      .filter(Boolean) as string[];
+
+    if (slugs.length === 1) {
+      redirect(`/${slugs[0]}`);
+    } else if (slugs.length > 1) {
+      redirect('/select-org');
     }
   }
 
