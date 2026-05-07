@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { motion, useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCurrentOrg, useCurrentRole, useCurrentUser } from '@/store/tenant-store';
@@ -198,6 +198,15 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
   // Sidebar x driven by sidebarProgress: 0 → -288px, 1 → 0px
   const sidebarX = useTransform(sidebarProgress, [0, 1], [-288, 0]);
 
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   if (!org) return null;
 
   const sections = getNavSections(org.slug);
@@ -226,8 +235,8 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
           'lg:static lg:z-auto lg:shrink-0 lg:translate-x-0'
         )}
         style={{
-          // Only apply motion x on mobile (lg overrides with static positioning)
-          x: sidebarX,
+          // Only apply motion x on mobile — desktop is statically positioned
+          x: isDesktop ? 0 : sidebarX,
         }}
       >
         {/* Logo / Org */}
