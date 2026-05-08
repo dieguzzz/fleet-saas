@@ -1128,6 +1128,47 @@ export type Database = {
           },
         ]
       }
+      trip_locations: {
+        Row: {
+          created_at: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          organization_id: string
+          updated_at: string | null
+          use_count: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          organization_id: string
+          updated_at?: string | null
+          use_count?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          organization_id?: string
+          updated_at?: string | null
+          use_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_locations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           created_at: string | null

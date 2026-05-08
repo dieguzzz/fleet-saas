@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
 import { tryResolveOrgId } from '@/lib/org-resolver';
-import type { Trip, TripExpense } from '@/types/database';
+import type { Trip, TripExpense, TripLocation } from '@/types/database';
 
 export async function getTrips(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
@@ -156,6 +156,83 @@ export async function markTripCompleted(tripId: string, orgSlug: string, endInvo
   revalidatePath(`/${orgSlug}/trips`);
   return { success: true };
 }
+
+// ── Trip Locations (saved recurrent stops) ──────────────────────────────────
+
+export async function getTripLocations(orgId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('trip_locations')
+    .select('*')
+    .eq('organization_id', orgId)
+    .order('use_count', { ascending: false })
+    .order('updated_at', { ascending: false });
+
+  if (error) return { error: error.message };
+  return { data: data as TripLocation[] };
+}
+
+export async function saveTripLocation(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+
+  const orgSlug = formData.get('orgSlug') as string;
+  const name = (formData.get('name') as string)?.trim();
+  const lat = parseFloat(formData.get('lat') as string);
+  const lng = parseFloat(formData.get('lng') as string);
+
+  if (!name || isNaN(lat) || isNaN(lng)) {
+    return { error: 'Datos incompletos para guardar la ubicación' };
+  }
+
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+
+  // Upsert by name within org — if name exists, update coords and increment use_count
+  const { data: existing } = await supabase
+    .from('trip_locations')
+    .select('id, use_count')
+    .eq('organization_id', orgId)
+    .ilike('name', name)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from('trip_locations')
+      .update({ lat, lng, use_count: existing.use_count + 1, updated_at: new Date().toISOString() })
+      .eq('id', existing.id);
+  } else {
+    await supabase
+      .from('trip_locations')
+      .insert({ organization_id: orgId, name, lat, lng });
+  }
+
+  return { success: true };
+}
+
+export async function incrementTripLocationUse(id: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('trip_locations')
+    .select('use_count')
+    .eq('id', id)
+    .single();
+  if (data) {
+    await supabase
+      .from('trip_locations')
+      .update({ use_count: data.use_count + 1, updated_at: new Date().toISOString() })
+      .eq('id', id);
+  }
+}
+
+export async function deleteTripLocation(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from('trip_locations').delete().eq('id', id);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 
 export async function deleteTripExpense(id: string, orgId: string, tripId: string) {
   const supabase = await createClient();

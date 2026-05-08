@@ -117,6 +117,17 @@ export interface Trip {
   driver?: Profile;
 }
 
+export interface TripLocation {
+  id: string;
+  organization_id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  use_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 export interface MaintenanceRecord {
   id: string;
   organization_id: string;

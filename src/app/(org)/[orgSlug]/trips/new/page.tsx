@@ -1,5 +1,7 @@
 import TripForm from '@/features/trips/components/TripForm';
 import { createClient } from '@/services/supabase/server';
+import { getTripLocations } from '@/features/trips/actions';
+import type { TripLocation } from '@/types/database';
 
 export default async function NewTripPage({
   params,
@@ -47,9 +49,11 @@ export default async function NewTripPage({
   // Remap to a simple array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const drivers = (members || []).map((m: any) => ({
-    id: m.profile.id, // User ID is the driver ID usually
+    id: m.profile.id,
     full_name: m.profile.full_name || m.profile.email || 'Sin nombre',
   }));
+
+  const { data: savedLocations } = await getTripLocations(org.id);
 
   return (
     <div className="space-y-4">
@@ -61,6 +65,7 @@ export default async function NewTripPage({
         orgSlug={orgSlug}
         vehicles={vehicles || []}
         drivers={drivers}
+        savedLocations={(savedLocations as TripLocation[]) || []}
       />
     </div>
   );
