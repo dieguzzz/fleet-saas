@@ -135,8 +135,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Monto recibido <span className="text-red-400">*</span></label>
+            <label htmlFor="paid_amount" className="field-label">Monto recibido <span className="text-red-400">*</span></label>
             <input
+              id="paid_amount"
               name="paid_amount"
               type="number"
               min="0"
@@ -148,8 +149,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Fecha de pago <span className="text-red-400">*</span></label>
+            <label htmlFor="paid_date" className="field-label">Fecha de pago <span className="text-red-400">*</span></label>
             <input
+              id="paid_date"
               name="paid_date"
               type="date"
               required
@@ -159,8 +161,8 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Método de pago <span className="text-red-400">*</span></label>
-            <select name="payment_method" required defaultValue={payment.payment_method ?? 'cash'} className="field-input">
+            <label htmlFor="payment_method" className="field-label">Método de pago <span className="text-red-400">*</span></label>
+            <select id="payment_method" name="payment_method" required defaultValue={payment.payment_method ?? 'cash'} className="field-input">
               <option value="cash">Efectivo</option>
               <option value="transfer">Transferencia</option>
               <option value="check">Cheque</option>
@@ -169,8 +171,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Notas</label>
+            <label htmlFor="payment_notes" className="field-label">Notas</label>
             <input
+              id="payment_notes"
               name="notes"
               type="text"
               defaultValue={payment.notes ?? ''}

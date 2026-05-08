@@ -161,9 +161,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             <div className="form-grid-2">
               <div>
-                <label className="field-label">Número de Factura</label>
+                <label htmlFor="invoice_number" className="field-label">Número de Factura</label>
                 {isEditing ? (
                   <input
+                    id="invoice_number"
                     name="invoice_number"
                     type="text"
                     required
@@ -177,8 +178,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 )}
               </div>
               <div>
-                <label className="field-label">Estado</label>
-                <select name="status" defaultValue={invoice?.status ?? 'draft'} className="field-input">
+                <label htmlFor="status" className="field-label">Estado</label>
+                <select id="status" name="status" defaultValue={invoice?.status ?? 'draft'} className="field-input">
                   <option value="draft">Borrador</option>
                   <option value="sent">Enviada</option>
                   <option value="paid">Pagada</option>
@@ -187,8 +188,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 </select>
               </div>
               <div>
-                <label className="field-label">Fecha</label>
+                <label htmlFor="date" className="field-label">Fecha</label>
                 <input
+                  id="date"
                   name="date"
                   type="date"
                   required
@@ -197,14 +199,15 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 />
               </div>
               <div>
-                <label className="field-label">Fecha de Vencimiento</label>
-                <input name="due_date" type="date" defaultValue={invoice?.due_date ?? ''} className="field-input" />
+                <label htmlFor="due_date" className="field-label">Fecha de Vencimiento</label>
+                <input id="due_date" name="due_date" type="date" defaultValue={invoice?.due_date ?? ''} className="field-input" />
               </div>
             </div>
 
             <div>
-              <label className="field-label">Notas</label>
+              <label htmlFor="invoice_notes" className="field-label">Notas</label>
               <textarea
+                id="invoice_notes"
                 name="notes"
                 rows={2}
                 defaultValue={invoice?.notes ?? ''}
@@ -222,8 +225,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
           <div className="form-card space-y-3">
             <h3 className="text-sm font-semibold text-foreground">Importes</h3>
             <div>
-              <label className="field-label">Subtotal ($)</label>
+              <label htmlFor="subtotal" className="field-label">Subtotal ($)</label>
               <input
+                id="subtotal"
                 name="subtotal"
                 type="number"
                 min="0"
@@ -234,8 +238,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
               />
             </div>
             <div>
-              <label className="field-label">Impuestos ($)</label>
+              <label htmlFor="tax" className="field-label">Impuestos ($)</label>
               <input
+                id="tax"
                 name="tax"
                 type="number"
                 min="0"

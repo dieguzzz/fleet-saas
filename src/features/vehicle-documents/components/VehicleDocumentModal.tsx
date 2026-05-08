@@ -68,8 +68,8 @@ export default function VehicleDocumentModal({
               )}
 
               <div>
-                <label className="field-label">Vehículo *</label>
-                <select name="vehicle_id" required defaultValue={document?.vehicle_id ?? defaultVehicleId ?? ''} className="field-input">
+                <label htmlFor="vehicle_id" className="field-label">Vehículo *</label>
+                <select id="vehicle_id" name="vehicle_id" required defaultValue={document?.vehicle_id ?? defaultVehicleId ?? ''} className="field-input">
                   <option value="">Seleccionar vehículo</option>
                   {vehicles.map(v => (
                     <option key={v.id} value={v.id}>
@@ -80,8 +80,9 @@ export default function VehicleDocumentModal({
               </div>
 
               <div>
-                <label className="field-label">Tipo de documento *</label>
+                <label htmlFor="document_type" className="field-label">Tipo de documento *</label>
                 <select
+                  id="document_type"
                   name="document_type"
                   required
                   value={docType}
@@ -95,8 +96,9 @@ export default function VehicleDocumentModal({
               </div>
 
               <div>
-                <label className="field-label">Nombre / Descripción *</label>
+                <label htmlFor="doc_label" className="field-label">Nombre / Descripción *</label>
                 <input
+                  id="doc_label"
                   name="label"
                   type="text"
                   required
@@ -108,8 +110,9 @@ export default function VehicleDocumentModal({
               </div>
 
               <div>
-                <label className="field-label">Fecha de vencimiento *</label>
+                <label htmlFor="expiry_date" className="field-label">Fecha de vencimiento *</label>
                 <input
+                  id="expiry_date"
                   name="expiry_date"
                   type="date"
                   required
@@ -119,8 +122,9 @@ export default function VehicleDocumentModal({
               </div>
 
               <div>
-                <label className="field-label">Notas</label>
+                <label htmlFor="doc_notes" className="field-label">Notas</label>
                 <textarea
+                  id="doc_notes"
                   name="notes"
                   rows={2}
                   defaultValue={document?.notes ?? ''}

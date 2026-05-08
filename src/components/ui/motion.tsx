@@ -1,14 +1,15 @@
 'use client';
 
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, useReducedMotion, HTMLMotionProps } from 'framer-motion';
 import { ReactNode } from 'react';
 
 export function FadeIn({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: reduced ? 0 : 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay, ease: 'easeOut' }}
+      transition={{ duration: reduced ? 0 : 0.2, delay: reduced ? 0 : delay, ease: 'easeOut' }}
       className={className}
     >
       {children}
@@ -17,11 +18,12 @@ export function FadeIn({ children, delay = 0, className }: { children: ReactNode
 }
 
 export function SlideUp({ children, className }: { children: ReactNode; className?: string }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: reduced ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      transition={{ duration: reduced ? 0 : 0.25, ease: 'easeOut' }}
       className={className}
     >
       {children}
@@ -36,13 +38,14 @@ interface StaggerListProps {
 }
 
 export function StaggerList({ children, className, staggerDelay = 0.04 }: StaggerListProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: staggerDelay } },
+        visible: { transition: { staggerChildren: reduced ? 0 : staggerDelay } },
       }}
       className={className}
     >
@@ -52,11 +55,12 @@ export function StaggerList({ children, className, staggerDelay = 0.04 }: Stagge
 }
 
 export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 6 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.18, ease: 'easeOut' } },
+        hidden: { opacity: 0, y: reduced ? 0 : 6 },
+        visible: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.18, ease: 'easeOut' } },
       }}
       className={className}
     >
