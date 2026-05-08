@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { getTrips } from '@/features/trips/actions';
@@ -6,6 +7,8 @@ import { notFound } from 'next/navigation';
 import { TripList } from '@/features/trips/components/TripList';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+
+export const metadata: Metadata = { title: 'Viajes — Fleet SaaS' };
 
 async function TripsListContainer({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
   const { data: trips, error } = await getTrips(orgId);

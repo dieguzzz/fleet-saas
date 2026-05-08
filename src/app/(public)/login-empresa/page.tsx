@@ -14,7 +14,7 @@ export default function LoginEmpresaPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-3xl">A</span>
             </div>
             <span className="text-foreground font-bold text-2xl tracking-tight">AMD Logistics</span>
@@ -26,7 +26,7 @@ export default function LoginEmpresaPage() {
             onClick={() => router.back()}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="size-4" />
             Volver
           </button>
 

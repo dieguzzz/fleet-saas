@@ -74,7 +74,7 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
 
       <div className="flex items-center gap-2">
         <input id="is_emergency" name="is_emergency" type="checkbox"
-          className="w-4 h-4 border-input rounded" />
+          className="size-4 border-input rounded" />
         <label htmlFor="is_emergency" className="text-sm font-medium text-foreground">
           Es contacto de emergencia
         </label>

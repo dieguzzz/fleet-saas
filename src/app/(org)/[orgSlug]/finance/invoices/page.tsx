@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { InvoiceList } from '@/features/finance/components/InvoiceList';
@@ -5,6 +6,8 @@ import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+
+export const metadata: Metadata = { title: 'Facturas — Fleet SaaS' };
 
 export default async function InvoicesPage({
   params,
@@ -30,7 +33,7 @@ export default async function InvoicesPage({
             href={`/${orgSlug}/finance/invoices/new?type=${activeTab === 'pagos' ? 'pago' : 'cobro'}`}
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Nueva {activeTab === 'pagos' ? 'Factura de Pago' : 'Factura de Cobro'}
@@ -49,7 +52,7 @@ export default async function InvoicesPage({
             }`}
           >
             <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
               </svg>
               Cobros
@@ -64,7 +67,7 @@ export default async function InvoicesPage({
             }`}
           >
             <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
               </svg>
               Pagos

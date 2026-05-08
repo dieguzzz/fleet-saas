@@ -42,7 +42,7 @@ export default function VehicleDocumentModal({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>
+      <span role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true); }}>
         {trigger ?? (
           <Button size="sm" variant="outline">+ Agregar documento</Button>
         )}

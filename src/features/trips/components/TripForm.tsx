@@ -308,13 +308,16 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
 
         {/* Factura de inicio */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <p className="text-sm font-medium text-foreground">
             Factura de Inicio <span className="text-muted-foreground font-normal">(opcional)</span>
-          </label>
+          </p>
           <input type="hidden" name="start_invoice_url" value={startInvoiceUrl} />
           <div
+            role="button"
+            tabIndex={0}
             className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
             onClick={() => invoiceInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') invoiceInputRef.current?.click(); }}
           >
             {invoiceFileName ? (
               <p className="text-sm text-green-600 font-medium">{invoiceFileName}</p>

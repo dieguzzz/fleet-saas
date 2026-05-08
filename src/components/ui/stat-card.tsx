@@ -36,7 +36,7 @@ export function StatCard({ label, value, icon, iconGradient, tone = 'default', c
       {icon && (
         <div
           className={cn(
-            'w-9 h-9 rounded-lg flex items-center justify-center mb-3',
+            'size-9 rounded-lg flex items-center justify-center mb-3',
             iconGradient ?? 'bg-muted'
           )}
         >

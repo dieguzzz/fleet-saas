@@ -36,7 +36,7 @@ export default function InventoryItemModal({ orgSlug, item, defaultCategory, tri
 
   return (
     <>
-      <span onClick={() => setOpen(true)} className="cursor-pointer">
+      <span role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true); }} className="cursor-pointer">
         {trigger ?? (
           <Button size="sm" variant="outline">+ Nuevo Ítem</Button>
         )}

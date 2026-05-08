@@ -12,6 +12,11 @@ interface TenantListProps {
   orgSlug: string;
 }
 
+const mxnFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+function formatCurrency(amount: number) {
+  return mxnFormatter.format(amount);
+}
+
 export function TenantList({ tenants, orgSlug }: TenantListProps) {
   const [search, setSearch] = useState('');
   const [, startTransition] = useTransition();
@@ -27,15 +32,11 @@ export function TenantList({ tenants, orgSlug }: TenantListProps) {
     startTransition(() => deleteTenant(tenantId, orgSlug));
   }
 
-  function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
-  }
-
   if (tenants.length === 0) {
     return (
       <EmptyState
         icon={
-          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="size-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         }
@@ -61,7 +62,7 @@ export function TenantList({ tenants, orgSlug }: TenantListProps) {
   return (
     <div className="space-y-4">
       <div className="relative">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input

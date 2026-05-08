@@ -9,13 +9,16 @@ import { StatCard } from '@/components/ui/stat-card';
 import { SectionCard } from '@/components/ui/section-card';
 import type { LandTenant, LandPayment } from '@/types/database';
 
+export const metadata: Metadata = { title: 'Terreno — Fleet SaaS' };
+
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
 
+const mxnFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+  return mxnFormatter.format(amount);
 }
 
 export default async function TerrenoPage({ params }: { params: Promise<{ orgSlug: string }> }) {

@@ -38,7 +38,7 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
 
   return (
     <>
-      <span onClick={() => setOpen(true)} className="cursor-pointer">
+      <span role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true); }} className="cursor-pointer">
         {trigger ?? (
           <Button size="sm" variant="outline">+ Nuevo Contacto</Button>
         )}
@@ -117,7 +117,7 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
               <div className="flex items-center gap-2">
                 <input id="is_emergency_modal" name="is_emergency" type="checkbox"
                   defaultChecked={contact?.is_emergency ?? false}
-                  className="w-4 h-4 rounded border-input accent-destructive" />
+                  className="size-4 rounded border-input accent-destructive" />
                 <label htmlFor="is_emergency_modal" className="text-sm text-foreground">
                   Contacto de emergencia <span className="text-muted-foreground">(disponible 24hs)</span>
                 </label>

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import TeamList from '@/features/team/components/TeamList';
 import InviteMemberForm from '@/features/team/components/InviteMemberForm';
@@ -5,6 +6,8 @@ import { getOrganizationMembers, getOrganization } from '@/features/organization
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+
+export const metadata: Metadata = { title: 'Equipo — Fleet SaaS' };
 
 export default async function TeamPage({
   params,

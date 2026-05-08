@@ -31,7 +31,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-3xl">A</span>
             </div>
             <span className="text-foreground font-bold text-2xl tracking-tight">AMD Logistics</span>
@@ -55,7 +55,7 @@ export default function LoginPage() {
                   onClick={() => setMode('amd')}
                   className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500 rounded-xl hover:bg-blue-500/5 transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-lg">A</span>
                   </div>
                   <div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
                   onClick={() => setMode('otra')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground font-bold text-lg">?</span>
                   </div>
                   <div>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 onClick={() => setMode('select')}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="size-4" />
                 Volver
               </button>
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
                   onClick={() => router.push('/login-empresa')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground text-lg">→</span>
                   </div>
                   <div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
                   onClick={() => router.push('/signup')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground text-lg">+</span>
                   </div>
                   <div>
@@ -135,12 +135,12 @@ export default function LoginPage() {
                 onClick={() => { setMode('select'); setNeedsSetup(null); }}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="size-4" />
                 Volver
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-lg">A</span>
                 </div>
                 <div>
@@ -203,7 +203,7 @@ export default function LoginPage() {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
                   </div>
@@ -265,7 +265,7 @@ export default function LoginPage() {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
                   </div>

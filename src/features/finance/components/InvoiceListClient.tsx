@@ -118,7 +118,7 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
                           {invoice.invoice_number}
                         </Link>
                         {invoice.attachment_url && (
-                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-primary/60 align-middle" title="Tiene adjunto" />
+                          <span className="ml-2 inline-block size-1.5 rounded-full bg-primary/60 align-middle" title="Tiene adjunto" />
                         )}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{formatDate(invoice.date)}</td>
@@ -162,7 +162,7 @@ export function InvoiceListClient({ invoices, orgId, orgSlug, type }: Props) {
                       <Link href={`/${orgSlug}/finance/invoices/${invoice.id}`} className="font-semibold text-foreground hover:text-primary">
                         {invoice.invoice_number}
                         {invoice.attachment_url && (
-                          <span className="ml-2 inline-block w-1.5 h-1.5 rounded-full bg-primary/60 align-middle" />
+                          <span className="ml-2 inline-block size-1.5 rounded-full bg-primary/60 align-middle" />
                         )}
                       </Link>
                       <p className="text-xs text-muted-foreground mt-0.5">{formatDate(invoice.date)}</p>

@@ -264,7 +264,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {existingAttachment && !file && (
               <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
                 <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex-1 truncate">
@@ -277,9 +277,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             {file && (
               <div className="flex items-center gap-2 p-2.5 bg-blue-50 rounded-lg border border-blue-200">
                 {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="w-8 h-8 rounded object-cover border border-blue-200 shrink-0" />
+                  <img src={filePreview} alt="Preview" className="size-8 rounded object-cover border border-blue-200 shrink-0" />
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 )}
@@ -290,7 +290,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {!file && (
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -299,7 +302,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 }}
                 className="border-2 border-dashed border-border rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 <p className="text-xs text-muted-foreground">Arrastrá o <span className="text-primary underline">seleccioná</span></p>

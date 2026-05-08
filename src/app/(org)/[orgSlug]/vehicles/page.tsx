@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import VehicleList from '@/features/vehicles/components/VehicleList';
 import { getVehicles } from '@/features/vehicles/actions';
@@ -6,6 +7,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+
+export const metadata: Metadata = { title: 'Vehículos — Fleet SaaS' };
 
 export default async function VehiclesPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;

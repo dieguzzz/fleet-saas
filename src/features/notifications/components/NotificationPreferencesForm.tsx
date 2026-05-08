@@ -24,20 +24,21 @@ interface ToggleRowProps {
 
 function ToggleRow({ name, label, description, defaultChecked }: ToggleRowProps) {
   return (
-    <label className="flex items-center justify-between gap-4 py-3 cursor-pointer group">
+    <label htmlFor={`toggle-${name}`} className="flex items-center justify-between gap-4 py-3 cursor-pointer group">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
       </div>
       <div className="relative shrink-0">
         <input
+          id={`toggle-${name}`}
           type="checkbox"
           name={name}
           defaultChecked={defaultChecked}
           className="sr-only peer"
         />
         <div className="w-10 h-6 bg-muted rounded-full peer-checked:bg-blue-500 transition-colors" />
-        <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+        <div className="absolute top-1 left-1 size-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
       </div>
     </label>
   );
@@ -110,15 +111,16 @@ export default function NotificationPreferencesForm({ orgId, orgSlug, prefs }: P
             <p className="text-sm font-medium text-foreground">Notificaciones por email</p>
             <p className="text-xs text-muted-foreground mt-0.5">Recibí un email además del aviso en la app (próximamente).</p>
           </div>
-          <label className="relative shrink-0 cursor-pointer">
+          <label htmlFor="toggle-email_enabled" className="relative shrink-0 cursor-pointer">
             <input
+              id="toggle-email_enabled"
               type="checkbox"
               name="email_enabled"
               defaultChecked={d('email_enabled', false)}
               className="sr-only peer"
             />
             <div className="w-10 h-6 bg-muted rounded-full peer-checked:bg-blue-500 transition-colors" />
-            <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
+            <div className="absolute top-1 left-1 size-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4" />
           </label>
         </div>
         <SubmitButton />

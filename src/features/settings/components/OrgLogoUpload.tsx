@@ -83,9 +83,9 @@ export default function OrgLogoUpload({ orgId, orgSlug, orgName, currentLogoUrl 
 
   return (
     <div className="space-y-3">
-      <label className="field-label">Logo de la Organización</label>
+      <p className="field-label">Logo de la Organización</p>
       <div className="flex items-center gap-4">
-        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-border bg-muted shrink-0">
+        <div className="relative size-16 rounded-2xl overflow-hidden border border-border bg-muted shrink-0">
           {displayUrl ? (
             <Image
               src={displayUrl}
@@ -101,7 +101,7 @@ export default function OrgLogoUpload({ orgId, orgSlug, orgName, currentLogoUrl 
           )}
           {isLoading && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+              <svg className="size-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
               </svg>

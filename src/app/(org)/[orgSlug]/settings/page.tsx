@@ -51,7 +51,7 @@ export default async function SettingsPage({
           <h2 className="text-base font-semibold text-foreground">Notificaciones</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Controla qué eventos te notifican.</p>
         </div>
-        <svg className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </Link>

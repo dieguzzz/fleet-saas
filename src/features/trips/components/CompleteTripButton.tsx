@@ -74,8 +74,11 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
             </p>
 
             <div
+              role="button"
+              tabIndex={0}
               className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-green-400 transition-colors"
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
             >
               {fileName ? (
                 <p className="text-sm text-green-600 font-medium">{fileName}</p>
