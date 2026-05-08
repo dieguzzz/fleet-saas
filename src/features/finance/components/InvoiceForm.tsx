@@ -20,7 +20,7 @@ interface InvoiceFormProps {
 }
 
 export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS }: InvoiceFormProps) {
-  const router = useRouter();
+  const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [subtotal, setSubtotal] = useState(Number(invoice?.subtotal ?? 0));
@@ -102,8 +102,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
         invoiceId = result.data!.id;
       }
       if (file) await uploadFile(invoiceId);
-      router.push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
-      router.refresh();
+      push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
+      refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error inesperado');
       setLoading(false);
@@ -325,7 +325,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             </button>
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => back()}
               className="w-full px-5 py-2.5 border border-border text-muted-foreground rounded-lg text-sm font-medium hover:bg-accent transition-colors"
             >
               Cancelar

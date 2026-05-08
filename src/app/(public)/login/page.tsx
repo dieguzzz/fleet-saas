@@ -8,7 +8,7 @@ import { loginAmd, setupAmd, getAmdSetupState } from '@/features/auth/actions';
 type Mode = 'select' | 'otra' | 'amd';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const [mode, setMode] = useState<Mode>('select');
   const [loginState, loginAction, loginPending] = useActionState(loginAmd, null);
   const [setupState, setupAction, setupPending] = useActionState(setupAmd, null);
@@ -100,7 +100,7 @@ export default function LoginPage() {
 
               <div className="space-y-3">
                 <button
-                  onClick={() => router.push('/login-empresa')}
+                  onClick={() => push('/login-empresa')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
                   <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push('/signup')}
+                  onClick={() => push('/signup')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
                   <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
@@ -146,13 +146,13 @@ export default function LoginPage() {
                 <div>
                   <p className="font-semibold text-foreground">AMD Logistics</p>
                   <p className="text-xs text-muted-foreground">
-                    {needsSetup === null ? 'Cargando...' : needsSetup ? 'Configura tu acceso' : 'Ingresá tu contraseña'}
+                    {needsSetup === null ? 'Cargando…' : needsSetup ? 'Configura tu acceso' : 'Ingresá tu contraseña'}
                   </p>
                 </div>
               </div>
 
               {needsSetup === null && (
-                <p className="text-sm text-muted-foreground text-center">Cargando...</p>
+                <p className="text-sm text-muted-foreground text-center">Cargando…</p>
               )}
 
               {/* SETUP INICIAL */}
@@ -226,7 +226,7 @@ export default function LoginPage() {
                     disabled={setupPending}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {setupPending ? 'Configurando...' : 'Configurar y entrar'}
+                    {setupPending ? 'Configurando…' : 'Configurar y entrar'}
                   </button>
                 </form>
               )}
@@ -275,7 +275,7 @@ export default function LoginPage() {
                     disabled={loginPending}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loginPending ? 'Ingresando...' : 'Ingresar'}
+                    {loginPending ? 'Ingresando…' : 'Ingresar'}
                   </button>
                 </form>
               )}

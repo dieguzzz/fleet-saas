@@ -11,7 +11,7 @@ interface Org {
 }
 
 export default function SelectOrgClient({ orgs }: { orgs: Org[] }) {
-  const router = useRouter();
+  const { push } = useRouter();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -27,7 +27,7 @@ export default function SelectOrgClient({ orgs }: { orgs: Org[] }) {
           {orgs.map((org) => (
             <button
               key={org.id}
-              onClick={() => router.push(`/${org.slug}`)}
+              onClick={() => push(`/${org.slug}`)}
               className="w-full flex items-center gap-4 bg-card border border-border rounded-xl p-4 hover:bg-accent transition-colors text-left"
             >
               <div className="size-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">

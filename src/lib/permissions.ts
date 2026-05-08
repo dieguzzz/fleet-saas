@@ -72,8 +72,7 @@ export function isRoleAtLeast(roleA: OrgRole | null, roleB: OrgRole): boolean {
  */
 export function getPermissionsForRole(role: OrgRole): Permission[] {
   return (Object.entries(PERMISSIONS) as [Permission, readonly string[]][])
-    .filter(([, roles]) => roles.includes(role))
-    .map(([permission]) => permission);
+    .flatMap(([permission, roles]) => roles.includes(role) ? [permission] : []);
 }
 
 /**

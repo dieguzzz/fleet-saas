@@ -43,7 +43,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
   }
 
   if (!blobUrl) {
-    return <div className="py-10 text-sm text-muted-foreground text-center">Cargando PDF...</div>;
+    return <div className="py-10 text-sm text-muted-foreground text-center">Cargando PDF…</div>;
   }
 
   return (

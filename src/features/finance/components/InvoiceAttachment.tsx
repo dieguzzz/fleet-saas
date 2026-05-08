@@ -83,7 +83,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
     }
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) handleFile(file);
   }
@@ -136,7 +136,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
           className="flex-1 border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-accent transition-colors"
         >
           {uploading ? (
-            <p className="text-sm text-muted-foreground">Subiendo...</p>
+            <p className="text-sm text-muted-foreground">Subiendo…</p>
           ) : (
             <>
               <svg xmlns="http://www.w3.org/2000/svg" className="size-6 mx-auto text-muted-foreground/30 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -153,7 +153,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
             type="file"
             accept="image/jpeg,image/png,image/webp,application/pdf"
             className="hidden"
-            onChange={handleChange}
+            onChange={handleFileSelect}
           />
         </div>
 
@@ -176,7 +176,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
             accept="image/*"
             capture="environment"
             className="hidden"
-            onChange={handleChange}
+            onChange={handleFileSelect}
           />
         </button>
       </div>

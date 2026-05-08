@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { login } from '@/features/auth/actions';
 
 export default function LoginEmpresaPage() {
-  const router = useRouter();
+  const { back } = useRouter();
   const [state, formAction, isPending] = useActionState(login, null);
 
   return (
@@ -24,7 +24,7 @@ export default function LoginEmpresaPage() {
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
           <button
-            onClick={() => router.back()}
+            onClick={() => back()}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
             <ArrowLeft className="size-4" />

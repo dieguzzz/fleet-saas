@@ -7,7 +7,7 @@ import { InvoiceAttachment } from './InvoiceAttachment';
 
 const PdfViewer = dynamic(
   () => import('./PdfViewer').then((m) => m.PdfViewer),
-  { ssr: false, loading: () => <p className="text-sm text-muted-foreground p-4">Cargando PDF...</p> }
+  { ssr: false, loading: () => <p className="text-sm text-muted-foreground p-4">Cargando PDF…</p> }
 );
 
 function formatDate(dateStr: string) {

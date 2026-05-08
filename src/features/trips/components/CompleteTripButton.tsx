@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function CompleteTripButton({ tripId, orgSlug }: Props) {
-  const router = useRouter();
+  const { refresh } = useRouter();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -53,7 +53,7 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
       return;
     }
     setOpen(false);
-    router.refresh();
+    refresh();
   };
 
   return (

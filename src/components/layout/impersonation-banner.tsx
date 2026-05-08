@@ -9,7 +9,7 @@ export function ImpersonationBanner() {
   const isImpersonating = useIsImpersonating();
   const impersonatedOrg = useTenantStore((s) => s.impersonatedOrg);
   const stopImpersonationStore = useTenantStore((s) => s.stopImpersonation);
-  const router = useRouter();
+  const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   if (!isImpersonating || !impersonatedOrg) return null;
@@ -18,8 +18,8 @@ export function ImpersonationBanner() {
     startTransition(async () => {
       await stopImpersonation();
       stopImpersonationStore();
-      router.push('/admin');
-      router.refresh();
+      push('/admin');
+      refresh();
     });
   };
 

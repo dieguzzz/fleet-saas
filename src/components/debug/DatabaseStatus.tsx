@@ -20,7 +20,7 @@ export default function DatabaseStatus() {
     return (
       <div className="fixed bottom-4 right-4 bg-card text-foreground p-3 rounded-lg shadow-lg text-xs flex items-center gap-2 z-50 border border-border">
         <div className="size-2 bg-yellow-400 rounded-full animate-pulse"></div>
-        Checking DB Connection...
+        Checking DB Connection…
       </div>
     );
   }

@@ -179,7 +179,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
               name="notes"
               type="text"
               defaultValue={payment.notes ?? ''}
-              placeholder="Observaciones..."
+              placeholder="Observaciones…"
               className="field-input"
             />
           </div>
@@ -218,7 +218,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Subiendo...
+                    Subiendo…
                   </>
                 ) : (
                   <>
@@ -250,7 +250,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
               disabled={isPending || uploading}
               className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
             >
-              {isPending ? 'Guardando...' : 'Confirmar pago'}
+              {isPending ? 'Guardando…' : 'Confirmar pago'}
             </button>
             <button
               type="button"

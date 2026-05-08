@@ -273,7 +273,7 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
           {sections.map((section, si) => {
             const visibleItems = section.items.filter(
               (item) => !item.permission || hasPermission(role, item.permission)
@@ -322,7 +322,7 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
         </nav>
 
         {/* User footer */}
-        <div className="px-3 py-3 border-t border-sidebar-border space-y-1">
+        <div className="p-3 border-t border-sidebar-border space-y-1">
           <Link
             href={`/${org.slug}/profile`}
             onClick={() => { haptic(); onClose(); }}

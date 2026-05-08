@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createOrganization, type CreateOrgState } from '@/features/organizations/actions';
 
 export default function OnboardingPage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const [state, formAction, pending] = useActionState<CreateOrgState, FormData>(
     createOrganization,
     null
@@ -14,7 +14,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (state?.success && state.slug) {
-      router.push(`/${state.slug}`);
+      push(`/${state.slug}`);
     }
   }, [state, router]);
 

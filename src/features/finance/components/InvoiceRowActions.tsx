@@ -28,7 +28,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
   invoiceType: string;
   currentStatus: string;
 }) {
-  const router = useRouter();
+  const { refresh } = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [status, setStatus] = useState(currentStatus || 'draft');
@@ -41,7 +41,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
       alert('Error al cambiar estado: ' + result.error);
     } else {
       setStatus(newStatus);
-      router.refresh();
+      refresh();
     }
     setUpdatingStatus(false);
   }
@@ -54,7 +54,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
       alert('Error al eliminar: ' + result.error);
       setDeleting(false);
     } else {
-      router.refresh();
+      refresh();
     }
   }
 

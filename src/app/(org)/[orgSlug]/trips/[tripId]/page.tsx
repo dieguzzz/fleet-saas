@@ -191,7 +191,7 @@ export default async function TripDetailPage({
       </div>
 
       {/* Expenses Section */}
-      <Suspense fallback={<div>Cargando gastos...</div>}>
+      <Suspense fallback={<div>Cargando gastos…</div>}>
         <TripExpensesList tripId={trip.id} orgId={org.id} orgSlug={org.slug} />
       </Suspense>
     </div>
