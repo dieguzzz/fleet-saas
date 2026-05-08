@@ -9,6 +9,8 @@ import ContactModal from '@/features/contacts/components/ContactModal';
 
 interface ContactOption { id: string; name: string; company: string | null }
 
+const EMPTY_CONTACTS: ContactOption[] = [];
+
 interface InvoiceFormProps {
   orgId: string;
   orgSlug: string;
@@ -17,7 +19,7 @@ interface InvoiceFormProps {
   contacts?: ContactOption[];
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = [] }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

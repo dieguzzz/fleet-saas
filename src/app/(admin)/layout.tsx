@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { createClient } from '@/services/supabase/server';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -42,12 +43,12 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               <p className="text-purple-300 text-sm">{profile.email}</p>
             </div>
           </div>
-          <a
+          <Link
             href="/"
             className="text-purple-300 hover:text-white transition-colors text-sm"
           >
             ← Volver a la App
-          </a>
+          </Link>
         </div>
       </header>
 

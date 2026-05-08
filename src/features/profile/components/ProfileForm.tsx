@@ -86,7 +86,7 @@ export default function ProfileForm({ profile }: Props) {
           <div className="flex items-center gap-4">
             <div className="relative size-16 rounded-full overflow-hidden border border-border bg-muted shrink-0">
               {displayAvatar ? (
-                <Image src={displayAvatar} alt="Avatar" fill className="object-cover" unoptimized />
+                <Image src={displayAvatar} alt="Avatar" fill sizes="64px" className="object-cover" unoptimized />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center font-bold text-2xl text-white">
                   {initials}

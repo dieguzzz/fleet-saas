@@ -164,7 +164,7 @@ function ServiciosGrid({ contacts, orgSlug, search }: { contacts: Contact[]; org
   if (contacts.length === 0) {
     return <p className="text-center py-10 text-sm text-muted-foreground">Sin servicios registrados.</p>;
   }
-  const sorted = [...contacts].sort((a, b) => {
+  const sorted = contacts.toSorted((a, b) => {
     if (a.is_emergency && !b.is_emergency) return -1;
     if (!a.is_emergency && b.is_emergency) return 1;
     return a.name.localeCompare(b.name);

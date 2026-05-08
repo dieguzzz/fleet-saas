@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
-import { motion, useTransform, type MotionValue } from 'framer-motion';
+import { m, useTransform, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCurrentOrg, useCurrentRole, useCurrentUser } from '@/store/tenant-store';
 import { hasPermission, type Permission } from '@/lib/permissions';
@@ -225,8 +225,8 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
 
   return (
     <>
-      {/* Sidebar — motion.aside, position driven by sidebarProgress on mobile */}
-      <motion.aside
+      {/* Sidebar — m.aside, position driven by sidebarProgress on mobile */}
+      <m.aside
         className={cn(
           // Mobile: fixed, driven by sidebarX
           'fixed top-0 left-0 h-full bg-sidebar text-sidebar-foreground flex flex-col z-50',
@@ -357,7 +357,7 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
             {isPending ? 'Cerrando sesión...' : 'Cerrar sesión'}
           </button>
         </div>
-      </motion.aside>
+      </m.aside>
     </>
   );
 }

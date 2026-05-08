@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { X, Download, Share } from 'lucide-react';
 
@@ -85,7 +86,7 @@ export function PwaInstallBanner() {
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {/* Icono */}
         <div className="flex-shrink-0 size-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <img src="/icon.svg" alt="Fleet" className="size-7" />
+          <Image src="/icon.svg" alt="Fleet" width={28} height={28} />
         </div>
 
         <div className="flex-1 min-w-0">

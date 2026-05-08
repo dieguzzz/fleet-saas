@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { memo, useRef, useState } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
+import { m, useMotionValue, animate } from 'framer-motion';
 import { EmptyState } from '@/components/ui/empty-state';
 
 interface Vehicle {
@@ -80,7 +80,7 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
       </div>
 
       {/* Draggable card */}
-      <motion.div
+      <m.div
         drag="x"
         dragConstraints={{ left: -ACTION_WIDTH, right: 0 }}
         dragElastic={0.1}
@@ -122,7 +122,7 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
             )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 });

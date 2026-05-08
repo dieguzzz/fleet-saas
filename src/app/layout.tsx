@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegister } from "@/components/PwaRegister";
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
+import { MotionProvider } from "@/components/ui/motion-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,10 +49,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          {children}
-          <Toaster />
-          <PwaRegister />
-          <PwaInstallBanner />
+          <MotionProvider>
+            {children}
+            <Toaster />
+            <PwaRegister />
+            <PwaInstallBanner />
+          </MotionProvider>
         </ThemeProvider>
       </body>
     </html>

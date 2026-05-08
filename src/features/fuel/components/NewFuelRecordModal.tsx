@@ -100,7 +100,7 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
                 </div>
               </div>
 
-              {total && (
+              {total.length > 0 && (
                 <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 flex justify-between items-center">
                   <span className="text-sm text-primary font-medium">Total calculado</span>
                   <span className="text-lg font-bold text-primary">${parseFloat(total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>

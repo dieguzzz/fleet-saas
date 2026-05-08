@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
@@ -80,9 +81,9 @@ export default function LoginEmpresaPage() {
             </button>
 
             <p className="text-center text-sm text-muted-foreground">
-              <a href="/forgot-password" className="text-blue-500 hover:text-blue-400">
+              <Link href="/forgot-password" className="text-blue-500 hover:text-blue-400">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </p>
           </form>
         </div>

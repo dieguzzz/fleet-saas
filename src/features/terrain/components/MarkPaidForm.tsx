@@ -102,7 +102,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
   }
 
   return (
-    <div role="presentation" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
+    <div role="presentation" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <div
         className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}

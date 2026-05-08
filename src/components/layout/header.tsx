@@ -2,7 +2,7 @@
 
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -15,7 +15,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const user = useTenantStore((s) => s.user);
 
   return (
-    <motion.header
+    <m.header
       className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900]"
       animate={{ y: isVisible ? 0 : -56 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -66,6 +66,6 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
           </span>
         </div>
       </div>
-    </motion.header>
+    </m.header>
   );
 }

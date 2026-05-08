@@ -127,7 +127,7 @@ function InventoryTable({ items, orgId, orgSlug }: { items: InventoryItem[]; org
     return <p className="text-center py-12 text-sm text-muted-foreground">Sin ítems en esta categoría.</p>;
   }
 
-  const sorted = [...items].sort((a, b) => {
+  const sorted = items.toSorted((a, b) => {
     const aLow = isLow(a) ? 0 : 1;
     const bLow = isLow(b) ? 0 : 1;
     if (aLow !== bLow) return aLow - bLow;

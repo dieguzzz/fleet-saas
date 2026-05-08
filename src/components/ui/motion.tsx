@@ -1,33 +1,33 @@
 'use client';
 
-import { motion, useReducedMotion, HTMLMotionProps } from 'framer-motion';
+import { m, useReducedMotion, HTMLMotionProps } from 'framer-motion';
 import { ReactNode } from 'react';
 
 export function FadeIn({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: reduced ? 0 : 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduced ? 0 : 0.2, delay: reduced ? 0 : delay, ease: 'easeOut' }}
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
 export function SlideUp({ children, className }: { children: ReactNode; className?: string }) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: reduced ? 0 : 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduced ? 0 : 0.25, ease: 'easeOut' }}
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -40,7 +40,7 @@ interface StaggerListProps {
 export function StaggerList({ children, className, staggerDelay = 0.04 }: StaggerListProps) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       animate="visible"
       variants={{
@@ -50,14 +50,14 @@ export function StaggerList({ children, className, staggerDelay = 0.04 }: Stagge
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
 export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
   const reduced = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       variants={{
         hidden: { opacity: 0, y: reduced ? 0 : 6 },
         visible: { opacity: 1, y: 0, transition: { duration: reduced ? 0 : 0.18, ease: 'easeOut' } },
@@ -65,9 +65,9 @@ export function StaggerItem({ children, className }: { children: ReactNode; clas
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
-export const MotionDiv = motion.div;
+export const MotionDiv = m.div;
 export type { HTMLMotionProps };

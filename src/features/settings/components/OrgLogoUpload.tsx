@@ -91,6 +91,7 @@ export default function OrgLogoUpload({ orgId, orgSlug, orgName, currentLogoUrl 
               src={displayUrl}
               alt="Logo"
               fill
+              sizes="64px"
               className="object-cover"
               unoptimized
             />
