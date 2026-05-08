@@ -886,6 +886,56 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          id: string
+          low_inventory_stock: boolean
+          maintenance_due: boolean
+          new_team_member: boolean
+          organization_id: string
+          trip_completed: boolean
+          updated_at: string
+          user_id: string
+          vehicle_document_expiry: boolean
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          low_inventory_stock?: boolean
+          maintenance_due?: boolean
+          new_team_member?: boolean
+          organization_id: string
+          trip_completed?: boolean
+          updated_at?: string
+          user_id: string
+          vehicle_document_expiry?: boolean
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          low_inventory_stock?: boolean
+          maintenance_due?: boolean
+          new_team_member?: boolean
+          organization_id?: string
+          trip_completed?: boolean
+          updated_at?: string
+          user_id?: string
+          vehicle_document_expiry?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           id: string
