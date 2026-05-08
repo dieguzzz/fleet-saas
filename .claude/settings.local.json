@@ -53,7 +53,8 @@
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__list-projects",
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__list-deployments",
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__get-logs",
-      "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__redeploy"
+      "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__redeploy",
+      "mcp__18bfff64-df54-414f-93aa-c3f7de2a4fc8__generate_typescript_types"
     ]
   },
   "enableAllProjectMcpServers": true,
