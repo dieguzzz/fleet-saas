@@ -394,6 +394,20 @@ export interface LandPayment {
   tenant?: LandTenant;
 }
 
+export interface NotificationPreferences {
+  id: string;
+  user_id: string;
+  organization_id: string;
+  vehicle_document_expiry: boolean;
+  maintenance_due: boolean;
+  low_inventory_stock: boolean;
+  new_team_member: boolean;
+  trip_completed: boolean;
+  email_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TripExpense {
   id: string;
   organization_id: string;
@@ -529,6 +543,12 @@ export interface Database {
         Row: LandPayment;
         Insert: Omit<LandPayment, 'id' | 'created_at' | 'updated_at' | 'tenant'>;
         Update: Partial<Omit<LandPayment, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'tenant'>>;
+        Relationships: [];
+      };
+      notification_preferences: {
+        Row: NotificationPreferences;
+        Insert: Omit<NotificationPreferences, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<NotificationPreferences, 'id' | 'user_id' | 'organization_id' | 'created_at' | 'updated_at'>>;
         Relationships: [];
       };
       vehicle_documents: {

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { motion, useTransform, type MotionValue } from 'framer-motion';
@@ -246,8 +247,14 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
             className="flex items-center gap-3 min-w-0"
             onClick={() => { haptic(); onClose(); }}
           >
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-violet-600 rounded-xl flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
-              {org.name.charAt(0).toUpperCase()}
+            <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-sm">
+              {org.logo_url ? (
+                <Image src={org.logo_url} alt={org.name} width={36} height={36} className="w-full h-full object-cover" unoptimized />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center font-bold text-base text-white">
+                  {org.name.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-sm text-sidebar-foreground truncate leading-tight">{org.name}</p>
@@ -316,9 +323,19 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
 
         {/* User footer */}
         <div className="px-3 py-3 border-t border-sidebar-border space-y-1">
-          <div className="flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-medium text-xs shrink-0">
-              {user?.full_name?.charAt(0).toUpperCase() || user?.email.charAt(0).toUpperCase() || '?'}
+          <Link
+            href={`/${org.slug}/profile`}
+            onClick={() => { haptic(); onClose(); }}
+            className="flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl hover:bg-sidebar-accent/60 transition-colors group"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+              {user?.avatar_url ? (
+                <Image src={user.avatar_url} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" unoptimized />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-medium text-xs">
+                  {user?.full_name?.charAt(0).toUpperCase() || user?.email.charAt(0).toUpperCase() || '?'}
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-sidebar-foreground truncate leading-tight">
@@ -328,7 +345,7 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
                 <p className="text-[11px] text-sidebar-foreground/40 truncate leading-tight">{user.email}</p>
               )}
             </div>
-          </div>
+          </Link>
           <button
             onClick={() => { haptic(); handleSignOut(); }}
             disabled={isPending}

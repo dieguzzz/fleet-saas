@@ -66,6 +66,43 @@ export async function updateOrganizationSettings(prevState: SettingsState | null
   }
 
   revalidatePath(`/${orgSlug}/settings`);
-  revalidatePath(`/${orgSlug}`); // Update dashboard title if shown
+  revalidatePath(`/${orgSlug}`);
+  return { success: true };
+}
+
+export async function updateOrgLogo(orgSlug: string, logoUrl: string | null): Promise<SettingsState> {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (!org) return { error: 'Organización no encontrada' };
+
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('role')
+    .eq('organization_id', org.id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    return { error: 'No tienes permisos para modificar esta configuración' };
+  }
+
+  const { error } = await supabase
+    .from('organizations')
+    .update({ logo_url: logoUrl })
+    .eq('id', org.id);
+
+  if (error) return { error: 'Error al actualizar el logo' };
+
+  revalidatePath(`/${orgSlug}/settings`);
+  revalidatePath(`/${orgSlug}`);
   return { success: true };
 }
