@@ -29,6 +29,22 @@ export default async function TripDetailPage({
   const originCoords = trip.origin_coords as { lat: number; lng: number; label: string } | null;
   const destCoords = trip.destination_coords as { lat: number; lng: number; label: string } | null;
 
+  // Haversine distance (km) between two lat/lng points
+  function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  const distanceKm =
+    originCoords && destCoords
+      ? haversineKm(originCoords.lat, originCoords.lng, destCoords.lat, destCoords.lng)
+      : null;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -71,12 +87,18 @@ export default async function TripDetailPage({
       </div>
       
       {/* Map Section */}
-      <div className="w-full h-[400px] bg-muted border rounded-xl overflow-hidden shadow-sm">
-         <TripMapWrapper 
+      <div className="relative w-full h-[400px] bg-muted border rounded-xl overflow-hidden shadow-sm">
+         <TripMapWrapper
             origin={originCoords ? { ...originCoords, label: trip.origin } : undefined}
             destination={destCoords ? { ...destCoords, label: trip.destination } : undefined}
             className="h-full w-full"
          />
+         {distanceKm !== null && (
+           <div className="absolute top-3 right-3 z-[1000] bg-background/90 backdrop-blur-sm border border-border rounded-lg px-3 py-1.5 text-sm font-semibold pointer-events-none select-none">
+             ↔ {distanceKm.toFixed(1)} km{' '}
+             <span className="text-xs font-normal text-muted-foreground">(línea recta)</span>
+           </div>
+         )}
       </div>
 
       {/* Details Grid */}

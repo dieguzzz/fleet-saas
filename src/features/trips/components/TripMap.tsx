@@ -2,7 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 import { useEffect } from 'react';
-import { Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Map, MapTileLayer } from '@/components/ui/map';
 
@@ -31,11 +31,31 @@ export interface TripMapProps {
   className?: string;
 }
 
-function MapUpdater({ center }: { center: [number, number] }) {
+function FitBounds({
+  origin,
+  destination,
+}: {
+  origin: { lat: number; lng: number };
+  destination: { lat: number; lng: number };
+}) {
   const map = useMap();
   useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
+    const bounds = L.latLngBounds(
+      [origin.lat, origin.lng],
+      [destination.lat, destination.lng]
+    );
+    map.fitBounds(bounds, { padding: [48, 48] });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [origin.lat, origin.lng, destination.lat, destination.lng]);
+  return null;
+}
+
+function CenterOnSingle({ center }: { center: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, 13);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center[0], center[1]]);
   return null;
 }
 
@@ -71,23 +91,22 @@ export function TripMap({
   onMapClick,
   className = 'h-[400px] w-full rounded-md border',
 }: TripMapProps) {
-  // Center on Panama City [8.9833, -79.5167]
   const defaultCenter: [number, number] = [8.9833, -79.5167];
-  const center = origin
+  const singleCenter: [number, number] | null = origin
     ? [origin.lat, origin.lng]
     : destination
     ? [destination.lat, destination.lng]
-    : defaultCenter;
+    : null;
 
   return (
     <Map
-      center={center as [number, number]}
+      center={singleCenter ?? defaultCenter}
       zoom={13}
       scrollWheelZoom={interactive}
       className={className}
     >
       <MapTileLayer />
-      
+
       {origin && (
         <Marker position={[origin.lat, origin.lng]}>
           <Popup className="premium-popup">
@@ -110,8 +129,24 @@ export function TripMap({
         </Marker>
       )}
 
-      <MapUpdater center={center as [number, number]} />
-      <GeolocateOnMount skip={!!(origin || destination)} />
+      {origin && destination && (
+        <Polyline
+          positions={[
+            [origin.lat, origin.lng],
+            [destination.lat, destination.lng],
+          ]}
+          pathOptions={{ color: '#3b82f6', weight: 3, dashArray: '8 5', opacity: 0.8 }}
+        />
+      )}
+
+      {origin && destination ? (
+        <FitBounds origin={origin} destination={destination} />
+      ) : singleCenter ? (
+        <CenterOnSingle center={singleCenter} />
+      ) : (
+        <GeolocateOnMount skip={false} />
+      )}
+
       {interactive && <MapClickHandler onClick={onMapClick} />}
     </Map>
   );

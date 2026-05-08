@@ -17,7 +17,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
   return (
     <motion.header
-      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0"
+      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900]"
       animate={{ y: isVisible ? 0 : -56 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
