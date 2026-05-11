@@ -87,7 +87,7 @@ export default async function ExpiryAlertsWidget({ orgId, orgSlug }: ExpiryAlert
   if (alerts.length === 0) {
     return (
       <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
-        <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
         Todo en regla — sin vencimientos próximos.
@@ -106,7 +106,7 @@ export default async function ExpiryAlertsWidget({ orgId, orgSlug }: ExpiryAlert
             href={alert.href}
             className="flex items-start gap-3 group rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors -mx-3"
           >
-            <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${isExpired ? 'bg-red-500' : 'bg-amber-500'}`} />
+            <div className={`mt-0.5 size-2 rounded-full shrink-0 ${isExpired ? 'bg-red-500' : 'bg-amber-500'}`} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground truncate group-hover:text-blue-600 transition-colors">

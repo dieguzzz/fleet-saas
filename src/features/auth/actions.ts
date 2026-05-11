@@ -129,12 +129,10 @@ export async function login(prevState: unknown, formData: FormData) {
       .select('organization:organizations(slug)')
       .eq('user_id', user.id);
 
-    const slugs = (memberships ?? [])
-      .map((m: any) => {
-        const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
-        return org?.slug;
-      })
-      .filter(Boolean) as string[];
+    const slugs = (memberships ?? []).flatMap((m: any) => {
+      const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
+      return org?.slug ? [org.slug] : [];
+    }) as string[];
 
     if (slugs.length === 1) {
       redirect(`/${slugs[0]}`);
@@ -147,9 +145,9 @@ export async function login(prevState: unknown, formData: FormData) {
 }
 
 export async function forgotPassword(prevState: unknown, formData: FormData) {
-  const supabase = await createClient();
   const email = formData.get('email') as string;
   if (!email) return { error: 'Ingresá tu email.' };
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/auth/callback?next=/reset-password`,
@@ -160,12 +158,12 @@ export async function forgotPassword(prevState: unknown, formData: FormData) {
 }
 
 export async function resetPassword(prevState: unknown, formData: FormData) {
-  const supabase = await createClient();
   const password = formData.get('password') as string;
   const confirm = formData.get('confirm') as string;
 
   if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.' };
   if (password !== confirm) return { error: 'Las contraseñas no coinciden.' };
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };

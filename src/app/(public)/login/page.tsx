@@ -8,7 +8,7 @@ import { loginAmd, setupAmd, getAmdSetupState } from '@/features/auth/actions';
 type Mode = 'select' | 'otra' | 'amd';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const [mode, setMode] = useState<Mode>('select');
   const [loginState, loginAction, loginPending] = useActionState(loginAmd, null);
   const [setupState, setupAction, setupPending] = useActionState(setupAmd, null);
@@ -31,7 +31,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-3xl">A</span>
             </div>
             <span className="text-foreground font-bold text-2xl tracking-tight">AMD Logistics</span>
@@ -55,7 +55,7 @@ export default function LoginPage() {
                   onClick={() => setMode('amd')}
                   className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500 rounded-xl hover:bg-blue-500/5 transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-lg">A</span>
                   </div>
                   <div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
                   onClick={() => setMode('otra')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground font-bold text-lg">?</span>
                   </div>
                   <div>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 onClick={() => setMode('select')}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="size-4" />
                 Volver
               </button>
 
@@ -100,10 +100,10 @@ export default function LoginPage() {
 
               <div className="space-y-3">
                 <button
-                  onClick={() => router.push('/login-empresa')}
+                  onClick={() => push('/login-empresa')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground text-lg">→</span>
                   </div>
                   <div>
@@ -113,10 +113,10 @@ export default function LoginPage() {
                 </button>
 
                 <button
-                  onClick={() => router.push('/signup')}
+                  onClick={() => push('/signup')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground text-lg">+</span>
                   </div>
                   <div>
@@ -135,24 +135,24 @@ export default function LoginPage() {
                 onClick={() => { setMode('select'); setNeedsSetup(null); }}
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="size-4" />
                 Volver
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-lg">A</span>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">AMD Logistics</p>
                   <p className="text-xs text-muted-foreground">
-                    {needsSetup === null ? 'Cargando...' : needsSetup ? 'Configura tu acceso' : 'Ingresá tu contraseña'}
+                    {needsSetup === null ? 'Cargando…' : needsSetup ? 'Configura tu acceso' : 'Ingresá tu contraseña'}
                   </p>
                 </div>
               </div>
 
               {needsSetup === null && (
-                <p className="text-sm text-muted-foreground text-center">Cargando...</p>
+                <p className="text-sm text-muted-foreground text-center">Cargando…</p>
               )}
 
               {/* SETUP INICIAL */}
@@ -203,7 +203,7 @@ export default function LoginPage() {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
                   </div>
@@ -226,7 +226,7 @@ export default function LoginPage() {
                     disabled={setupPending}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {setupPending ? 'Configurando...' : 'Configurar y entrar'}
+                    {setupPending ? 'Configurando…' : 'Configurar y entrar'}
                   </button>
                 </form>
               )}
@@ -265,7 +265,7 @@ export default function LoginPage() {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
                   </div>
@@ -275,7 +275,7 @@ export default function LoginPage() {
                     disabled={loginPending}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loginPending ? 'Ingresando...' : 'Ingresar'}
+                    {loginPending ? 'Ingresando…' : 'Ingresar'}
                   </button>
                 </form>
               )}

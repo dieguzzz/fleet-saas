@@ -15,11 +15,10 @@ export default async function SelectOrgPage() {
     .select('role, organization:organizations(id, name, slug)')
     .eq('user_id', user.id);
 
-  const orgs = (memberships ?? [])
-    .map((m: { role: string; organization: { id: string; name: string; slug: string } | null }) =>
-      m.organization ? { ...m.organization, role: m.role } : null
-    )
-    .filter(Boolean) as { id: string; name: string; slug: string; role: string }[];
+  const orgs = (memberships ?? []).flatMap(
+    (m: { role: string; organization: { id: string; name: string; slug: string } | null }) =>
+      m.organization ? [{ ...m.organization, role: m.role }] : []
+  ) as { id: string; name: string; slug: string; role: string }[];
 
   if (orgs.length === 0) redirect('/onboarding');
   if (orgs.length === 1) redirect(`/${orgs[0].slug}`);

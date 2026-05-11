@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createOrganization, type CreateOrgState } from '@/features/organizations/actions';
 
 export default function OnboardingPage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const [state, formAction, pending] = useActionState<CreateOrgState, FormData>(
     createOrganization,
     null
@@ -14,7 +14,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (state?.success && state.slug) {
-      router.push(`/${state.slug}`);
+      push(`/${state.slug}`);
     }
   }, [state, router]);
 
@@ -24,7 +24,7 @@ export default function OnboardingPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="size-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
             <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>

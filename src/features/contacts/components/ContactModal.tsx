@@ -38,7 +38,7 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
 
   return (
     <>
-      <span onClick={() => setOpen(true)} className="cursor-pointer">
+      <span role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true); }} className="cursor-pointer">
         {trigger ?? (
           <Button size="sm" variant="outline">+ Nuevo Contacto</Button>
         )}
@@ -65,13 +65,13 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="field-label">Nombre *</label>
-                  <input name="name" type="text" required defaultValue={contact?.name ?? ''} placeholder="Juan García / Taller Norte" className="field-input" />
+                  <label htmlFor="contact_name" className="field-label">Nombre *</label>
+                  <input id="contact_name" name="name" type="text" required defaultValue={contact?.name ?? ''} placeholder="Juan García / Taller Norte" className="field-input" />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="field-label">Tipo *</label>
-                  <select name="role" required defaultValue={contact?.role ?? defaultRole ?? ''} className="field-input">
+                  <label htmlFor="role" className="field-label">Tipo *</label>
+                  <select id="role" name="role" required defaultValue={contact?.role ?? defaultRole ?? ''} className="field-input">
                     <option value="">Seleccionar tipo</option>
                     <optgroup label="Facturación">
                       <option value="customer">Cliente</option>
@@ -89,35 +89,35 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
                 </div>
 
                 <div>
-                  <label className="field-label">Empresa</label>
-                  <input name="company" type="text" defaultValue={contact?.company ?? ''} placeholder="Empresa SA" className="field-input" />
+                  <label htmlFor="company" className="field-label">Empresa</label>
+                  <input id="company" name="company" type="text" defaultValue={contact?.company ?? ''} placeholder="Empresa SA" className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Teléfono</label>
-                  <input name="phone" type="tel" defaultValue={contact?.phone ?? ''} placeholder="+54 9 11 1234-5678" className="field-input" />
+                  <label htmlFor="contact_phone" className="field-label">Teléfono</label>
+                  <input id="contact_phone" name="phone" type="tel" defaultValue={contact?.phone ?? ''} placeholder="+54 9 11 1234-5678" className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Email</label>
-                  <input name="email" type="email" defaultValue={contact?.email ?? ''} placeholder="contacto@empresa.com" className="field-input" />
+                  <label htmlFor="contact_email" className="field-label">Email</label>
+                  <input id="contact_email" name="email" type="email" defaultValue={contact?.email ?? ''} placeholder="contacto@empresa.com" className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Dirección / Zona</label>
-                  <input name="address" type="text" defaultValue={contact?.address ?? ''} placeholder="Av. Corrientes 1234" className="field-input" />
+                  <label htmlFor="address" className="field-label">Dirección / Zona</label>
+                  <input id="address" name="address" type="text" defaultValue={contact?.address ?? ''} placeholder="Av. Corrientes 1234" className="field-input" />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="field-label">Notas</label>
-                  <textarea name="notes" rows={2} defaultValue={contact?.notes ?? ''} className="field-input" placeholder="Especialidad, horarios, observaciones..." />
+                  <label htmlFor="contact_notes" className="field-label">Notas</label>
+                  <textarea id="contact_notes" name="notes" rows={2} defaultValue={contact?.notes ?? ''} className="field-input" placeholder="Especialidad, horarios, observaciones..." />
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <input id="is_emergency_modal" name="is_emergency" type="checkbox"
                   defaultChecked={contact?.is_emergency ?? false}
-                  className="w-4 h-4 rounded border-input accent-destructive" />
+                  className="size-4 rounded border-input accent-destructive" />
                 <label htmlFor="is_emergency_modal" className="text-sm text-foreground">
                   Contacto de emergencia <span className="text-muted-foreground">(disponible 24hs)</span>
                 </label>

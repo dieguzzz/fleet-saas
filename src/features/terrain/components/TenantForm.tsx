@@ -14,7 +14,7 @@ interface TenantFormProps {
 }
 
 export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
-  const router = useRouter();
+  const { push, back } = useRouter();
   const action = tenant ? updateTenant : createTenant;
   const [state, formAction, isPending] = useActionState(
     async (_prev: TenantFormState | null, formData: FormData) => action(_prev, formData),
@@ -22,8 +22,8 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
   );
 
   useEffect(() => {
-    if (state?.success) router.push(`/${orgSlug}/terreno`);
-  }, [state, router, orgSlug]);
+    if (state?.success) push(`/${orgSlug}/terreno`);
+  }, [state, push, orgSlug]);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -90,7 +90,7 @@ export function TenantForm({ orgSlug, tenant }: TenantFormProps) {
       </div>
 
       <div className="form-footer">
-        <Button type="button" variant="outline" onClick={() => router.back()}>Cancelar</Button>
+        <Button type="button" variant="outline" onClick={() => back()}>Cancelar</Button>
         <Button type="submit" disabled={isPending}>
           {isPending ? 'Guardando...' : tenant ? 'Actualizar inquilino' : 'Crear inquilino'}
         </Button>

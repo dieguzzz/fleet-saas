@@ -38,38 +38,38 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
 
       <div className="form-grid">
         <div>
-          <label className="field-label">Nombre completo *</label>
-          <input name="full_name" type="text" required defaultValue={employee?.full_name}
+          <label htmlFor="full_name" className="field-label">Nombre completo *</label>
+          <input id="full_name" name="full_name" type="text" required defaultValue={employee?.full_name}
             className="field-input" placeholder="Juan García" />
         </div>
 
         <div>
-          <label className="field-label">Cargo / Puesto</label>
-          <input name="position" type="text" defaultValue={employee?.position ?? ''}
+          <label htmlFor="position" className="field-label">Cargo / Puesto</label>
+          <input id="position" name="position" type="text" defaultValue={employee?.position ?? ''}
             className="field-input" placeholder="Conductor, Mecánico..." />
         </div>
 
         <div>
-          <label className="field-label">Nº de documento</label>
-          <input name="document_number" type="text" defaultValue={employee?.document_number ?? ''}
+          <label htmlFor="document_number" className="field-label">Nº de documento</label>
+          <input id="document_number" name="document_number" type="text" defaultValue={employee?.document_number ?? ''}
             className="field-input" placeholder="DNI / CUIT" />
         </div>
 
         <div>
-          <label className="field-label">Teléfono</label>
-          <input name="phone" type="tel" defaultValue={employee?.phone ?? ''}
+          <label htmlFor="phone" className="field-label">Teléfono</label>
+          <input id="phone" name="phone" type="tel" defaultValue={employee?.phone ?? ''}
             className="field-input" placeholder="+54 9 11 1234-5678" />
         </div>
 
         <div>
-          <label className="field-label">Email</label>
-          <input name="email" type="email" defaultValue={employee?.email ?? ''}
+          <label htmlFor="email" className="field-label">Email</label>
+          <input id="email" name="email" type="email" defaultValue={employee?.email ?? ''}
             className="field-input" placeholder="empleado@empresa.com" />
         </div>
 
         <div>
-          <label className="field-label">Estado</label>
-          <select name="status" defaultValue={employee?.status ?? 'active'} className="field-input">
+          <label htmlFor="status" className="field-label">Estado</label>
+          <select id="status" name="status" defaultValue={employee?.status ?? 'active'} className="field-input">
             <option value="active">Activo</option>
             <option value="inactive">Inactivo</option>
             <option value="on_leave">De licencia</option>
@@ -77,26 +77,26 @@ export default function EmployeeForm({ orgSlug, action, employee }: EmployeeForm
         </div>
 
         <div>
-          <label className="field-label">Nº de licencia de conducir</label>
-          <input name="license_number" type="text" defaultValue={employee?.license_number ?? ''}
+          <label htmlFor="license_number" className="field-label">Nº de licencia de conducir</label>
+          <input id="license_number" name="license_number" type="text" defaultValue={employee?.license_number ?? ''}
             className="field-input" placeholder="12345678" />
         </div>
 
         <div>
-          <label className="field-label">Vencimiento de licencia</label>
-          <input name="license_expiry" type="date"
+          <label htmlFor="license_expiry" className="field-label">Vencimiento de licencia</label>
+          <input id="license_expiry" name="license_expiry" type="date"
             defaultValue={employee?.license_expiry?.split('T')[0] ?? ''} className="field-input" />
         </div>
 
         <div>
-          <label className="field-label">Fecha de ingreso</label>
-          <input name="hire_date" type="date"
+          <label htmlFor="hire_date" className="field-label">Fecha de ingreso</label>
+          <input id="hire_date" name="hire_date" type="date"
             defaultValue={employee?.hire_date?.split('T')[0] ?? ''} className="field-input" />
         </div>
 
         <div className="sm:col-span-2 lg:col-span-3">
-          <label className="field-label">Notas</label>
-          <textarea name="notes" rows={2} defaultValue={employee?.notes ?? ''}
+          <label htmlFor="notes" className="field-label">Notas</label>
+          <textarea id="notes" name="notes" rows={2} defaultValue={employee?.notes ?? ''}
             className="field-input" placeholder="Observaciones adicionales..." />
         </div>
       </div>

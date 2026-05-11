@@ -11,13 +11,14 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const router = useRouter();
+  const { push } = useRouter();
 
   const mismatch = confirm.length > 0 && password !== confirm;
 
   useEffect(() => {
     if (state?.success) {
-      setTimeout(() => router.push('/login'), 2000);
+      const timer = setTimeout(() => push('/login'), 2000);
+      return () => clearTimeout(timer);
     }
   }, [state?.success, router]);
 
@@ -26,7 +27,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="size-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">F</span>
             </div>
             <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
@@ -39,7 +40,7 @@ export default function ResetPasswordPage() {
           {state?.success ? (
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center space-y-2">
               <p className="text-green-400 font-medium">¡Contraseña actualizada!</p>
-              <p className="text-muted-foreground text-sm">Redirigiendo al login...</p>
+              <p className="text-muted-foreground text-sm">Redirigiendo al login…</p>
             </div>
           ) : (
             <form action={formAction} className="space-y-5">
@@ -100,7 +101,7 @@ export default function ResetPasswordPage() {
                 disabled={isPending || mismatch}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isPending ? 'Guardando...' : 'Guardar nueva contraseña'}
+                {isPending ? 'Guardando…' : 'Guardar nueva contraseña'}
               </button>
             </form>
           )}

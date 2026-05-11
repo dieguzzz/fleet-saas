@@ -36,7 +36,7 @@ export default function InventoryItemModal({ orgSlug, item, defaultCategory, tri
 
   return (
     <>
-      <span onClick={() => setOpen(true)} className="cursor-pointer">
+      <span role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true); }} className="cursor-pointer">
         {trigger ?? (
           <Button size="sm" variant="outline">+ Nuevo Ítem</Button>
         )}
@@ -63,13 +63,13 @@ export default function InventoryItemModal({ orgSlug, item, defaultCategory, tri
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="field-label">Nombre *</label>
-                  <input name="name" type="text" required defaultValue={item?.name ?? ''} placeholder="Aceite Sintético 5W-30" className="field-input" />
+                  <label htmlFor="item_name" className="field-label">Nombre *</label>
+                  <input id="item_name" name="name" type="text" required defaultValue={item?.name ?? ''} placeholder="Aceite Sintético 5W-30" className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Categoría *</label>
-                  <select name="category" required defaultValue={item?.category ?? defaultCategory ?? 'parts'} className="field-input">
+                  <label htmlFor="category" className="field-label">Categoría *</label>
+                  <select id="category" name="category" required defaultValue={item?.category ?? defaultCategory ?? 'parts'} className="field-input">
                     {CATEGORIES.map(([val, label]) => (
                       <option key={val} value={val}>{label}</option>
                     ))}
@@ -77,40 +77,40 @@ export default function InventoryItemModal({ orgSlug, item, defaultCategory, tri
                 </div>
 
                 <div>
-                  <label className="field-label">SKU / Código</label>
-                  <input name="sku" type="text" defaultValue={item?.sku ?? ''} placeholder="OIL-001" className="field-input" />
+                  <label htmlFor="sku" className="field-label">SKU / Código</label>
+                  <input id="sku" name="sku" type="text" defaultValue={item?.sku ?? ''} placeholder="OIL-001" className="field-input" />
                 </div>
 
                 {!item && (
                   <div>
-                    <label className="field-label">Stock Inicial</label>
-                    <input name="current_stock" type="number" min="0" defaultValue="0" className="field-input" />
+                    <label htmlFor="current_stock" className="field-label">Stock Inicial</label>
+                    <input id="current_stock" name="current_stock" type="number" min="0" defaultValue="0" className="field-input" />
                   </div>
                 )}
 
                 <div>
-                  <label className="field-label">Stock Mínimo</label>
-                  <input name="min_stock_level" type="number" min="0" defaultValue={item?.min_stock_level ?? 5} className="field-input" />
+                  <label htmlFor="min_stock_level" className="field-label">Stock Mínimo</label>
+                  <input id="min_stock_level" name="min_stock_level" type="number" min="0" defaultValue={item?.min_stock_level ?? 5} className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Unidad</label>
-                  <input name="unit" type="text" defaultValue={item?.unit ?? 'unidades'} placeholder="unidades, litros..." className="field-input" />
+                  <label htmlFor="unit" className="field-label">Unidad</label>
+                  <input id="unit" name="unit" type="text" defaultValue={item?.unit ?? 'unidades'} placeholder="unidades, litros..." className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Costo unitario</label>
-                  <input name="cost_per_unit" type="number" min="0" step="0.01" defaultValue={item?.cost_per_unit ?? ''} placeholder="0.00" className="field-input" />
+                  <label htmlFor="cost_per_unit" className="field-label">Costo unitario</label>
+                  <input id="cost_per_unit" name="cost_per_unit" type="number" min="0" step="0.01" defaultValue={item?.cost_per_unit ?? ''} placeholder="0.00" className="field-input" />
                 </div>
 
                 <div>
-                  <label className="field-label">Ubicación</label>
-                  <input name="location" type="text" defaultValue={item?.location ?? ''} placeholder="Estante A-4" className="field-input" />
+                  <label htmlFor="location" className="field-label">Ubicación</label>
+                  <input id="location" name="location" type="text" defaultValue={item?.location ?? ''} placeholder="Estante A-4" className="field-input" />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="field-label">Descripción</label>
-                  <textarea name="description" rows={2} defaultValue={item?.description ?? ''} className="field-input" />
+                  <label htmlFor="description" className="field-label">Descripción</label>
+                  <textarea id="description" name="description" rows={2} defaultValue={item?.description ?? ''} className="field-input" />
                 </div>
               </div>
 

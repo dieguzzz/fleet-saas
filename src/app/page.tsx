@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Building2, Truck, DollarSign, ShieldCheck, Mail, Eye } from 'lucide-react';
 import { createClient } from '@/services/supabase/server';
 import DatabaseStatus from '@/components/debug/DatabaseStatus';
+
+export const metadata: Metadata = {
+  title: 'Fleet SaaS — Gestión de flotas para tu empresa',
+  description: 'Administrá vehículos, viajes, mantenimiento, combustible y finanzas de tu flota en un solo lugar.',
+};
 
 async function getAuthState() {
   const supabase = await createClient();
@@ -28,32 +34,32 @@ export default async function HomePage() {
     {
       title: 'Multi-Tenant',
       description: 'Cada organización con datos completamente aislados mediante Row Level Security.',
-      icon: <Building2 className="w-7 h-7" />,
+      icon: <Building2 className="size-7" />,
     },
     {
       title: 'Gestión de Flotas',
       description: 'Vehículos, viajes, mantenimiento y conductores en un solo lugar.',
-      icon: <Truck className="w-7 h-7" />,
+      icon: <Truck className="size-7" />,
     },
     {
       title: 'Finanzas Integradas',
       description: 'Control de ingresos, gastos y balances por organización.',
-      icon: <DollarSign className="w-7 h-7" />,
+      icon: <DollarSign className="size-7" />,
     },
     {
       title: 'Roles y Permisos',
       description: 'Owner, Admin, Collaborator y Viewer con permisos granulares.',
-      icon: <ShieldCheck className="w-7 h-7" />,
+      icon: <ShieldCheck className="size-7" />,
     },
     {
       title: 'Invitaciones por Email',
       description: 'Invita a tu equipo con roles específicos de forma segura.',
-      icon: <Mail className="w-7 h-7" />,
+      icon: <Mail className="size-7" />,
     },
     {
       title: 'Super Admin',
       description: 'Impersonación de organizaciones para soporte y auditoría.',
-      icon: <Eye className="w-7 h-7" />,
+      icon: <Eye className="size-7" />,
     },
   ];
 
@@ -63,7 +69,7 @@ export default async function HomePage() {
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="size-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">F</span>
             </div>
             <span className="text-foreground font-semibold text-xl">Fleet SaaS</span>

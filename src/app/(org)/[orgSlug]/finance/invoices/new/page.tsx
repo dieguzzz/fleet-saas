@@ -20,8 +20,7 @@ export default async function NewInvoicePage({
   const { data: contactsRaw } = await getCustomersAndSuppliers(org.id);
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
-    .filter(c => c.role === role)
-    .map(c => ({ id: c.id, name: c.name, company: c.company }));
+    .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company }] : []);
 
   return (
     <div className="space-y-4">

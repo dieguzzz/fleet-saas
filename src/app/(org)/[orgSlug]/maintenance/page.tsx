@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import MaintenanceList from '@/features/maintenance/components/MaintenanceList';
 import { getMaintenanceRecords } from '@/features/maintenance/actions';
@@ -6,6 +7,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+
+export const metadata: Metadata = { title: 'Mantenimiento — Fleet SaaS' };
 
 export default async function MaintenancePage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;

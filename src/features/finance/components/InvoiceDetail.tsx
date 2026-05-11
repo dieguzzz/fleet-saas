@@ -7,7 +7,7 @@ import { InvoiceAttachment } from './InvoiceAttachment';
 
 const PdfViewer = dynamic(
   () => import('./PdfViewer').then((m) => m.PdfViewer),
-  { ssr: false, loading: () => <p className="text-sm text-muted-foreground p-4">Cargando PDF...</p> }
+  { ssr: false, loading: () => <p className="text-sm text-muted-foreground p-4">Cargando PDF…</p> }
 );
 
 function formatDate(dateStr: string) {
@@ -137,7 +137,7 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
                 </tr>
               ) : (
                 invoice.items.map((item, idx) => (
-                  <tr key={idx}>
+                  <tr key={`${item.description}-${idx}`}>
                     <td className="py-4 px-4 text-foreground">{item.description}</td>
                     <td className="py-4 px-4 text-foreground text-right">{item.quantity}</td>
                     <td className="py-4 px-4 text-foreground text-right">${Number(item.unit_price).toFixed(2)}</td>

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
 import { getFuelRecords, getFuelStats } from '@/features/fuel/actions';
@@ -6,6 +7,8 @@ import FuelList from '@/features/fuel/components/FuelList';
 import NewFuelRecordModal from '@/features/fuel/components/NewFuelRecordModal';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
+
+export const metadata: Metadata = { title: 'Combustible — Fleet SaaS' };
 
 function fmt(n: number) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

@@ -5,6 +5,8 @@ import { createClient } from '@/services/supabase/client';
 import { markPaymentPaid, updatePaymentReceiptUrl, type MarkPaidFormState } from '@/features/terrain/actions';
 import type { LandPayment, LandTenant } from '@/types/database';
 
+const mxnFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
 interface MarkPaidFormProps {
   payment: LandPayment & { tenant?: Pick<LandTenant, 'id' | 'name' | 'equipment_description' | 'phone'> };
   orgSlug: string;
@@ -96,11 +98,11 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
   }
 
   function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+    return mxnFormatter.format(amount);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
+    <div role="presentation" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <div
         className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -113,7 +115,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
             </p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -135,8 +137,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Monto recibido <span className="text-red-400">*</span></label>
+            <label htmlFor="paid_amount" className="field-label">Monto recibido <span className="text-red-400">*</span></label>
             <input
+              id="paid_amount"
               name="paid_amount"
               type="number"
               min="0"
@@ -148,8 +151,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Fecha de pago <span className="text-red-400">*</span></label>
+            <label htmlFor="paid_date" className="field-label">Fecha de pago <span className="text-red-400">*</span></label>
             <input
+              id="paid_date"
               name="paid_date"
               type="date"
               required
@@ -159,8 +163,8 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Método de pago <span className="text-red-400">*</span></label>
-            <select name="payment_method" required defaultValue={payment.payment_method ?? 'cash'} className="field-input">
+            <label htmlFor="payment_method" className="field-label">Método de pago <span className="text-red-400">*</span></label>
+            <select id="payment_method" name="payment_method" required defaultValue={payment.payment_method ?? 'cash'} className="field-input">
               <option value="cash">Efectivo</option>
               <option value="transfer">Transferencia</option>
               <option value="check">Cheque</option>
@@ -169,23 +173,24 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
           </div>
 
           <div className="space-y-1.5">
-            <label className="field-label">Notas</label>
+            <label htmlFor="payment_notes" className="field-label">Notas</label>
             <input
+              id="payment_notes"
               name="notes"
               type="text"
               defaultValue={payment.notes ?? ''}
-              placeholder="Observaciones..."
+              placeholder="Observaciones…"
               className="field-input"
             />
           </div>
 
           {/* Comprobante */}
           <div className="space-y-1.5">
-            <label className="field-label">Comprobante (opcional)</label>
+            <p className="field-label">Comprobante (opcional)</p>
             {receiptUrl ? (
               <div className="flex items-center justify-between p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
                 <div className="flex items-center gap-2 min-w-0">
-                  <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <a href={receiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-400 truncate hover:underline">
@@ -209,15 +214,15 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
               >
                 {uploading ? (
                   <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg className="size-4 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Subiendo...
+                    Subiendo…
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     Subir comprobante (JPG, PNG, PDF)
@@ -245,7 +250,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
               disabled={isPending || uploading}
               className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
             >
-              {isPending ? 'Guardando...' : 'Confirmar pago'}
+              {isPending ? 'Guardando…' : 'Confirmar pago'}
             </button>
             <button
               type="button"

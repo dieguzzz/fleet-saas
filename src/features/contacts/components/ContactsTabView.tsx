@@ -45,7 +45,7 @@ function DeleteButton({ contactId, orgSlug }: { contactId: string; orgSlug: stri
       disabled={isPending}
       className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
     >
-      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
       </svg>
     </button>
@@ -84,7 +84,7 @@ function ContactsTable({ contacts, orgSlug, search }: { contacts: Contact[]; org
                   <div className="flex items-center gap-1 justify-end">
                     <ContactModal orgSlug={orgSlug} contact={c} trigger={
                       <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
@@ -119,7 +119,7 @@ function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug:
         <div className="flex gap-1 shrink-0">
           <ContactModal orgSlug={orgSlug} contact={contact} trigger={
             <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
@@ -136,7 +136,7 @@ function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug:
       {contact.phone && (
         <a href={`tel:${contact.phone}`}
           className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
-          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="size-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>
           <span className="text-sm">{contact.phone}</span>
@@ -145,7 +145,7 @@ function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug:
 
       {contact.address && (
         <p className="text-xs text-muted-foreground flex items-start gap-1.5">
-          <svg className="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="size-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
@@ -164,7 +164,7 @@ function ServiciosGrid({ contacts, orgSlug, search }: { contacts: Contact[]; org
   if (contacts.length === 0) {
     return <p className="text-center py-10 text-sm text-muted-foreground">Sin servicios registrados.</p>;
   }
-  const sorted = [...contacts].sort((a, b) => {
+  const sorted = contacts.toSorted((a, b) => {
     if (a.is_emergency && !b.is_emergency) return -1;
     if (!a.is_emergency && b.is_emergency) return 1;
     return a.name.localeCompare(b.name);
@@ -226,7 +226,7 @@ export default function ContactsTabView({ orgSlug, contacts }: { orgSlug: string
         <div className="flex items-center gap-2 flex-1">
           {/* Search */}
           <div className="relative flex-1 sm:max-w-xs">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input

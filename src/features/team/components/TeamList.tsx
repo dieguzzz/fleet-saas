@@ -42,7 +42,7 @@ export default function TeamList({ members }: { members: Member[] }) {
               <tr key={member.id} className="hover:bg-accent/30 transition-colors">
                 <td className="px-6 py-4 font-medium text-foreground">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs">
+                    <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs">
                       {member.profile?.full_name?.charAt(0) || member.profile?.email?.charAt(0) || '?'}
                     </div>
                     {member.profile?.full_name || 'Sin nombre'}

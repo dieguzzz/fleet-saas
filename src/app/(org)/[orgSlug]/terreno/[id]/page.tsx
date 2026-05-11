@@ -5,6 +5,8 @@ import { getTenant, getPaymentsByTenant } from '@/features/terrain/actions';
 import { TenantPaymentHistory } from '@/features/terrain/components/TenantPaymentHistory';
 import { SectionCard } from '@/components/ui/section-card';
 
+const mxnFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
 export default async function TenantDetailPage({ params }: { params: Promise<{ orgSlug: string; id: string }> }) {
   const { orgSlug, id } = await params;
   const supabase = await createClient();
@@ -13,13 +15,14 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ o
   if (!orgData) notFound();
   const org = orgData as unknown as { id: string };
 
-  const { data: tenant } = await getTenant(id);
+  const [{ data: tenant }, { data: payments }] = await Promise.all([
+    getTenant(id),
+    getPaymentsByTenant(id, org.id),
+  ]);
   if (!tenant || tenant.organization_id !== org.id) notFound();
 
-  const { data: payments } = await getPaymentsByTenant(id, org.id);
-
   function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+    return mxnFormatter.format(amount);
   }
 
   function formatDate(dateStr: string) {
@@ -34,7 +37,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ o
           href={`/${orgSlug}/terreno`}
           className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>

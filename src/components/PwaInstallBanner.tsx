@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { X, Download, Share } from 'lucide-react';
 
@@ -84,8 +85,8 @@ export function PwaInstallBanner() {
     <div className="fixed top-0 left-0 right-0 z-[9999] flex items-start justify-between gap-3 bg-sidebar text-sidebar-foreground px-4 py-3 shadow-lg border-b border-border">
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {/* Icono */}
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <img src="/icon.svg" alt="Fleet" className="w-7 h-7" />
+        <div className="flex-shrink-0 size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Image src="/icon.svg" alt="Fleet" width={28} height={28} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -93,7 +94,7 @@ export function PwaInstallBanner() {
           {isIosDevice ? (
             <p className="text-xs text-sidebar-foreground/70 mt-0.5 leading-snug">
               Toca{' '}
-              <Share className="inline w-3.5 h-3.5 mx-0.5 align-text-bottom" />
+              <Share className="inline size-3.5 mx-0.5 align-text-bottom" />
               {' '}y luego{' '}
               <strong>&ldquo;Agregar a pantalla de inicio&rdquo;</strong>
             </p>
@@ -111,7 +112,7 @@ export function PwaInstallBanner() {
             onClick={handleInstall}
             className="flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="size-3.5" />
             Instalar
           </button>
         )}
@@ -120,7 +121,7 @@ export function PwaInstallBanner() {
           className="p-1.5 rounded-lg hover:bg-sidebar-foreground/10 transition-colors"
           aria-label="Cerrar"
         >
-          <X className="w-4 h-4" />
+          <X className="size-4" />
         </button>
       </div>
     </div>

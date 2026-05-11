@@ -63,12 +63,10 @@ export async function middleware(request: NextRequest) {
       .eq('user_id', user.id);
 
     const url = request.nextUrl.clone();
-    const slugs = (memberships ?? [])
-      .map((m: any) => {
-        const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
-        return org?.slug;
-      })
-      .filter(Boolean) as string[];
+    const slugs = (memberships ?? []).flatMap((m: any) => {
+      const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
+      return org?.slug ? [org.slug] : [];
+    }) as string[];
 
     if (slugs.length === 1) {
       url.pathname = `/${slugs[0]}`;

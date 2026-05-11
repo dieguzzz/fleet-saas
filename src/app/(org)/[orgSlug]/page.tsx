@@ -22,7 +22,7 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
       label: 'Vehículos', value: stats.vehicles, href: `/${orgSlug}/vehicles`,
       gradient: 'bg-gradient-to-br from-blue-500 to-blue-600',
       icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2-.001M13 16H9m4 0h2m2 0h1l1-4.5H13V6m0 0h2l3 4.5" />
         </svg>
@@ -32,7 +32,7 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
       label: 'Viajes', value: stats.trips, href: `/${orgSlug}/trips`,
       gradient: 'bg-gradient-to-br from-green-500 to-green-600',
       icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
         </svg>
       ),
@@ -41,7 +41,7 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
       label: 'Mantenimientos', value: stats.maintenance, href: `/${orgSlug}/maintenance`,
       gradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
       icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -51,7 +51,7 @@ async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: stri
       label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`,
       gradient: 'bg-gradient-to-br from-purple-500 to-purple-600',
       icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
@@ -189,7 +189,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     <div className="space-y-4">
       {recent.map((item) => (
         <Link key={item.id} href={item.href} className="flex items-start gap-3 group">
-          <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dotColor[item.type]}`} />
+          <div className={`size-2 rounded-full mt-1.5 shrink-0 ${dotColor[item.type]}`} />
           <div className="min-w-0">
             <p className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors truncate">{item.text}</p>
             <p className="text-xs text-muted-foreground">{item.time}</p>

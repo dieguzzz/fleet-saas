@@ -56,12 +56,12 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="field-label">Fecha *</label>
-                  <input name="fuel_date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="field-input" />
+                  <label htmlFor="fuel_date" className="field-label">Fecha *</label>
+                  <input id="fuel_date" name="fuel_date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="field-input" />
                 </div>
                 <div>
-                  <label className="field-label">Tipo *</label>
-                  <select name="fuel_type" required className="field-input">
+                  <label htmlFor="fuel_type" className="field-label">Tipo *</label>
+                  <select id="fuel_type" name="fuel_type" required className="field-input">
                     <option value="diesel">Diesel</option>
                     <option value="gasoline">Gasolina</option>
                     <option value="gasoil">Gasoil</option>
@@ -70,8 +70,8 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
               </div>
 
               <div>
-                <label className="field-label">Vehículo</label>
-                <select name="vehicle_id" className="field-input">
+                <label htmlFor="vehicle_id" className="field-label">Vehículo</label>
+                <select id="vehicle_id" name="vehicle_id" className="field-input">
                   <option value="">Sin vehículo</option>
                   {vehicles.map(v => (
                     <option key={v.id} value={v.id}>{v.name}{v.plate_number ? ` (${v.plate_number})` : ''}</option>
@@ -80,8 +80,8 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
               </div>
 
               <div>
-                <label className="field-label">Conductor / Empleado</label>
-                <select name="employee_id" className="field-input">
+                <label htmlFor="employee_id" className="field-label">Conductor / Empleado</label>
+                <select id="employee_id" name="employee_id" className="field-input">
                   <option value="">Sin asignar</option>
                   {employees.map(e => (
                     <option key={e.id} value={e.id}>{e.full_name}</option>
@@ -91,16 +91,16 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="field-label">Litros *</label>
-                  <input name="liters" type="number" step="0.01" min="0.01" required value={liters} onChange={e => setLiters(e.target.value)} className="field-input" placeholder="0.00" />
+                  <label htmlFor="liters" className="field-label">Litros *</label>
+                  <input id="liters" name="liters" type="number" step="0.01" min="0.01" required value={liters} onChange={e => setLiters(e.target.value)} className="field-input" placeholder="0.00" />
                 </div>
                 <div>
-                  <label className="field-label">Precio/litro *</label>
-                  <input name="price_per_liter" type="number" step="0.001" min="0.001" required value={pricePerLiter} onChange={e => setPricePerLiter(e.target.value)} className="field-input" placeholder="0.000" />
+                  <label htmlFor="price_per_liter" className="field-label">Precio/litro *</label>
+                  <input id="price_per_liter" name="price_per_liter" type="number" step="0.001" min="0.001" required value={pricePerLiter} onChange={e => setPricePerLiter(e.target.value)} className="field-input" placeholder="0.000" />
                 </div>
               </div>
 
-              {total && (
+              {total.length > 0 && (
                 <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 flex justify-between items-center">
                   <span className="text-sm text-primary font-medium">Total calculado</span>
                   <span className="text-lg font-bold text-primary">${parseFloat(total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
@@ -109,18 +109,18 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="field-label">Estación de servicio</label>
-                  <input name="station" type="text" className="field-input" placeholder="YPF, Shell..." />
+                  <label htmlFor="station" className="field-label">Estación de servicio</label>
+                  <input id="station" name="station" type="text" className="field-input" placeholder="YPF, Shell..." />
                 </div>
                 <div>
-                  <label className="field-label">Odómetro (km)</label>
-                  <input name="odometer" type="number" min="0" className="field-input" placeholder="120000" />
+                  <label htmlFor="odometer" className="field-label">Odómetro (km)</label>
+                  <input id="odometer" name="odometer" type="number" min="0" className="field-input" placeholder="120000" />
                 </div>
               </div>
 
               <div>
-                <label className="field-label">Notas</label>
-                <textarea name="notes" rows={2} className="field-input" placeholder="Observaciones..." />
+                <label htmlFor="fuel_notes" className="field-label">Notas</label>
+                <textarea id="fuel_notes" name="notes" rows={2} className="field-input" placeholder="Observaciones..." />
               </div>
 
               <div className="flex gap-3 pt-2">

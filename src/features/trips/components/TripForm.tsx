@@ -11,7 +11,7 @@ const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   ssr: false,
   loading: () => (
     <div className="h-[300px] w-full bg-muted rounded-lg animate-pulse flex items-center justify-center text-muted-foreground">
-      Cargando mapa...
+      Cargando mapa…
     </div>
   ),
 });
@@ -197,7 +197,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
                   : 'bg-muted text-muted-foreground hover:bg-accent'
               }`}
             >
-              {selecting === 'origin' ? 'Seleccionando...' : 'Marcar en mapa'}
+              {selecting === 'origin' ? 'Seleccionando…' : 'Marcar en mapa'}
             </button>
           </div>
           <div className="flex gap-2 items-center">
@@ -208,7 +208,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
               required
               value={originName}
               onChange={(e) => setOriginName(e.target.value)}
-              placeholder={geocoding === 'origin' ? 'Obteniendo nombre...' : 'Ciudad o dirección de origen'}
+              placeholder={geocoding === 'origin' ? 'Obteniendo nombre…' : 'Ciudad o dirección de origen'}
               className="field-input flex-1"
             />
             {originCoords && (
@@ -219,7 +219,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
                 title="Guardar como ubicación recurrente"
                 className="shrink-0 text-xs px-2 py-1.5 bg-muted hover:bg-accent border border-border rounded-lg transition-colors disabled:opacity-50"
               >
-                {savingLocation === 'origin' ? '...' : '⭐'}
+                {savingLocation === 'origin' ? '…' : '⭐'}
               </button>
             )}
           </div>
@@ -247,7 +247,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
                   : 'bg-muted text-muted-foreground hover:bg-accent'
               }`}
             >
-              {selecting === 'destination' ? 'Seleccionando...' : 'Marcar en mapa'}
+              {selecting === 'destination' ? 'Seleccionando…' : 'Marcar en mapa'}
             </button>
           </div>
           <div className="flex gap-2 items-center">
@@ -258,7 +258,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
               required
               value={destName}
               onChange={(e) => setDestName(e.target.value)}
-              placeholder={geocoding === 'destination' ? 'Obteniendo nombre...' : 'Ciudad o dirección de destino'}
+              placeholder={geocoding === 'destination' ? 'Obteniendo nombre…' : 'Ciudad o dirección de destino'}
               className="field-input flex-1"
             />
             {destCoords && (
@@ -269,7 +269,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
                 title="Guardar como ubicación recurrente"
                 className="shrink-0 text-xs px-2 py-1.5 bg-muted hover:bg-accent border border-border rounded-lg transition-colors disabled:opacity-50"
               >
-                {savingLocation === 'destination' ? '...' : '⭐'}
+                {savingLocation === 'destination' ? '…' : '⭐'}
               </button>
             )}
           </div>
@@ -301,26 +301,29 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
             id="notes"
             name="notes"
             rows={3}
-            placeholder="Detalles adicionales del viaje..."
+            placeholder="Detalles adicionales del viaje…"
             className="field-input"
           />
         </div>
 
         {/* Factura de inicio */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">
+          <p className="text-sm font-medium text-foreground">
             Factura de Inicio <span className="text-muted-foreground font-normal">(opcional)</span>
-          </label>
+          </p>
           <input type="hidden" name="start_invoice_url" value={startInvoiceUrl} />
           <div
+            role="button"
+            tabIndex={0}
             className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
             onClick={() => invoiceInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') invoiceInputRef.current?.click(); }}
           >
             {invoiceFileName ? (
               <p className="text-sm text-green-600 font-medium">{invoiceFileName}</p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                {uploadingInvoice ? 'Subiendo...' : 'Clic para adjuntar factura (PDF, imagen)'}
+                {uploadingInvoice ? 'Subiendo…' : 'Clic para adjuntar factura (PDF, imagen)'}
               </p>
             )}
           </div>
@@ -346,7 +349,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
             disabled={isPending}
             className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
           >
-            {isPending ? 'Guardando...' : 'Crear Viaje'}
+            {isPending ? 'Guardando…' : 'Crear Viaje'}
           </button>
         </div>
       </form>

@@ -45,7 +45,7 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
           )}
 
           <div>
-            <label className="field-label">Tipo de Movimiento</label>
+            <p className="field-label">Tipo de Movimiento</p>
             <div className="flex gap-2 p-1 bg-muted rounded-lg">
               <button type="button" onClick={() => setType('in')} className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${type === 'in' ? 'bg-emerald-600 text-white' : 'text-muted-foreground hover:text-foreground'}`}>
                 Entrada

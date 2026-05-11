@@ -19,8 +19,8 @@ export default function DatabaseStatus() {
   if (status === 'loading') {
     return (
       <div className="fixed bottom-4 right-4 bg-card text-foreground p-3 rounded-lg shadow-lg text-xs flex items-center gap-2 z-50 border border-border">
-        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-        Checking DB Connection...
+        <div className="size-2 bg-yellow-400 rounded-full animate-pulse"></div>
+        Checking DB Connection…
       </div>
     );
   }
@@ -32,7 +32,7 @@ export default function DatabaseStatus() {
         : 'bg-red-900/90 text-red-100 border-red-700'
     }`}>
       <div className="flex items-center gap-2 font-semibold">
-        <div className={`w-2 h-2 rounded-full ${status === 'success' ? 'bg-green-400' : 'bg-red-400'}`}></div>
+        <div className={`size-2 rounded-full ${status === 'success' ? 'bg-green-400' : 'bg-red-400'}`}></div>
         {status === 'success' ? 'Database Connected' : 'Connection Failed'}
       </div>
       <p className="opacity-90">{message}</p>

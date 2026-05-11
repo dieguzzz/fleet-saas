@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
@@ -5,6 +6,8 @@ import { getEmployees } from '@/features/employees/actions';
 import EmployeeList from '@/features/employees/components/EmployeeList';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
+
+export const metadata: Metadata = { title: 'Empleados — Fleet SaaS' };
 
 export default async function EmployeesPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;

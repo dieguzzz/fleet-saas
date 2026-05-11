@@ -9,6 +9,8 @@ import ContactModal from '@/features/contacts/components/ContactModal';
 
 interface ContactOption { id: string; name: string; company: string | null }
 
+const EMPTY_CONTACTS: ContactOption[] = [];
+
 interface InvoiceFormProps {
   orgId: string;
   orgSlug: string;
@@ -17,8 +19,8 @@ interface InvoiceFormProps {
   contacts?: ContactOption[];
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = [] }: InvoiceFormProps) {
-  const router = useRouter();
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS }: InvoiceFormProps) {
+  const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [subtotal, setSubtotal] = useState(Number(invoice?.subtotal ?? 0));
@@ -100,8 +102,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
         invoiceId = result.data!.id;
       }
       if (file) await uploadFile(invoiceId);
-      router.push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
-      router.refresh();
+      push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
+      refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error inesperado');
       setLoading(false);
@@ -130,11 +132,12 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {/* Contacto (cliente o proveedor) */}
             <div>
-              <label className="field-label">
+              <label htmlFor="contact_id" className="field-label">
                 {invoiceType === 'cobro' ? 'Cliente' : 'Proveedor'}
               </label>
               <div className="flex gap-2">
                 <select
+                  id="contact_id"
                   value={contactId}
                   onChange={e => setContactId(e.target.value)}
                   className="field-input flex-1"
@@ -161,9 +164,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             <div className="form-grid-2">
               <div>
-                <label className="field-label">Número de Factura</label>
+                <label htmlFor="invoice_number" className="field-label">Número de Factura</label>
                 {isEditing ? (
                   <input
+                    id="invoice_number"
                     name="invoice_number"
                     type="text"
                     required
@@ -177,8 +181,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 )}
               </div>
               <div>
-                <label className="field-label">Estado</label>
-                <select name="status" defaultValue={invoice?.status ?? 'draft'} className="field-input">
+                <label htmlFor="status" className="field-label">Estado</label>
+                <select id="status" name="status" defaultValue={invoice?.status ?? 'draft'} className="field-input">
                   <option value="draft">Borrador</option>
                   <option value="sent">Enviada</option>
                   <option value="paid">Pagada</option>
@@ -187,8 +191,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 </select>
               </div>
               <div>
-                <label className="field-label">Fecha</label>
+                <label htmlFor="date" className="field-label">Fecha</label>
                 <input
+                  id="date"
                   name="date"
                   type="date"
                   required
@@ -197,14 +202,15 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 />
               </div>
               <div>
-                <label className="field-label">Fecha de Vencimiento</label>
-                <input name="due_date" type="date" defaultValue={invoice?.due_date ?? ''} className="field-input" />
+                <label htmlFor="due_date" className="field-label">Fecha de Vencimiento</label>
+                <input id="due_date" name="due_date" type="date" defaultValue={invoice?.due_date ?? ''} className="field-input" />
               </div>
             </div>
 
             <div>
-              <label className="field-label">Notas</label>
+              <label htmlFor="invoice_notes" className="field-label">Notas</label>
               <textarea
+                id="invoice_notes"
                 name="notes"
                 rows={2}
                 defaultValue={invoice?.notes ?? ''}
@@ -222,8 +228,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
           <div className="form-card space-y-3">
             <h3 className="text-sm font-semibold text-foreground">Importes</h3>
             <div>
-              <label className="field-label">Subtotal ($)</label>
+              <label htmlFor="subtotal" className="field-label">Subtotal ($)</label>
               <input
+                id="subtotal"
                 name="subtotal"
                 type="number"
                 min="0"
@@ -234,8 +241,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
               />
             </div>
             <div>
-              <label className="field-label">Impuestos ($)</label>
+              <label htmlFor="tax" className="field-label">Impuestos ($)</label>
               <input
+                id="tax"
                 name="tax"
                 type="number"
                 min="0"
@@ -259,7 +267,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {existingAttachment && !file && (
               <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
                 <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex-1 truncate">
@@ -272,9 +280,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             {file && (
               <div className="flex items-center gap-2 p-2.5 bg-blue-50 rounded-lg border border-blue-200">
                 {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="w-8 h-8 rounded object-cover border border-blue-200 shrink-0" />
+                  <img src={filePreview} alt="Preview" className="size-8 rounded object-cover border border-blue-200 shrink-0" />
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 )}
@@ -285,7 +293,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {!file && (
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -294,7 +305,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 }}
                 className="border-2 border-dashed border-border rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 <p className="text-xs text-muted-foreground">Arrastrá o <span className="text-primary underline">seleccioná</span></p>
@@ -315,7 +326,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             </button>
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => back()}
               className="w-full px-5 py-2.5 border border-border text-muted-foreground rounded-lg text-sm font-medium hover:bg-accent transition-colors"
             >
               Cancelar

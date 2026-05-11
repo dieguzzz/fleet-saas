@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams, usePathname } from 'next/navigation';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
@@ -174,7 +174,7 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
         />
 
         {/* Progressive backdrop (mobile only) */}
-        <motion.div
+        <m.div
           className="fixed inset-0 z-40 lg:hidden"
           style={{
             opacity: backdropOpacity,

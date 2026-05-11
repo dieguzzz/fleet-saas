@@ -9,7 +9,7 @@ export function ImpersonationBanner() {
   const isImpersonating = useIsImpersonating();
   const impersonatedOrg = useTenantStore((s) => s.impersonatedOrg);
   const stopImpersonationStore = useTenantStore((s) => s.stopImpersonation);
-  const router = useRouter();
+  const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
 
   if (!isImpersonating || !impersonatedOrg) return null;
@@ -18,8 +18,8 @@ export function ImpersonationBanner() {
     startTransition(async () => {
       await stopImpersonation();
       stopImpersonationStore();
-      router.push('/admin');
-      router.refresh();
+      push('/admin');
+      refresh();
     });
   };
 
@@ -27,7 +27,7 @@ export function ImpersonationBanner() {
     <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 px-4 py-2 flex items-center justify-between shadow-lg">
       <div className="flex items-center gap-2">
         <svg
-          className="w-5 h-5"
+          className="size-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

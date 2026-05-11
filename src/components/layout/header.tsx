@@ -2,7 +2,7 @@
 
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -15,7 +15,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const user = useTenantStore((s) => s.user);
 
   return (
-    <motion.header
+    <m.header
       className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900]"
       animate={{ y: isVisible ? 0 : -56 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -26,7 +26,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         className="lg:hidden p-2 -ml-1 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label="Abrir menú"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
@@ -58,7 +58,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
         {/* User avatar */}
         <div className="flex items-center gap-2 pl-1">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
+          <div className="size-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
             {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
           </div>
           <span className="hidden lg:block text-sm text-foreground font-medium max-w-[140px] truncate">
@@ -66,6 +66,6 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
           </span>
         </div>
       </div>
-    </motion.header>
+    </m.header>
   );
 }
