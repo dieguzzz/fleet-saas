@@ -110,7 +110,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
           <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-muted-foreground shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
           </svg>
-          <span>{isPdf(currentUrl) ? 'PDF adjunto' : 'Imagen adjunta'} — se muestra abajo</span>
+          <span>{isPdf(currentUrl) ? 'PDF adjunto' : 'Imagen adjunta'} &mdash; se muestra abajo</span>
         </div>
       )}
 
@@ -145,7 +145,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
               <p className="text-sm text-muted-foreground">
                 Arrastrá o <span className="text-blue-600 underline">seleccioná archivo</span>
               </p>
-              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF — máx. 10 MB</p>
+              <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF &mdash; máx. 10 MB</p>
             </>
           )}
           <input

@@ -24,8 +24,7 @@ export default async function EditInvoicePage({
   const invoiceType = (invoice as Invoice & { invoice_type?: string }).invoice_type === 'pago' ? 'pago' : 'cobro';
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
-    .filter(c => c.role === role)
-    .map(c => ({ id: c.id, name: c.name, company: c.company }));
+    .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company }] : []);
 
   return (
     <div className="space-y-6">
