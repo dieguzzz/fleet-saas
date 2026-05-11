@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { createClient } from '@/services/supabase/server';
 import { getTenants, getPaymentsByMonth } from '@/features/terrain/actions';
 import { TenantList } from '@/features/terrain/components/TenantList';
