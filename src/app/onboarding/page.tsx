@@ -16,7 +16,7 @@ export default function OnboardingPage() {
     if (state?.success && state.slug) {
       push(`/${state.slug}`);
     }
-  }, [state, router]);
+  }, [state, push]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
