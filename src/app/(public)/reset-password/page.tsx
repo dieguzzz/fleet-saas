@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
       const timer = setTimeout(() => push('/login'), 2000);
       return () => clearTimeout(timer);
     }
-  }, [state?.success, router]);
+  }, [state?.success, push]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
