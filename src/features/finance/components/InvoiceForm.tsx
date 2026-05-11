@@ -132,11 +132,12 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
 
             {/* Contacto (cliente o proveedor) */}
             <div>
-              <label className="field-label">
+              <label htmlFor="contact_id" className="field-label">
                 {invoiceType === 'cobro' ? 'Cliente' : 'Proveedor'}
               </label>
               <div className="flex gap-2">
                 <select
+                  id="contact_id"
                   value={contactId}
                   onChange={e => setContactId(e.target.value)}
                   className="field-input flex-1"
