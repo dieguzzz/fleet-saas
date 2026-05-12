@@ -262,6 +262,7 @@ export type Database = {
           organization_id: string
           price_per_liter: number
           station: string | null
+          subsidy_amount: number | null
           total_cost: number
           trip_id: string | null
           updated_at: string | null
@@ -279,6 +280,7 @@ export type Database = {
           organization_id: string
           price_per_liter: number
           station?: string | null
+          subsidy_amount?: number | null
           total_cost: number
           trip_id?: string | null
           updated_at?: string | null
@@ -296,6 +298,7 @@ export type Database = {
           organization_id?: string
           price_per_liter?: number
           station?: string | null
+          subsidy_amount?: number | null
           total_cost?: number
           trip_id?: string | null
           updated_at?: string | null

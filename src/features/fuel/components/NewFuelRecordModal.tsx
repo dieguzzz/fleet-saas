@@ -15,18 +15,23 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   const [open, setOpen] = useState(false);
   const [liters, setLiters] = useState('');
   const [pricePerLiter, setPricePerLiter] = useState('');
+  const [hasSubsidy, setHasSubsidy] = useState(false);
+  const [subsidyAmount, setSubsidyAmount] = useState('');
   const [state, formAction, isPending] = useActionState(
     async (prev: FuelFormState, fd: FormData) => createFuelRecord(prev, fd),
     {}
   );
 
   const total = liters && pricePerLiter ? (parseFloat(liters) * parseFloat(pricePerLiter)).toFixed(2) : '';
+  const netCost = total && hasSubsidy && subsidyAmount ? (parseFloat(total) - parseFloat(subsidyAmount)) : null;
 
   useEffect(() => {
     if (state.success) {
       setOpen(false);
       setLiters('');
       setPricePerLiter('');
+      setHasSubsidy(false);
+      setSubsidyAmount('');
     }
   }, [state.success]);
 
@@ -101,10 +106,66 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
               </div>
 
               {total.length > 0 && (
-                <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 flex justify-between items-center">
-                  <span className="text-sm text-primary font-medium">Total calculado</span>
-                  <span className="text-lg font-bold text-primary">${parseFloat(total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-primary font-medium">Total calculado</span>
+                    <span className={`text-lg font-bold text-primary ${netCost !== null ? 'line-through opacity-60' : ''}`}>
+                      ${parseFloat(total).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  {netCost !== null && (
+                    <>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-muted-foreground">Subsidio</span>
+                        <span className="text-emerald-600 dark:text-emerald-400">
+                          −${parseFloat(subsidyAmount).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center border-t border-primary/20 pt-1">
+                        <span className="text-sm font-semibold text-primary">Neto</span>
+                        <span className="text-lg font-bold text-primary">
+                          ${netCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <input
+                  id="has_subsidy"
+                  type="checkbox"
+                  checked={hasSubsidy}
+                  onChange={e => {
+                    setHasSubsidy(e.target.checked);
+                    if (!e.target.checked) setSubsidyAmount('');
+                  }}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <label htmlFor="has_subsidy" className="text-sm text-foreground font-medium select-none cursor-pointer">
+                  ¿Tiene subsidio?
+                </label>
+              </div>
+
+              {hasSubsidy ? (
+                <div>
+                  <label htmlFor="subsidy_amount" className="field-label">Monto del subsidio *</label>
+                  <input
+                    id="subsidy_amount"
+                    name="subsidy_amount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    value={subsidyAmount}
+                    onChange={e => setSubsidyAmount(e.target.value)}
+                    className="field-input"
+                    placeholder="5000.00"
+                  />
+                </div>
+              ) : (
+                <input type="hidden" name="subsidy_amount" value="" />
               )}
 
               <div className="grid grid-cols-2 gap-3">

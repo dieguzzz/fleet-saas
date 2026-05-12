@@ -235,6 +235,7 @@ export interface FuelRecord {
   liters: number;
   price_per_liter: number;
   total_cost: number;
+  subsidy_amount: number | null;
   odometer: number | null;
   station: string | null;
   fuel_date: string;

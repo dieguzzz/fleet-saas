@@ -33,7 +33,8 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
 
   const fuelRecords = (records ?? []) as unknown as {
     id: string; fuel_type: string; liters: number; price_per_liter: number; total_cost: number;
-    odometer: number | null; station: string | null; fuel_date: string; notes: string | null;
+    subsidy_amount: number | null; odometer: number | null; station: string | null;
+    fuel_date: string; notes: string | null;
     vehicle: { name: string; plate_number: string | null } | null;
     employee: { full_name: string } | null;
   }[];
@@ -65,6 +66,13 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
           label="Registros totales"
           value={(records ?? []).length}
         />
+        {stats.totalSubsidiesMonth > 0 && (
+          <StatCard
+            label="Subsidios este mes"
+            value={`$${fmt(stats.totalSubsidiesMonth)}`}
+            tone="success"
+          />
+        )}
       </div>
 
       <FuelList orgSlug={orgSlug} records={fuelRecords} />

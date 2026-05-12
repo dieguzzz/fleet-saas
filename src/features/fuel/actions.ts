@@ -17,6 +17,10 @@ const fuelSchema = z.object({
   station: z.string().optional(),
   fuel_date: z.string().min(1, 'La fecha es obligatoria'),
   notes: z.string().optional(),
+  subsidy_amount: z.preprocess(
+    (v: unknown) => (v === '' || v === null || v === undefined ? null : Number(v)),
+    z.number().nonnegative('El subsidio no puede ser negativo').nullable().optional()
+  ),
 });
 
 export type FuelFormState = { error?: string; success?: boolean };
@@ -40,6 +44,7 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
     station: formData.get('station') || undefined,
     fuel_date: formData.get('fuel_date'),
     notes: formData.get('notes') || undefined,
+    subsidy_amount: formData.get('subsidy_amount') || '',
   };
 
   const validated = fuelSchema.safeParse(raw);
@@ -57,6 +62,7 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
     station: validated.data.station || null,
     fuel_date: validated.data.fuel_date,
     notes: validated.data.notes || null,
+    subsidy_amount: validated.data.subsidy_amount ?? null,
   });
 
   if (error) {
@@ -96,11 +102,12 @@ export async function getFuelStats(orgId: string) {
 
   const [allTime, thisMonth] = await Promise.all([
     supabase.from('fuel_records').select('fuel_type, total_cost, liters').eq('organization_id', orgId),
-    supabase.from('fuel_records').select('fuel_type, total_cost, liters').eq('organization_id', orgId).gte('fuel_date', firstOfMonth),
+    supabase.from('fuel_records').select('fuel_type, total_cost, liters, subsidy_amount').eq('organization_id', orgId).gte('fuel_date', firstOfMonth),
   ]);
 
   const sum = (rows: { total_cost: number }[]) => rows.reduce((a, r) => a + r.total_cost, 0);
   const sumLiters = (rows: { liters: number }[]) => rows.reduce((a, r) => a + r.liters, 0);
+  const sumSubsidies = (rows: { subsidy_amount: number | null }[]) => rows.reduce((a, r) => a + (r.subsidy_amount ?? 0), 0);
 
   const diesel = (allTime.data ?? []).filter(r => r.fuel_type === 'diesel');
   const gasoline = (allTime.data ?? []).filter(r => r.fuel_type === 'gasoline' || r.fuel_type === 'gasoil');
@@ -108,6 +115,7 @@ export async function getFuelStats(orgId: string) {
   return {
     totalCostMonth: sum(thisMonth.data ?? []),
     totalLitersMonth: sumLiters(thisMonth.data ?? []),
+    totalSubsidiesMonth: sumSubsidies(thisMonth.data ?? []),
     totalCostDiesel: sum(diesel),
     totalCostGasoline: sum(gasoline),
     totalLitersDiesel: sumLiters(diesel),
