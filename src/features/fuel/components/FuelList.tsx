@@ -10,6 +10,7 @@ interface FuelRecord {
   liters: number;
   price_per_liter: number;
   total_cost: number;
+  subsidy_amount: number | null;
   odometer: number | null;
   station: string | null;
   fuel_date: string;
@@ -128,7 +129,17 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
                 </td>
                 <td className="px-4 py-3 text-right font-mono">{fmt(r.liters)} L</td>
                 <td className="px-4 py-3 text-right font-mono text-muted-foreground">${fmt(r.price_per_liter)}</td>
-                <td className="px-4 py-3 text-right font-semibold text-foreground">${fmt(r.total_cost)}</td>
+                <td className="px-4 py-3 text-right">
+                  {r.subsidy_amount ? (
+                    <div className="space-y-0.5">
+                      <p className="text-xs line-through text-muted-foreground">${fmt(r.total_cost)}</p>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400">−${fmt(r.subsidy_amount)}</p>
+                      <p className="font-semibold text-foreground">${fmt(r.total_cost - r.subsidy_amount)}</p>
+                    </div>
+                  ) : (
+                    <span className="font-semibold text-foreground">${fmt(r.total_cost)}</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-xs">{r.station ?? '-'}</td>
                 <td className="px-4 py-3 text-right text-xs">{r.odometer ? r.odometer.toLocaleString('es-AR') : '-'}</td>
                 <td className="px-4 py-3 text-right">
@@ -158,13 +169,24 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
             <div className="flex gap-4 text-sm">
               <div><p className="text-xs text-muted-foreground">Litros</p><p className="font-mono font-medium">{fmt(r.liters)} L</p></div>
               <div><p className="text-xs text-muted-foreground">$/L</p><p className="font-mono">${fmt(r.price_per_liter)}</p></div>
-              <div><p className="text-xs text-muted-foreground">Total</p><p className="font-semibold">${fmt(r.total_cost)}</p></div>
+              <div>
+                <p className="text-xs text-muted-foreground">Total</p>
+                {r.subsidy_amount ? (
+                  <div>
+                    <p className="text-xs line-through text-muted-foreground">${fmt(r.total_cost)}</p>
+                    <p className="font-semibold text-foreground">${fmt(r.total_cost - r.subsidy_amount)}</p>
+                  </div>
+                ) : (
+                  <p className="font-semibold">${fmt(r.total_cost)}</p>
+                )}
+              </div>
             </div>
             <div className="text-xs text-muted-foreground space-y-0.5">
               <p>📅 {formatDate(r.fuel_date)}</p>
               {r.employee && <p>👤 {r.employee.full_name}</p>}
               {r.station && <p>⛽ {r.station}</p>}
               {r.odometer && <p>🔢 {r.odometer.toLocaleString('es-AR')} km</p>}
+              {r.subsidy_amount && <p className="text-emerald-600 dark:text-emerald-400">💰 Subsidio: ${fmt(r.subsidy_amount)}</p>}
             </div>
             <div className="pt-1 border-t border-border">
               <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">
