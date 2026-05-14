@@ -1212,51 +1212,20 @@ export default function DogAnimation({
           </div>
         )}
 
-        {showHearts && (
-          <div className="particles-wrap">
-            {heartList.map(h => (
-              <span
-                key={h.id}
-                className="heart-particle"
-                style={{ '--delay': `${h.delay}s`, '--dx': `${h.dx}px` } as React.CSSProperties}
-              >
-                {h.emoji}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {showDirt && (
-          <div className="dirt-wrap">
-            <span className="dirt d1">🟤</span>
-            <span className="dirt d2">🟫</span>
-            <span className="dirt d3">🟤</span>
-          </div>
-        )}
-
-        {currentState === 'sleeping' && (
-          <div className="zzz-wrap">
-            <span className="zzz z1">z</span>
-            <span className="zzz z2">z</span>
-            <span className="zzz z3">Z</span>
-          </div>
-        )}
-
-        {isDancing && (
-          <div className="music-wrap">
-            <span className="note n1">🎵</span>
-            <span className="note n2">🎶</span>
-            <span className="note n3">🎵</span>
-          </div>
-        )}
-
-        {showPoop   && <div className="poop-emoji">💩</div>}
-        {showPee    && <div className="pee-puddle">💦</div>}
-        {showTrophy && <div className="trophy-emoji">🏆</div>}
-        {isSuperman && <div className="cape">🦸</div>}
-        {isSexy     && <div className="sexy-sparkle">✨</div>}
-
         <div className="dog-shadow" />
+
+        <div
+          className="dog-sprite w-[100px] h-[100px]"
+          style={{
+            ...dogStyle,
+            transform: currentDirection === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
+            filter:    spriteFilter || undefined,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
         <div
           className="dog-sprite w-[100px] h-[100px]"
