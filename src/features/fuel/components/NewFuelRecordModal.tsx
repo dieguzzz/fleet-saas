@@ -1,8 +1,9 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { createFuelRecord, type FuelFormState } from '@/features/fuel/actions';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/services/supabase/client';
 
 interface Vehicle { id: string; name: string; plate_number: string | null; }
 interface Employee { id: string; full_name: string; }
@@ -17,6 +18,10 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   const [pricePerLiter, setPricePerLiter] = useState('');
   const [hasSubsidy, setHasSubsidy] = useState(false);
   const [subsidyAmount, setSubsidyAmount] = useState('');
+  const [invoiceUrl, setInvoiceUrl] = useState('');
+  const [invoiceFileName, setInvoiceFileName] = useState('');
+  const [uploadingInvoice, setUploadingInvoice] = useState(false);
+  const invoiceInputRef = useRef<HTMLInputElement>(null);
   const [state, formAction, isPending] = useActionState(
     async (prev: FuelFormState, fd: FormData) => createFuelRecord(prev, fd),
     {}
@@ -25,14 +30,41 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   const total = liters && pricePerLiter ? (parseFloat(liters) * parseFloat(pricePerLiter)).toFixed(2) : '';
   const netCost = total && hasSubsidy && subsidyAmount ? (parseFloat(total) - parseFloat(subsidyAmount)) : null;
 
+  const handleInvoiceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingInvoice(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop();
+      const path = `fuel-invoices/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
+      setInvoiceUrl(data.publicUrl);
+      setInvoiceFileName(file.name);
+    } catch {
+      alert('Error subiendo la factura');
+    } finally {
+      setUploadingInvoice(false);
+    }
+  };
+
+  const resetForm = () => {
+    setLiters('');
+    setPricePerLiter('');
+    setHasSubsidy(false);
+    setSubsidyAmount('');
+    setInvoiceUrl('');
+    setInvoiceFileName('');
+  };
+
   useEffect(() => {
     if (state.success) {
       setOpen(false);
-      setLiters('');
-      setPricePerLiter('');
-      setHasSubsidy(false);
-      setSubsidyAmount('');
+      resetForm();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.success]);
 
   return (
@@ -184,8 +216,39 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
                 <textarea id="fuel_notes" name="notes" rows={2} className="field-input" placeholder="Observaciones..." />
               </div>
 
+              {/* Factura (opcional) */}
+              <div>
+                <p className="field-label">
+                  Factura <span className="text-muted-foreground font-normal">(opcional)</span>
+                </p>
+                <input type="hidden" name="invoice_url" value={invoiceUrl} />
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="border-2 border-dashed border-border rounded-lg p-3 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => invoiceInputRef.current?.click()}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') invoiceInputRef.current?.click(); }}
+                >
+                  {invoiceFileName ? (
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">{invoiceFileName}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {uploadingInvoice ? 'Subiendo…' : 'Clic para adjuntar factura (PDF, imagen)'}
+                    </p>
+                  )}
+                </div>
+                <input
+                  ref={invoiceInputRef}
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  className="hidden"
+                  onChange={handleInvoiceUpload}
+                  disabled={uploadingInvoice}
+                />
+              </div>
+
               <div className="flex gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">Cancelar</Button>
+                <Button type="button" variant="outline" onClick={() => { setOpen(false); resetForm(); }} className="flex-1">Cancelar</Button>
                 <Button type="submit" disabled={isPending || !total} className="flex-1">
                   {isPending ? 'Guardando...' : 'Guardar'}
                 </Button>

@@ -34,7 +34,7 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
   const fuelRecords = (records ?? []) as unknown as {
     id: string; fuel_type: string; liters: number; price_per_liter: number; total_cost: number;
     subsidy_amount: number | null; odometer: number | null; station: string | null;
-    fuel_date: string; notes: string | null;
+    fuel_date: string; notes: string | null; invoice_url: string | null;
     vehicle: { name: string; plate_number: string | null } | null;
     employee: { full_name: string } | null;
   }[];

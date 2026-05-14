@@ -17,6 +17,7 @@ const fuelSchema = z.object({
   station: z.string().optional(),
   fuel_date: z.string().min(1, 'La fecha es obligatoria'),
   notes: z.string().optional(),
+  invoice_url: z.string().optional().nullable().or(z.literal('')),
   subsidy_amount: z.preprocess(
     (v: unknown) => (v === '' || v === null || v === undefined ? null : Number(v)),
     z.number().nonnegative('El subsidio no puede ser negativo').nullable().optional()
@@ -44,6 +45,7 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
     station: formData.get('station') || undefined,
     fuel_date: formData.get('fuel_date'),
     notes: formData.get('notes') || undefined,
+    invoice_url: formData.get('invoice_url') || null,
     subsidy_amount: formData.get('subsidy_amount') || '',
   };
 
@@ -62,6 +64,7 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
     station: validated.data.station || null,
     fuel_date: validated.data.fuel_date,
     notes: validated.data.notes || null,
+    invoice_url: validated.data.invoice_url || null,
     subsidy_amount: validated.data.subsidy_amount ?? null,
   });
 

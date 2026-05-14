@@ -15,6 +15,7 @@ interface FuelRecord {
   station: string | null;
   fuel_date: string;
   notes: string | null;
+  invoice_url: string | null;
   vehicle: { name: string; plate_number: string | null } | null;
   employee: { full_name: string } | null;
 }
@@ -143,9 +144,16 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
                 <td className="px-4 py-3 text-xs">{r.station ?? '-'}</td>
                 <td className="px-4 py-3 text-right text-xs">{r.odometer ? r.odometer.toLocaleString('es-AR') : '-'}</td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">
-                    Eliminar
-                  </button>
+                  <div className="flex items-center justify-end gap-3">
+                    {r.invoice_url && (
+                      <a href={r.invoice_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:text-primary/80 font-medium">
+                        Factura
+                      </a>
+                    )}
+                    <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -188,7 +196,14 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
               {r.odometer && <p>🔢 {r.odometer.toLocaleString('es-AR')} km</p>}
               {r.subsidy_amount && <p className="text-emerald-600 dark:text-emerald-400">💰 Subsidio: ${fmt(r.subsidy_amount)}</p>}
             </div>
-            <div className="pt-1 border-t border-border">
+            <div className="pt-1 border-t border-border flex items-center justify-between">
+              {r.invoice_url ? (
+                <a href={r.invoice_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary font-medium">
+                  Ver factura
+                </a>
+              ) : (
+                <span />
+              )}
               <button onClick={() => handleDelete(r.id)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">
                 Eliminar
               </button>
