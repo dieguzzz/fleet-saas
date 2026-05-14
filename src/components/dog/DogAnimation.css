@@ -157,6 +157,20 @@
 .dog-bubble--sexy        { background: #fdf2f8; border-color: #f9a8d4; color: #9d174d; }
 .dog-bubble--sexy::after { background: #fdf2f8; border-color: #f9a8d4; }
 
+/* Bubble below the dog (for inline/header mode) */
+.dog-bubble--below {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+.dog-bubble--below::after {
+  bottom: auto;
+  top: -5px;
+  border-right: none;
+  border-bottom: none;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+}
+
 .pee-puddle {
   position: absolute;
   bottom: -4px;

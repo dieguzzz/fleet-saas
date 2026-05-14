@@ -3,6 +3,7 @@
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { m } from 'framer-motion';
+import DogAnimation from '@/components/dog/DogAnimation';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -16,7 +17,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
   return (
     <m.header
-      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900]"
+      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900] overflow-visible"
       animate={{ y: isVisible ? 0 : -56 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
@@ -36,8 +37,10 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
       </div>
 
-      {/* Spacer (desktop) */}
-      <div className="hidden lg:block flex-1" />
+      {/* Spacer + dog walking area (desktop) */}
+      <div className="hidden lg:block flex-1 relative self-stretch">
+        <DogAnimation inline dogSize={48} />
+      </div>
 
       {/* Right side */}
       <div className="flex items-center gap-2">

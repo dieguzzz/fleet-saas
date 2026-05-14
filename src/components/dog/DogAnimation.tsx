@@ -13,6 +13,10 @@ interface Props {
   selectedPosition?: string;
   selectedDept?: string;
   selectedGender?: 'M' | 'F' | '';
+  /** Mount inside a relative container (e.g. the header bar) instead of fixed at bottom */
+  inline?: boolean;
+  /** Sprite size in px (default 100). Use ~48 for the header bar. */
+  dogSize?: number;
 }
 
 export default function DogAnimation({
@@ -21,8 +25,10 @@ export default function DogAnimation({
   selectedPosition = '',
   selectedDept = '',
   selectedGender = '',
+  inline = false,
+  dogSize = 100,
 }: Props) {
-  const DOG_SIZE = 100;
+  const DOG_SIZE = dogSize;
   const SLEEP_DELAY = 3 * 60 * 1000;
   const ROTATION_KEY = 'pt_dog_rotation_v3';
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
@@ -1167,18 +1173,22 @@ export default function DogAnimation({
     showTransition ? 'transition-transform' : '',
   ].filter(Boolean).join(' ');
 
+  const containerStyle: React.CSSProperties = inline
+    ? { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible', zIndex: 10 }
+    : { position: 'fixed', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex: 9999 };
+
   return (
     <div
       ref={dogContainerRef}
-      className="dog-animation-root"
-      style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex: 9999 }}
+      className={inline ? undefined : 'dog-animation-root'}
+      style={containerStyle}
     >
       <div
         ref={dogWrapperRef}
         className={wrapperClassName}
         style={{
           position: 'absolute',
-          bottom: '-28px',
+          bottom: inline ? '0' : '-28px',
           transform: `translateX(${currentPixelPosition}px)`,
           transitionDuration:       showTransition ? `${moveDuration}s`  : undefined,
           transitionTimingFunction: showTransition ? 'ease-in-out'        : undefined,
@@ -1189,6 +1199,7 @@ export default function DogAnimation({
         {showTip && (
           <div className={[
             'dog-bubble',
+            inline                ? 'dog-bubble--below'  : '',
             isSleepState          ? 'dog-bubble--sleep'   : '',
             isZoomies || isHyper  ? 'dog-bubble--zoomies' : '',
             badMood               ? 'dog-bubble--grumpy'  : '',
