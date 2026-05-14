@@ -256,6 +256,7 @@ export type Database = {
           fuel_date: string
           fuel_type: string
           id: string
+          invoice_url: string | null
           liters: number
           notes: string | null
           odometer: number | null
@@ -274,6 +275,7 @@ export type Database = {
           fuel_date?: string
           fuel_type?: string
           id?: string
+          invoice_url?: string | null
           liters: number
           notes?: string | null
           odometer?: number | null
@@ -292,6 +294,7 @@ export type Database = {
           fuel_date?: string
           fuel_type?: string
           id?: string
+          invoice_url?: string | null
           liters?: number
           notes?: string | null
           odometer?: number | null
