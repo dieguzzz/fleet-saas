@@ -1,9 +1,13 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { m } from 'framer-motion';
 import DogAnimation from '@/components/dog/DogAnimation';
+import { readDogConfig, DOG_CONFIG_EVENT } from '@/lib/dogConfig';
+import type { DogUserConfig } from '@/lib/dogConfig';
+import type { DogBreed } from '@/components/dog/dogConstants';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -14,6 +18,17 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const organizations = useTenantStore((s) => s.organizations);
   const currentOrg = useCurrentOrg();
   const user = useTenantStore((s) => s.user);
+
+  const [dogCfg, setDogCfg] = useState<DogUserConfig | null>(null);
+  useEffect(() => {
+    setDogCfg(readDogConfig());
+    const sync = () => setDogCfg(readDogConfig());
+    window.addEventListener(DOG_CONFIG_EVENT, sync);
+    return () => window.removeEventListener(DOG_CONFIG_EVENT, sync);
+  }, []);
+
+  const dogSize      = dogCfg?.size ?? 53;
+  const forcedBreed  = (dogCfg?.breed && dogCfg.breed !== 'auto') ? dogCfg.breed as DogBreed : undefined;
 
   return (
     <m.header
@@ -39,7 +54,13 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
       {/* Spacer + dog walking area (desktop) */}
       <div className="hidden lg:block flex-1 relative self-stretch">
-        <DogAnimation inline dogSize={48} silent />
+        <DogAnimation
+          key={`${dogSize}-${forcedBreed ?? 'auto'}`}
+          inline
+          dogSize={dogSize}
+          forcedBreed={forcedBreed}
+          silent
+        />
       </div>
 
       {/* Right side */}
