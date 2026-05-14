@@ -39,7 +39,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
       {/* Spacer + dog walking area (desktop) */}
       <div className="hidden lg:block flex-1 relative self-stretch">
-        <DogAnimation inline dogSize={48} silent />
+        <DogAnimation inline dogSize={53} silent />
       </div>
 
       {/* Right side */}

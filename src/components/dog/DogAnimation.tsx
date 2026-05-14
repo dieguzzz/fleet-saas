@@ -152,13 +152,14 @@ export default function DogAnimation({
     const url    = `/assets_dog/Pet Dogs Pack/${breed.folder}/${breed.prefix}${fileName}.png`;
     const endPos = -(action.width * (DOG_SIZE / 100));
     return {
-      backgroundImage: `url('${url}')`,
-      backgroundSize:  `auto ${DOG_SIZE}px`,
+      backgroundImage:    `url('${url}')`,
+      backgroundSize:     `auto ${DOG_SIZE}px`,
+      backgroundPositionX: '0px',
       width:  `${DOG_SIZE}px`,
       height: `${DOG_SIZE}px`,
       ['--sprite-width' as string]: `${endPos}px`,
       animation: action.frames > 1
-        ? `play-sprite ${action.duration} steps(${action.frames}) infinite`
+        ? `play-sprite ${action.duration} steps(${action.frames}) infinite both`
         : 'none',
     };
   }, [currentBreed, currentState]);
@@ -1192,6 +1193,7 @@ export default function DogAnimation({
         style={{
           position: 'absolute',
           bottom: inline ? '0' : '-28px',
+          width: `${DOG_SIZE}px`,
           transform: `translateX(${currentPixelPosition}px)`,
           transitionDuration:       showTransition ? `${moveDuration}s`  : undefined,
           transitionTimingFunction: showTransition ? 'ease-in-out'        : undefined,
