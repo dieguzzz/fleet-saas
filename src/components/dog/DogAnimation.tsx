@@ -1226,16 +1226,3 @@ export default function DogAnimation({
     </div>
   );
 }
-
-        <div
-          className="dog-sprite w-[100px] h-[100px]"
-          style={{
-            ...dogStyle,
-            transform: currentDirection === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
-            filter:    spriteFilter || undefined,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
