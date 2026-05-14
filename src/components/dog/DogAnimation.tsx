@@ -15,10 +15,12 @@ interface Props {
   selectedGender?: 'M' | 'F' | '';
   /** Mount inside a relative container (e.g. the header bar) instead of fixed at bottom */
   inline?: boolean;
-  /** Sprite size in px (default 100). Use ~48 for the header bar. */
+  /** Sprite size in px (default 100). Use ~53 for the header bar. */
   dogSize?: number;
   /** Suppress all speech bubbles — dog just animates silently */
   silent?: boolean;
+  /** Skip daily rotation and use this breed directly */
+  forcedBreed?: DogBreed;
 }
 
 export default function DogAnimation({
@@ -30,6 +32,7 @@ export default function DogAnimation({
   inline = false,
   dogSize = 100,
   silent = false,
+  forcedBreed,
 }: Props) {
   const DOG_SIZE = dogSize;
   const silentRef = useRef(silent);
@@ -189,7 +192,7 @@ export default function DogAnimation({
   }
 
   function clamp() {
-    const max = containerWidthRef.current - 125;
+    const max = containerWidthRef.current - DOG_SIZE - 25;
     const pos = currentPixelPositionRef.current;
     if (pos > max) updatePosition(max);
     else if (pos < 0) updatePosition(0);
@@ -485,7 +488,7 @@ export default function DogAnimation({
     const goRight = currentPixelPositionRef.current < containerWidthRef.current / 2;
     updateDirection(goRight ? 'right' : 'left');
     updateDuration(2.2);
-    updatePosition(goRight ? Math.max(25, containerWidthRef.current - 125) : 25);
+    updatePosition(goRight ? Math.max(25, containerWidthRef.current - DOG_SIZE - 25) : 25);
     const id = setTimeout(() => {
       if (!isDestroyedRef.current) { updateSuperman(false); updateState('idle'); scheduleNext(1000); }
     }, 2500);
@@ -644,7 +647,7 @@ export default function DogAnimation({
     const goRight   = laps % 2 === 0
       ? currentPixelPositionRef.current < containerWidthRef.current / 2
       : currentPixelPositionRef.current >= containerWidthRef.current / 2;
-    const targetPos = goRight ? Math.max(25, containerWidthRef.current - 125) : 25;
+    const targetPos = goRight ? Math.max(25, containerWidthRef.current - DOG_SIZE - 25) : 25;
 
     updateDirection(goRight ? 'right' : 'left');
     updateDuration(0.55);
@@ -683,7 +686,7 @@ export default function DogAnimation({
     const goRight   = lap % 2 === 0
       ? currentPixelPositionRef.current < containerWidthRef.current / 2
       : currentPixelPositionRef.current >= containerWidthRef.current / 2;
-    const targetPos = goRight ? Math.max(25, containerWidthRef.current - 125) : 25;
+    const targetPos = goRight ? Math.max(25, containerWidthRef.current - DOG_SIZE - 25) : 25;
     updateDirection(goRight ? 'right' : 'left');
     updateDuration(0.4); updateState('running'); updatePosition(targetPos);
     spawnPawTrail(currentPixelPositionRef.current, targetPos, 400);
@@ -782,7 +785,7 @@ export default function DogAnimation({
     const container = dogContainerRef.current;
     if (!container) return;
     const cRect   = container.getBoundingClientRect();
-    const targetX = Math.max(25, Math.min(mouseClientX - cRect.left - 50, containerWidthRef.current - 125));
+    const targetX = Math.max(25, Math.min(mouseClientX - cRect.left - DOG_SIZE / 2, containerWidthRef.current - DOG_SIZE - 25));
 
     updateDirection(targetX > currentPixelPositionRef.current ? 'right' : 'left');
     const dist     = Math.abs(targetX - currentPixelPositionRef.current);
@@ -870,13 +873,18 @@ export default function DogAnimation({
 
   async function initBreedRotation() {
     if (typeof window === 'undefined') return;
+    // If the user pinned a specific breed, skip rotation
+    if (forcedBreed) {
+      await loadBreed(forcedBreed);
+      if (!isDestroyedRef.current) { isReadyRef.current = true; setIsReady(true); }
+      return;
+    }
     const breedKeys = Object.keys(BREEDS) as DogBreed[];
     try {
-      const today = new Date().toDateString(); // e.g. "Wed May 14 2026"
+      const today = new Date().toDateString();
       const stored = localStorage.getItem(ROTATION_KEY);
       let data: { breed: string; date: string } | null = stored ? JSON.parse(stored) : null;
       if (!data || data.date !== today) {
-        // Deterministic per day: day-number mod total breeds
         const dayNum = Math.floor(Date.now() / 86_400_000);
         const idx    = dayNum % breedKeys.length;
         data = { breed: breedKeys[idx], date: today };
@@ -917,7 +925,7 @@ export default function DogAnimation({
     const container = dogContainerRef.current;
     if (!container) return;
     const cRect = container.getBoundingClientRect();
-    const newX  = Math.max(25, Math.min(event.clientX - cRect.left - 50, containerWidthRef.current - 125));
+    const newX  = Math.max(0, Math.min(event.clientX - cRect.left - DOG_SIZE / 2, containerWidthRef.current - DOG_SIZE));
     updateDuration(0); updatePosition(newX);
   }
 

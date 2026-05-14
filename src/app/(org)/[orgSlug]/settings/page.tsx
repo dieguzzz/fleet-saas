@@ -1,5 +1,6 @@
 import OrganizationSettingsForm from '@/features/settings/components/OrganizationSettingsForm';
 import OrgLogoUpload from '@/features/settings/components/OrgLogoUpload';
+import DogSettingsPanel from '@/features/settings/components/DogSettingsPanel';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -40,6 +41,17 @@ export default async function SettingsPage({
         <div className="border-t border-border pt-5">
           <OrganizationSettingsForm orgSlug={orgSlug} orgName={org.name} />
         </div>
+      </div>
+
+      {/* Dog mascot */}
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
+        <div>
+          <h2 className="text-base font-semibold text-foreground">Mascota de escritorio</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Personaliza el perrito que camina en la barra de navegación.
+          </p>
+        </div>
+        <DogSettingsPanel />
       </div>
 
       {/* Notifications shortcut */}
