@@ -17,6 +17,8 @@ interface Props {
   inline?: boolean;
   /** Sprite size in px (default 100). Use ~48 for the header bar. */
   dogSize?: number;
+  /** Suppress all speech bubbles — dog just animates silently */
+  silent?: boolean;
 }
 
 export default function DogAnimation({
@@ -27,8 +29,11 @@ export default function DogAnimation({
   selectedGender = '',
   inline = false,
   dogSize = 100,
+  silent = false,
 }: Props) {
   const DOG_SIZE = dogSize;
+  const silentRef = useRef(silent);
+  useEffect(() => { silentRef.current = silent; }, [silent]);
   const SLEEP_DELAY = 3 * 60 * 1000;
   const ROTATION_KEY = 'pt_dog_rotation_v3';
   const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
@@ -191,6 +196,7 @@ export default function DogAnimation({
 
   // ── Speech bubbles ────────────────────────────────────────────────────
   function showMsgDirect(msg: string) {
+    if (silentRef.current) return;
     setShowTip(false);
     const id0 = setTimeout(() => {
       if (isDestroyedRef.current) return;
@@ -203,6 +209,7 @@ export default function DogAnimation({
   }
 
   function showStateMessage(key: string) {
+    if (silentRef.current) return;
     const breedArr   = BREED_MSGS[currentBreedRef.current]?.[key];
     const genericArr = MSGS[key];
     const arr = breedArr && breedArr.length && Math.random() < 0.65
@@ -862,24 +869,20 @@ export default function DogAnimation({
 
   async function initBreedRotation() {
     if (typeof window === 'undefined') return;
-    const INTERVAL  = 1_800_000;
     const breedKeys = Object.keys(BREEDS) as DogBreed[];
     try {
+      const today = new Date().toDateString(); // e.g. "Wed May 14 2026"
       const stored = localStorage.getItem(ROTATION_KEY);
-      let data: { breed: string; timestamp: number } | null = stored ? JSON.parse(stored) : null;
-      const now = Date.now();
-      if (!data || now - data.timestamp > INTERVAL) {
-        let idx = Math.floor(Math.random() * breedKeys.length);
-        if (data && breedKeys.length > 1) {
-          while (breedKeys[idx] === data.breed) idx = Math.floor(Math.random() * breedKeys.length);
-        }
-        data = { breed: breedKeys[idx], timestamp: now };
+      let data: { breed: string; date: string } | null = stored ? JSON.parse(stored) : null;
+      if (!data || data.date !== today) {
+        // Deterministic per day: day-number mod total breeds
+        const dayNum = Math.floor(Date.now() / 86_400_000);
+        const idx    = dayNum % breedKeys.length;
+        data = { breed: breedKeys[idx], date: today };
         localStorage.setItem(ROTATION_KEY, JSON.stringify(data));
       }
       await loadBreed((data.breed as DogBreed) || breedKeys[0]);
       if (!isDestroyedRef.current) { isReadyRef.current = true; setIsReady(true); }
-      const id = setTimeout(() => initBreedRotation(), Math.max(0, INTERVAL - (now - data.timestamp)) + 1000);
-      timeoutIdsRef.current.push(id);
     } catch {
       await loadBreed('Dog-1-Golden-Retriever');
       if (!isDestroyedRef.current) { isReadyRef.current = true; setIsReady(true); }
