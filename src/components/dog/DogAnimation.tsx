@@ -276,6 +276,7 @@ export default function DogAnimation({
   }
 
   function spawnPawTrail(fromX: number, toX: number, durationMs: number) {
+    if (inline) return; // paw prints look wrong in the header bar
     const dist      = Math.abs(toX - fromX);
     const numPrints = Math.min(Math.floor(dist / 65), 12);
     if (numPrints < 1) return;
@@ -1225,7 +1226,8 @@ export default function DogAnimation({
         <div className="dog-shadow" />
 
         <div
-          className="dog-sprite w-[100px] h-[100px]"
+          key={currentState}
+          className="dog-sprite"
           style={{
             ...dogStyle,
             transform: currentDirection === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
