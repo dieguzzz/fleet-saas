@@ -102,10 +102,6 @@
   -webkit-user-select: none;
 }
 
-@media (max-width: 768px) {
-  .dog-animation-root { display: none !important; }
-}
-
 .dog-jumping  { animation: dog-jump    0.7s cubic-bezier(.36,.07,.19,.97); }
 .dog-superman { animation: superman-fly 2.4s ease-in-out; }
 .dog-hyper .dog-sprite { animation: hyper-shake 0.25s linear infinite !important; }
