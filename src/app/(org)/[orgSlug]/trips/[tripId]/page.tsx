@@ -62,7 +62,7 @@ export default async function TripDetailPage({
             Viaje a {trip.destination}
           </h1>
           <p className="text-muted-foreground">
-            {new Date(trip.started_at || '').toLocaleDateString()} &bull;{' '}
+            {trip.started_at ? (() => { const [y,m,d] = trip.started_at.split('T')[0].split('-'); return `${d}/${m}/${y}`; })() : ''} &bull;{' '}
             {trip.vehicle?.name} ({trip.vehicle?.plate_number})
           </p>
         </div>

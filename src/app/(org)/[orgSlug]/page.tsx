@@ -143,14 +143,21 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
   type MaintRow = { id: string; type: string; performed_at: string; vehicle_id: string };
   type InvRow = { id: string; invoice_number: string; status: string | null; date: string; invoice_type: string };
 
-  type ActivityItem = { id: string; text: string; time: string; type: 'success' | 'warning' | 'info'; href: string };
+  function formatDate(dateStr: string | null) {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('T')[0].split('-');
+    return `${day}/${month}/${year}`;
+  }
+
+  type ActivityItem = { id: string; text: string; time: string; rawTime: string; type: 'success' | 'warning' | 'info'; href: string };
   const items: ActivityItem[] = [];
 
   for (const t of (trips as unknown as TripRow[] | null) ?? []) {
     items.push({
       id: `trip-${t.id}`,
       text: `Viaje: ${t.origin} → ${t.destination}`,
-      time: t.updated_at ? new Date(t.updated_at).toLocaleDateString('es', { day: '2-digit', month: 'short' }) : '',
+      time: formatDate(t.updated_at),
+      rawTime: t.updated_at ?? '',
       type: t.status === 'completed' ? 'success' : t.status === 'in_progress' ? 'info' : 'warning',
       href: `/${orgSlug}/trips/${t.id}`,
     });
@@ -160,7 +167,8 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     items.push({
       id: `maint-${m.id}`,
       text: `Mantenimiento: ${m.type}`,
-      time: m.performed_at ? new Date(m.performed_at).toLocaleDateString('es', { day: '2-digit', month: 'short' }) : '',
+      time: formatDate(m.performed_at),
+      rawTime: m.performed_at ?? '',
       type: 'warning',
       href: `/${orgSlug}/maintenance`,
     });
@@ -170,13 +178,14 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     items.push({
       id: `inv-${inv.id}`,
       text: `Factura ${inv.invoice_number} (${inv.invoice_type === 'pago' ? 'Pago' : 'Cobro'})`,
-      time: inv.date ? new Date(inv.date).toLocaleDateString('es', { day: '2-digit', month: 'short' }) : '',
+      time: formatDate(inv.date),
+      rawTime: inv.date ?? '',
       type: inv.status === 'paid' ? 'success' : inv.status === 'overdue' ? 'warning' : 'info',
       href: `/${orgSlug}/finance/invoices/${inv.id}`,
     });
   }
 
-  items.sort((a, b) => b.time.localeCompare(a.time));
+  items.sort((a, b) => b.rawTime.localeCompare(a.rawTime));
   const recent = items.slice(0, 6);
 
   const dotColor = { success: 'bg-emerald-500', warning: 'bg-amber-500', info: 'bg-blue-500' };

@@ -82,7 +82,7 @@ export function TripList({ trips, orgSlug }: TripListProps) {
                 </span>
               </TableCell>
               <TableCell>
-                {trip.started_at ? new Date(trip.started_at).toLocaleDateString() : '-'}
+                {trip.started_at ? (() => { const [y,m,d] = trip.started_at.split('T')[0].split('-'); return `${d}/${m}/${y}`; })() : '-'}
               </TableCell>
               <TableCell className="text-right">
                 <Button asChild variant="ghost" size="sm">

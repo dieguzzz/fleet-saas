@@ -1226,7 +1226,7 @@ export default function DogAnimation({
           </div>
         )}
 
-        <div className="dog-shadow" />
+        {!inline && <div className="dog-shadow" />}
 
         <div
           key={currentState}
