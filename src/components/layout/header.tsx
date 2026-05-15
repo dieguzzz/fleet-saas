@@ -63,15 +63,6 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         />
       </div>
 
-      {/* Dog walking area (mobile — fixed at bottom of screen) */}
-      <div className="lg:hidden">
-        <DogAnimation
-          key={`mobile-${forcedBreed ?? 'auto'}`}
-          dogSize={80}
-          forcedBreed={forcedBreed}
-        />
-      </div>
-
       {/* Right side */}
       <div className="flex items-center gap-2">
         {/* Org switcher — only if multiple orgs */}
