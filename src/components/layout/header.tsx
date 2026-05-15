@@ -55,11 +55,20 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
       {/* Spacer + dog walking area (desktop) */}
       <div className="hidden lg:block flex-1 relative h-14">
         <DogAnimation
-          key={`${dogSize}-${forcedBreed ?? 'auto'}`}
+          key={`desktop-${dogSize}-${forcedBreed ?? 'auto'}`}
           inline
           dogSize={dogSize}
           forcedBreed={forcedBreed}
           silent
+        />
+      </div>
+
+      {/* Dog walking area (mobile — fixed at bottom of screen) */}
+      <div className="lg:hidden">
+        <DogAnimation
+          key={`mobile-${forcedBreed ?? 'auto'}`}
+          dogSize={80}
+          forcedBreed={forcedBreed}
         />
       </div>
 
