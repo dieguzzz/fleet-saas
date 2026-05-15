@@ -52,6 +52,18 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
       </div>
 
+      {/* Dog walking area (mobile) — absolute so it doesn't push layout */}
+      <div className="lg:hidden absolute inset-x-0 inset-y-0 pointer-events-none overflow-visible" style={{ zIndex: 5 }}>
+        <DogAnimation
+          key={`mobile-${dogSize}-${forcedBreed ?? 'auto'}`}
+          inline
+          dogSize={Math.min(dogSize, 48)}
+          forcedBreed={forcedBreed}
+          silent
+          muted
+        />
+      </div>
+
       {/* Spacer + dog walking area (desktop) */}
       <div className="hidden lg:block flex-1 relative h-14">
         <DogAnimation
