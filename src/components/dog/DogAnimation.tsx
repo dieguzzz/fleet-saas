@@ -21,6 +21,8 @@ interface Props {
   silent?: boolean;
   /** Skip daily rotation and use this breed directly */
   forcedBreed?: DogBreed;
+  /** Override z-index of the fixed container (default 9999) */
+  zIndex?: number;
 }
 
 export default function DogAnimation({
@@ -33,6 +35,7 @@ export default function DogAnimation({
   dogSize = 100,
   silent = false,
   forcedBreed,
+  zIndex = 9999,
 }: Props) {
   const DOG_SIZE = dogSize;
   const silentRef = useRef(silent);
@@ -1188,7 +1191,7 @@ export default function DogAnimation({
 
   const containerStyle: React.CSSProperties = inline
     ? { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible', zIndex: 10 }
-    : { position: 'fixed', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex: 9999 };
+    : { position: 'fixed', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex };
 
   return (
     <div

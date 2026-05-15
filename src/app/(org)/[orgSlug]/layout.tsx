@@ -9,6 +9,9 @@ import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
 import type { Organization, Profile, OrgRole } from '@/types/database';
+import DogAnimation from '@/components/dog/DogAnimation';
+import { readDogConfig, DOG_CONFIG_EVENT } from '@/lib/dogConfig';
+import type { DogBreed } from '@/components/dog/dogConstants';
 
 const SIDEBAR_WIDTH = 288; // w-72
 
@@ -28,6 +31,7 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [mobileDogBreed, setMobileDogBreed] = useState<DogBreed | undefined>(undefined);
   const lastScrollY = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -98,6 +102,18 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
     }
     lastScrollY.current = currentY;
   }
+
+  // Dog config for mobile
+  useEffect(() => {
+    const cfg = readDogConfig();
+    setMobileDogBreed((cfg?.breed && cfg.breed !== 'auto') ? cfg.breed as DogBreed : undefined);
+    const sync = () => {
+      const updated = readDogConfig();
+      setMobileDogBreed((updated?.breed && updated.breed !== 'auto') ? updated.breed as DogBreed : undefined);
+    };
+    window.addEventListener(DOG_CONFIG_EVENT, sync);
+    return () => window.removeEventListener(DOG_CONFIG_EVENT, sync);
+  }, []);
 
   // Close sidebar when navigating
   useEffect(() => {
@@ -211,6 +227,16 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
             </div>
           </main>
         </div>
+      </div>
+
+      {/* Mobile dog — rendered here (outside any CSS transform) so position:fixed works correctly */}
+      <div className="lg:hidden">
+        <DogAnimation
+          key={`mobile-${mobileDogBreed ?? 'auto'}`}
+          dogSize={80}
+          forcedBreed={mobileDogBreed}
+          zIndex={30}
+        />
       </div>
     </div>
   );
