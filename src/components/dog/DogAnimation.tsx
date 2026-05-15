@@ -155,8 +155,14 @@ export default function DogAnimation({
     if (!action || !breed) return {};
     let fileName = STATE_TO_FILE[action.name];
     if (action.name === 'idle' && breed.idleCase === 'Idle') fileName = 'Idle';
-    const url    = `/assets_dog/Pet Dogs Pack/${breed.folder}/${breed.prefix}${fileName}.png`;
-    const endPos = -(action.width * (DOG_SIZE / 100));
+    const url       = `/assets_dog/Pet Dogs Pack/${breed.folder}/${breed.prefix}${fileName}.png`;
+    const frameW    = DOG_SIZE;
+    // For looping animations, slide from 0 to -N*frameW with steps(N) so frames cycle 0..N-1.
+    // For one-shot animations, slide from 0 to -(N-1)*frameW with steps(N, jump-none) and
+    // animation-fill-mode: forwards, so the final visible frame is the last sprite frame.
+    const endPos = action.oneShot
+      ? -(action.frames - 1) * frameW
+      : -action.frames * frameW;
     return {
       backgroundImage:    `url('${url}')`,
       backgroundSize:     `auto ${DOG_SIZE}px`,
@@ -165,7 +171,9 @@ export default function DogAnimation({
       height: `${DOG_SIZE}px`,
       ['--sprite-width' as string]: `${endPos}px`,
       animation: action.frames > 1
-        ? `play-sprite ${action.duration} steps(${action.frames}) infinite both`
+        ? action.oneShot
+          ? `play-sprite ${action.duration} steps(${action.frames}, jump-none) 1 forwards`
+          : `play-sprite ${action.duration} steps(${action.frames}) infinite both`
         : 'none',
     };
   }, [currentBreed, currentState]);
@@ -1175,7 +1183,10 @@ export default function DogAnimation({
   }, [selectedName, selectedPosition, selectedDept, selectedGender]);
 
   // ── Render ────────────────────────────────────────────────────────────
-  const showTransition = isMoving && !isZoomies && !isSuperman && !isDragging;
+  // Need the CSS transition active during zoomies and superman too — otherwise the wrapper
+  // teleports to the target instead of sliding across. Dragging keeps duration=0 so it follows
+  // the cursor instantly even with the transition class on.
+  const showTransition = (isMoving || isZoomies || isSuperman) && !isDragging;
 
   const wrapperClassName = [
     'cursor-pointer pointer-events-auto dog-wrapper',

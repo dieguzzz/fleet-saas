@@ -6,7 +6,7 @@ export type DogBreed =
   | 'Dog-1-Golden-Retriever' | 'Dog-2-Akita' | 'Dog-3-Great-Dane'
   | 'Dog-4-Schnauzer' | 'Dog-5-Saint-Bernard' | 'Dog-6-Siberian-Husky';
 
-export interface DogAction { name: DogState; frames: number; width: number; duration: string; }
+export interface DogAction { name: DogState; frames: number; width: number; duration: string; oneShot?: boolean; }
 export interface DogConfig { folder: string; prefix: string; idleCase: 'idle' | 'Idle'; }
 
 export const STATE_TO_FILE: Record<DogState, string> = {
@@ -23,8 +23,8 @@ export const ACTIONS: DogAction[] = [
   { name: 'barking',    frames: 3,  width: 300,  duration: '0.6s'  },
   { name: 'licking',    frames: 4,  width: 400,  duration: '0.7s'  },
   { name: 'itching',    frames: 2,  width: 200,  duration: '0.8s'  },
-  { name: 'stretching', frames: 10, width: 1000, duration: '1.2s'  },
-  { name: 'lying-down', frames: 7,  width: 700,  duration: '1.0s'  },
+  { name: 'stretching', frames: 10, width: 1000, duration: '1.2s', oneShot: true },
+  { name: 'lying-down', frames: 7,  width: 700,  duration: '1.0s', oneShot: true },
   { name: 'sleeping',   frames: 1,  width: 100,  duration: '0s'    },
 ];
 
