@@ -12,8 +12,7 @@ import type { Organization, Profile, OrgRole } from '@/types/database';
 import DogAnimation from '@/components/dog/DogAnimation';
 import { readDogConfig, DOG_CONFIG_EVENT } from '@/lib/dogConfig';
 import type { DogBreed } from '@/components/dog/dogConstants';
-
-const SIDEBAR_WIDTH = 288; // w-72
+import { toast } from 'sonner';
 
 interface OrgLayoutProps {
   children: ReactNode;
@@ -41,10 +40,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   const backdropBlurPx = useTransform(sidebarProgress, [0, 1], [0, 6]);
   const backdropFilter = useTransform(backdropBlurPx, (v) => `blur(${v}px)`);
 
-  const isDragging = useRef(false);
-  const dragStartX = useRef(0);
-  const dragStartProgress = useRef(0);
-
   function openSidebar() {
     animate(sidebarProgress, 1, { type: 'spring', stiffness: 300, damping: 30 });
     setIsMobileMenuOpen(true);
@@ -53,40 +48,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   function closeSidebar() {
     animate(sidebarProgress, 0, { type: 'spring', stiffness: 300, damping: 30 });
     setIsMobileMenuOpen(false);
-  }
-
-  function handleTouchStart(e: React.TouchEvent) {
-    const touchX = e.touches[0].clientX;
-    const currentProgress = sidebarProgress.get();
-    // Drag from left edge to open, or drag sidebar to close
-    if (touchX < 40 || (isMobileMenuOpen && touchX < SIDEBAR_WIDTH + 20)) {
-      isDragging.current = true;
-      dragStartX.current = touchX;
-      dragStartProgress.current = currentProgress;
-    }
-  }
-
-  function handleTouchMove(e: React.TouchEvent) {
-    if (!isDragging.current) return;
-    const touchX = e.touches[0].clientX;
-    const delta = touchX - dragStartX.current;
-    const newProgress = Math.max(0, Math.min(1, dragStartProgress.current + delta / SIDEBAR_WIDTH));
-    sidebarProgress.set(newProgress);
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    const touchX = e.changedTouches[0].clientX;
-    const velocity = touchX - dragStartX.current;
-    const currentProgress = sidebarProgress.get();
-
-    // Snap based on position + velocity
-    if (currentProgress > 0.5 || velocity > 50) {
-      openSidebar();
-    } else {
-      closeSidebar();
-    }
   }
 
   // Header scroll-hide
@@ -126,6 +87,26 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
+
+  // Double-back-to-exit for mobile: push a sentinel history entry so the first
+  // back gesture shows a toast instead of leaving the app.
+  useEffect(() => {
+    history.pushState({ fleet_sentinel: true }, '');
+    let lastBackTime = 0;
+
+    function onPopState(e: PopStateEvent) {
+      if ((e.state as { fleet_sentinel?: boolean } | null)?.fleet_sentinel) {
+        const now = Date.now();
+        if (now - lastBackTime < 2000) return;
+        lastBackTime = now;
+        history.pushState({ fleet_sentinel: true }, '');
+        toast('Desliza de nuevo para salir', { duration: 2000 });
+      }
+    }
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => {
     const loadTenantData = async () => {
@@ -177,9 +158,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   return (
     <div
       className={`h-screen flex flex-col bg-background overflow-hidden ${isImpersonating ? '' : ''}`}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       <ImpersonationBanner />
       <div className="flex flex-1 min-h-0">
@@ -201,16 +179,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
           onClick={() => { if (isMobileMenuOpen) closeSidebar(); }}
           onTouchStart={(e) => { if (isMobileMenuOpen) e.stopPropagation(); }}
         />
-
-        {/* Edge handle — visible when sidebar closed on mobile */}
-        {!isMobileMenuOpen && (
-          <div
-            className="fixed left-0 top-1/2 -translate-y-1/2 z-50 lg:hidden"
-            style={{ width: 4, height: 48 }}
-          >
-            <div className="w-full h-full bg-foreground/20 rounded-r-full" />
-          </div>
-        )}
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <Header
