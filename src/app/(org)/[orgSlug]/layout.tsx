@@ -26,8 +26,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   const isImpersonating = useTenantStore((s) => s.isImpersonating);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const lastScrollY = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
 
   // Motion value: 0 = sidebar closed, 1 = sidebar fully open
@@ -44,20 +42,6 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   function closeSidebar() {
     animate(sidebarProgress, 0, { type: 'spring', stiffness: 300, damping: 30 });
     setIsMobileMenuOpen(false);
-  }
-
-  // Header scroll-hide
-  function handleScroll() {
-    const el = mainRef.current;
-    if (!el) return;
-    const currentY = el.scrollTop;
-    const delta = currentY - lastScrollY.current;
-    if (delta > 8 && currentY > 60) {
-      setIsHeaderVisible(false);
-    } else if (delta < -8) {
-      setIsHeaderVisible(true);
-    }
-    lastScrollY.current = currentY;
   }
 
   // Close sidebar when navigating
@@ -167,11 +151,9 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
           <Header
             onMenuToggle={() => isMobileMenuOpen ? closeSidebar() : openSidebar()}
-            isVisible={isHeaderVisible}
           />
           <main
             ref={mainRef}
-            onScroll={handleScroll}
             className="flex-1 overflow-y-auto p-4 lg:p-6"
           >
             <div className="w-full">
