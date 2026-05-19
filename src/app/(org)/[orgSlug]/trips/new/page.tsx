@@ -1,6 +1,7 @@
 import TripForm from '@/features/trips/components/TripForm';
 import { createClient } from '@/services/supabase/server';
 import { getTripLocations } from '@/features/trips/actions';
+import { getEmployees } from '@/features/employees/actions';
 import type { TripLocation } from '@/types/database';
 
 export default async function NewTripPage({
@@ -27,11 +28,11 @@ export default async function NewTripPage({
 
   const [
     { data: vehiclesData },
-    { data: members },
+    employeesResult,
     { data: savedLocations },
   ] = await Promise.all([
     supabase.from('vehicles').select('id, name, plate_number').eq('organization_id', org.id).order('name'),
-    supabase.from('organization_members').select('user_id, profile:profiles(id, full_name, email)').eq('organization_id', org.id),
+    getEmployees(org.id),
     getTripLocations(org.id),
   ]);
 
@@ -40,11 +41,9 @@ export default async function NewTripPage({
     plate_number: v.plate_number || '',
   }));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const drivers = (members || []).map((m: any) => ({
-    id: m.profile.id,
-    full_name: m.profile.full_name || m.profile.email || 'Sin nombre',
-  }));
+  const drivers = ((employeesResult.data ?? []) as { id: string; full_name: string; status: string }[])
+    .filter((e) => e.status === 'active')
+    .map((e) => ({ id: e.id, full_name: e.full_name }));
 
   return (
     <div className="space-y-4">

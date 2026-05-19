@@ -113,7 +113,7 @@ export interface Trip {
   updated_at: string | null;
   // Joined data
   vehicle?: Vehicle;
-  driver?: Profile;
+  driver?: { id: string; full_name: string | null };
 }
 
 export interface TripLocation {
