@@ -11,7 +11,7 @@ export async function getTrips(orgId: string, limit = 50, offset = 0) {
 
   const { data, error, count } = await supabase
     .from('trips')
-    .select('*, vehicle:vehicles(name, plate_number), driver:profiles(full_name)', { count: 'exact' })
+    .select('*, vehicle:vehicles(name, plate_number), driver:employees(full_name)', { count: 'exact' })
     .eq('organization_id', orgId)
     .order('started_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -29,7 +29,7 @@ export async function getTrip(id: string) {
 
   const { data, error } = await supabase
     .from('trips')
-    .select('*, vehicle:vehicles(*), driver:profiles(*)')
+    .select('*, vehicle:vehicles(*), driver:employees(id, full_name)')
     .eq('id', id)
     .single();
 
