@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { m } from 'framer-motion';
 import DogAnimation from '@/components/dog/DogAnimation';
 import { readDogConfig, DOG_CONFIG_EVENT } from '@/lib/dogConfig';
 import type { DogUserConfig } from '@/lib/dogConfig';
@@ -11,10 +10,9 @@ import type { DogBreed } from '@/components/dog/dogConstants';
 
 interface HeaderProps {
   onMenuToggle: () => void;
-  isVisible: boolean;
 }
 
-export function Header({ onMenuToggle, isVisible }: HeaderProps) {
+export function Header({ onMenuToggle }: HeaderProps) {
   const organizations = useTenantStore((s) => s.organizations);
   const currentOrg = useCurrentOrg();
   const user = useTenantStore((s) => s.user);
@@ -31,11 +29,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const forcedBreed  = (dogCfg?.breed && dogCfg.breed !== 'auto') ? dogCfg.breed as DogBreed : undefined;
 
   return (
-    <m.header
-      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900] overflow-visible"
-      animate={{ y: isVisible ? 0 : -56 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-    >
+    <header className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 relative z-[900] overflow-visible">
       {/* Hamburger (mobile only) */}
       <button
         onClick={onMenuToggle}
@@ -102,6 +96,6 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
           </span>
         </div>
       </div>
-    </m.header>
+    </header>
   );
 }
