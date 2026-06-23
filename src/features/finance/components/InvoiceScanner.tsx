@@ -12,10 +12,51 @@ interface ScannedData {
   amount?: string;
   date?: string;
   description?: string;
+  cufe?: string;
+  dgiUrl?: string;
+  docType?: string;
   raw: string;
 }
 
+function parseDgiUrl(url: string): ScannedData | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes('dgi-fep.mef.gob.pa')) return null;
+
+    const cufe = parsed.searchParams.get('chFE') || '';
+    if (!cufe) return null;
+
+    const result: ScannedData = { raw: url, cufe, dgiUrl: url };
+
+    const docTypeMatch = cufe.match(/^(FE|NC|ND)\d{2}/);
+    if (docTypeMatch) {
+      const prefix = docTypeMatch[0].substring(0, 2);
+      result.docType = prefix === 'FE' ? 'Factura Electrónica'
+        : prefix === 'NC' ? 'Nota de Crédito'
+        : 'Nota de Débito';
+    }
+
+    const dateMatch = cufe.match(/(\d{4})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])/);
+    if (dateMatch) {
+      result.date = `${dateMatch[3]}/${dateMatch[2]}/${dateMatch[1]}`;
+    }
+
+    const withoutPrefix = cufe.replace(/^(FE|NC|ND)\d{2}/, '');
+    const rucMatch = withoutPrefix.match(/^([\dA-Z]+-[\dA-Z]+-[\dA-Z]+)/);
+    if (rucMatch) {
+      result.ruc = rucMatch[1];
+    }
+
+    return result;
+  } catch {
+    return null;
+  }
+}
+
 function parseQRData(raw: string): ScannedData {
+  const dgiResult = parseDgiUrl(raw);
+  if (dgiResult) return dgiResult;
+
   const result: ScannedData = { raw };
 
   const lines = raw.split(/[\n|;,]/);
@@ -90,6 +131,9 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
     if (result?.amount) params.set('amount', result.amount);
     if (result?.date) params.set('date', result.date);
     if (result?.description) params.set('description', result.description);
+    if (result?.ruc) params.set('ruc', result.ruc);
+    if (result?.cufe) params.set('cufe', result.cufe);
+    if (result?.dgiUrl) params.set('dgi_url', result.dgiUrl);
     if (result?.raw) params.set('qr_data', result.raw);
     router.push(`/${orgSlug}/finance/invoices/new?${params.toString()}`);
     setIsOpen(false);
@@ -163,14 +207,39 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
       {result && (
         <div className="space-y-3">
           <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
-            <p className="text-sm font-medium text-green-800 dark:text-green-300">QR detectado</p>
+            <p className="text-sm font-medium text-green-800 dark:text-green-300">
+              {result.cufe ? '✓ Factura electrónica DGI detectada' : 'QR detectado'}
+            </p>
             <div className="mt-2 space-y-1 text-xs text-green-700 dark:text-green-400">
-              {result.ruc && <p>RUC/RNC: {result.ruc}</p>}
+              {result.docType && <p>Tipo: {result.docType}</p>}
+              {result.ruc && <p>RUC emisor: {result.ruc}</p>}
               {result.amount && <p>Monto: ${result.amount}</p>}
               {result.date && <p>Fecha: {result.date}</p>}
-              <p className="text-muted-foreground mt-1 break-all">Raw: {result.raw.substring(0, 100)}{result.raw.length > 100 ? '...' : ''}</p>
+              {result.cufe && (
+                <p className="text-muted-foreground mt-1 break-all">
+                  CUFE: {result.cufe.substring(0, 40)}{result.cufe.length > 40 ? '...' : ''}
+                </p>
+              )}
+              {!result.cufe && (
+                <p className="text-muted-foreground mt-1 break-all">
+                  Raw: {result.raw.substring(0, 100)}{result.raw.length > 100 ? '...' : ''}
+                </p>
+              )}
             </div>
           </div>
+          {result.dgiUrl && (
+            <a
+              href={result.dgiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-primary hover:bg-accent transition-colors"
+            >
+              <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Ver en portal DGI
+            </a>
+          )}
           <div className="flex gap-2">
             <button
               onClick={handleUseData}
