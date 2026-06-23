@@ -997,6 +997,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          org_type: string
           settings: Json | null
           slug: string
           updated_at: string | null
@@ -1006,6 +1007,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          org_type?: string
           settings?: Json | null
           slug: string
           updated_at?: string | null
@@ -1015,11 +1017,65 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          org_type?: string
           settings?: Json | null
           slug?: string
           updated_at?: string | null
         }
         Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          cost_estimate: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          organization_id: string
+          sell_price: number | null
+          unit: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          cost_estimate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          organization_id: string
+          sell_price?: number | null
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          cost_estimate?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          organization_id?: string
+          sell_price?: number | null
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
