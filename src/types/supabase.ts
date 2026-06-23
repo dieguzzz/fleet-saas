@@ -72,6 +72,7 @@ export type Database = {
           organization_id: string
           phone: string | null
           role: string | null
+          tax_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -87,6 +88,7 @@ export type Database = {
           organization_id: string
           phone?: string | null
           role?: string | null
+          tax_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -102,6 +104,7 @@ export type Database = {
           organization_id?: string
           phone?: string | null
           role?: string | null
+          tax_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -613,8 +616,10 @@ export type Database = {
         Row: {
           attachment_url: string | null
           created_at: string | null
+          cufe: string | null
           customer_id: string | null
           date: string
+          dgi_url: string | null
           due_date: string | null
           id: string
           invoice_number: string
@@ -633,8 +638,10 @@ export type Database = {
         Insert: {
           attachment_url?: string | null
           created_at?: string | null
+          cufe?: string | null
           customer_id?: string | null
           date?: string
+          dgi_url?: string | null
           due_date?: string | null
           id?: string
           invoice_number: string
@@ -653,8 +660,10 @@ export type Database = {
         Update: {
           attachment_url?: string | null
           created_at?: string | null
+          cufe?: string | null
           customer_id?: string | null
           date?: string
+          dgi_url?: string | null
           due_date?: string | null
           id?: string
           invoice_number?: string

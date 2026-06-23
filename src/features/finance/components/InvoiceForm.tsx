@@ -7,9 +7,18 @@ import { createInvoice, updateInvoice, updateInvoiceAttachmentUrl, type CreateIn
 import type { Invoice } from '@/types/database';
 import ContactModal from '@/features/contacts/components/ContactModal';
 
-interface ContactOption { id: string; name: string; company: string | null }
+interface ContactOption { id: string; name: string; company: string | null; tax_id?: string | null }
 
 const EMPTY_CONTACTS: ContactOption[] = [];
+
+interface ScannerData {
+  ruc?: string;
+  cufe?: string;
+  dgi_url?: string;
+  qr_data?: string;
+  date?: string;
+  amount?: string;
+}
 
 interface InvoiceFormProps {
   orgId: string;
@@ -17,22 +26,30 @@ interface InvoiceFormProps {
   invoiceType: 'cobro' | 'pago';
   invoice?: Invoice;
   contacts?: ContactOption[];
+  scannerData?: ScannerData;
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData }: InvoiceFormProps) {
   const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [subtotal, setSubtotal] = useState(Number(invoice?.subtotal ?? 0));
+  const [subtotal, setSubtotal] = useState(Number(invoice?.subtotal ?? scannerData?.amount ?? 0));
   const [tax, setTax] = useState(Number(invoice?.tax ?? 0));
+
+  const matchedContact = scannerData?.ruc
+    ? initialContacts.find(c => c.tax_id === scannerData.ruc)
+    : undefined;
   const [contactId, setContactId] = useState<string>(
-    invoiceType === 'cobro' ? (invoice?.customer_id ?? '') : (invoice?.supplier_id ?? '')
+    matchedContact?.id
+      ?? (invoiceType === 'cobro' ? (invoice?.customer_id ?? '') : (invoice?.supplier_id ?? ''))
   );
   const [contacts, setContacts] = useState<ContactOption[]>(initialContacts);
+  const [rucNotFound, setRucNotFound] = useState(!!scannerData?.ruc && !matchedContact);
 
   const handleNewContact = useCallback((id: string, name: string) => {
     setContacts(prev => [...prev, { id, name, company: null }]);
     setContactId(id);
+    setRucNotFound(false);
   }, []);
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
@@ -89,6 +106,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
       customer_id: invoiceType === 'cobro' ? (contactId || null) : null,
       supplier_id: invoiceType === 'pago' ? (contactId || null) : null,
       attachment_url: existingAttachment,
+      cufe: scannerData?.cufe ?? invoice?.cufe ?? null,
+      dgi_url: scannerData?.dgi_url ?? invoice?.dgi_url ?? null,
     };
     try {
       let invoiceId: string;
@@ -129,6 +148,34 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 {isEditing ? 'Editar Factura' : `Nueva Factura de ${invoiceType === 'cobro' ? 'Cobro' : 'Pago'}`}
               </h2>
             </div>
+
+            {scannerData?.cufe && (
+              <div className="rounded-lg border border-border bg-muted/50 p-3 space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground">Factura electrónica DGI</p>
+                <p className="text-xs text-muted-foreground font-mono break-all">
+                  CUFE: {scannerData.cufe.substring(0, 50)}{scannerData.cufe.length > 50 ? '...' : ''}
+                </p>
+                {scannerData.dgi_url && (
+                  <a
+                    href={scannerData.dgi_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                  >
+                    <svg className="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Ver en portal DGI
+                  </a>
+                )}
+              </div>
+            )}
+
+            {rucNotFound && scannerData?.ruc && (
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+                RUC escaneado: <strong>{scannerData.ruc}</strong> — no se encontró un proveedor con este RUC. Seleccioná uno manualmente o creá uno nuevo.
+              </div>
+            )}
 
             {/* Contacto (cliente o proveedor) */}
             <div>
@@ -197,7 +244,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                   name="date"
                   type="date"
                   required
-                  defaultValue={invoice?.date ?? new Date().toISOString().split('T')[0]}
+                  defaultValue={invoice?.date ?? scannerData?.date ?? new Date().toISOString().split('T')[0]}
                   className="field-input"
                 />
               </div>

@@ -3,15 +3,30 @@ import { getOrganization } from '@/features/organizations/queries';
 import { getCustomersAndSuppliers } from '@/features/contacts/actions';
 import { notFound } from 'next/navigation';
 
+function dgiDateToISO(d?: string): string | undefined {
+  if (!d) return undefined;
+  const [day, month, year] = d.split('/');
+  if (day && month && year) return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return undefined;
+}
+
 export default async function NewInvoicePage({
   params,
   searchParams,
 }: {
   params: Promise<{ orgSlug: string }>;
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{
+    type?: string;
+    amount?: string;
+    date?: string;
+    ruc?: string;
+    cufe?: string;
+    dgi_url?: string;
+    qr_data?: string;
+  }>;
 }) {
   const { orgSlug } = await params;
-  const { type } = await searchParams;
+  const { type, amount, date, ruc, cufe, dgi_url, qr_data } = await searchParams;
   const invoiceType = type === 'pago' ? 'pago' : 'cobro';
 
   const org = await getOrganization(orgSlug);
@@ -20,7 +35,16 @@ export default async function NewInvoicePage({
   const { data: contactsRaw } = await getCustomersAndSuppliers(org.id);
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
-    .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company }] : []);
+    .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
+
+  const scannerData = (ruc || cufe || dgi_url) ? {
+    ruc,
+    cufe,
+    dgi_url,
+    qr_data,
+    date: dgiDateToISO(date) ?? date,
+    amount,
+  } : undefined;
 
   return (
     <div className="space-y-4">
@@ -32,6 +56,7 @@ export default async function NewInvoicePage({
         orgSlug={orgSlug}
         invoiceType={invoiceType as 'cobro' | 'pago'}
         contacts={contacts}
+        scannerData={scannerData}
       />
     </div>
   );
