@@ -6,6 +6,7 @@ import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
+import InvoiceScanner from '@/features/finance/components/InvoiceScanner';
 
 export const metadata: Metadata = { title: 'Facturas — Fleet SaaS' };
 
@@ -29,15 +30,18 @@ export default async function InvoicesPage({
         title="Facturas"
         description="Gestiona tus cobros y pagos"
         action={
-          <Link
-            href={`/${orgSlug}/finance/invoices/new?type=${activeTab === 'pagos' ? 'pago' : 'cobro'}`}
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nueva {activeTab === 'pagos' ? 'Factura de Pago' : 'Factura de Cobro'}
-          </Link>
+          <div className="flex items-center gap-2">
+            <InvoiceScanner orgSlug={orgSlug} />
+            <Link
+              href={`/${orgSlug}/finance/invoices/new?type=${activeTab === 'pagos' ? 'pago' : 'cobro'}`}
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Nueva {activeTab === 'pagos' ? 'Factura de Pago' : 'Factura de Cobro'}
+            </Link>
+          </div>
         }
       />
 

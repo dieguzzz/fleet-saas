@@ -46,6 +46,18 @@ export const PERMISSIONS = {
   'contacts:create': ['collaborator', 'admin', 'owner'],
   'contacts:update': ['admin', 'owner'],
   'contacts:delete': ['admin', 'owner'],
+
+  // Products
+  'products:view': ['viewer', 'collaborator', 'admin', 'owner'],
+  'products:create': ['collaborator', 'admin', 'owner'],
+  'products:update': ['admin', 'owner'],
+  'products:delete': ['owner'],
+
+  // Inventory
+  'inventory:view': ['viewer', 'collaborator', 'admin', 'owner'],
+  'inventory:create': ['collaborator', 'admin', 'owner'],
+  'inventory:update': ['admin', 'owner'],
+  'inventory:delete': ['owner'],
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

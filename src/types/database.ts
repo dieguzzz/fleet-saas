@@ -12,13 +12,14 @@ export type Json =
 
 // Enum types
 export type OrgRole = 'owner' | 'admin' | 'collaborator' | 'viewer';
+export type OrgType = 'fleet' | 'kitchen';
 export type VehicleStatus = 'active' | 'maintenance' | 'inactive';
 export type TripStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled';
 export type TransactionType = 'income' | 'expense';
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
 export type InventoryMovementType = 'in' | 'out' | 'adjustment';
-export type InventoryCategory = 'parts' | 'fluids' | 'tires' | 'tools' | 'consumables' | 'other';
+export type InventoryCategory = 'parts' | 'fluids' | 'tires' | 'tools' | 'consumables' | 'ingredients' | 'packaging' | 'meats' | 'produce' | 'spices' | 'other';
 
 export const INVENTORY_CATEGORY_LABELS: Record<InventoryCategory, string> = {
   parts: 'Repuestos',
@@ -26,6 +27,11 @@ export const INVENTORY_CATEGORY_LABELS: Record<InventoryCategory, string> = {
   tires: 'Neumáticos',
   tools: 'Herramientas',
   consumables: 'Consumibles',
+  ingredients: 'Ingredientes',
+  packaging: 'Empaque',
+  meats: 'Carnes',
+  produce: 'Vegetales/Frutas',
+  spices: 'Especias',
   other: 'Otro',
 };
 
@@ -34,6 +40,7 @@ export interface Organization {
   id: string;
   name: string;
   slug: string;
+  org_type: OrgType;
   logo_url: string | null;
   settings: Json | null;
   created_at: string | null;
@@ -246,6 +253,21 @@ export interface FuelRecord {
   // Joined
   vehicle?: Vehicle;
   employee?: Employee;
+}
+
+export interface Product {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  sell_price: number | null;
+  cost_estimate: number | null;
+  unit: string | null;
+  is_active: boolean;
+  image_url: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface AuditLog {
@@ -472,6 +494,12 @@ export interface Database {
         Row: OrganizationMember;
         Insert: Omit<OrganizationMember, 'id' | 'joined_at'>;
         Update: Partial<Pick<OrganizationMember, 'role'>>;
+        Relationships: [];
+      };
+      products: {
+        Row: Product;
+        Insert: Omit<Product, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Product, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
         Relationships: [];
       };
       organizations: {
