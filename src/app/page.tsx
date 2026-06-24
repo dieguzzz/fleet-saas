@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Building2, Truck, DollarSign, ShieldCheck, Mail, Eye } from 'lucide-react';
+import { DollarSign, Package, Users, ShieldCheck, UtensilsCrossed, Truck } from 'lucide-react';
 import { createClient } from '@/services/supabase/server';
-import DatabaseStatus from '@/components/debug/DatabaseStatus';
+import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
 
 export const metadata: Metadata = {
-  title: 'Fleet SaaS — Gestión de flotas para tu empresa',
-  description: 'Administrá vehículos, viajes, mantenimiento, combustible y finanzas de tu flota en un solo lugar.',
+  title: 'Merlin — Gestión integral para tu empresa',
+  description: 'Administrá flotas, cocinas, inventario, finanzas y equipos desde un solo lugar.',
 };
 
 async function getAuthState() {
@@ -32,34 +32,40 @@ export default async function HomePage() {
 
   const features = [
     {
-      title: 'Multi-Tenant',
-      description: 'Cada organización con datos completamente aislados mediante Row Level Security.',
-      icon: <Building2 className="size-7" />,
-    },
-    {
-      title: 'Gestión de Flotas',
-      description: 'Vehículos, viajes, mantenimiento y conductores en un solo lugar.',
-      icon: <Truck className="size-7" />,
-    },
-    {
-      title: 'Finanzas Integradas',
-      description: 'Control de ingresos, gastos y balances por organización.',
+      title: 'Finanzas',
+      description: 'Facturas de cobro y pago, ingresos, gastos y reportes por organización.',
       icon: <DollarSign className="size-7" />,
+      color: 'text-emerald-500',
+    },
+    {
+      title: 'Inventario',
+      description: 'Control de stock con categorías para cualquier industria.',
+      icon: <Package className="size-7" />,
+      color: 'text-blue-500',
+    },
+    {
+      title: 'Contactos',
+      description: 'Clientes, proveedores y contactos centralizados.',
+      icon: <Users className="size-7" />,
+      color: 'text-purple-500',
     },
     {
       title: 'Roles y Permisos',
-      description: 'Owner, Admin, Collaborator y Viewer con permisos granulares.',
+      description: 'Owner, Admin, Collaborator y Viewer con control granular.',
       icon: <ShieldCheck className="size-7" />,
+      color: 'text-amber-500',
     },
     {
-      title: 'Invitaciones por Email',
-      description: 'Invita a tu equipo con roles específicos de forma segura.',
-      icon: <Mail className="size-7" />,
+      title: 'Cocina y Productos',
+      description: 'Catálogo de productos, costos y precios para negocios gastronómicos.',
+      icon: <UtensilsCrossed className="size-7" />,
+      color: 'text-red-500',
     },
     {
-      title: 'Super Admin',
-      description: 'Impersonación de organizaciones para soporte y auditoría.',
-      icon: <Eye className="size-7" />,
+      title: 'Flotas y Vehículos',
+      description: 'Vehículos, viajes, mantenimiento y combustible para operaciones logísticas.',
+      icon: <Truck className="size-7" />,
+      color: 'text-blue-600',
     },
   ];
 
@@ -68,17 +74,21 @@ export default async function HomePage() {
       {/* Header */}
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">F</span>
+          <div className="flex items-center gap-2.5">
+            <div className="size-10 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <svg className="size-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
-            <span className="text-foreground font-semibold text-xl">Fleet SaaS</span>
+            <span className="text-foreground font-bold text-xl tracking-tight">Merlin</span>
           </div>
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <Link
                 href={dashboardHref}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Ir al Dashboard
               </Link>
@@ -91,10 +101,10 @@ export default async function HomePage() {
                   Iniciar Sesión
                 </Link>
                 <Link
-                  href="/signup"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  href="/login"
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
-                  Comenzar Gratis
+                  Comenzar
                 </Link>
               </>
             )}
@@ -103,67 +113,84 @@ export default async function HomePage() {
       </header>
 
       {/* Hero */}
-      <main className="container mx-auto px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
-            Gestión de Flotas{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-              Multi-Tenant
+      <main className="container mx-auto px-6 py-16 md:py-24">
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            Tu negocio,{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-500">
+              organizado
             </span>
           </h1>
-          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Sistema profesional para gestionar vehículos, viajes, mantenimiento y finanzas.
-            Cada organización con su propio espacio seguro y aislado.
+          <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+            Gestión integral para tu empresa — flotas, cocinas, finanzas, inventario y equipos desde un solo lugar.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {isLoggedIn ? (
+
+          {/* Company Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <Link
+              href="/login"
+              className="group relative bg-card border-2 border-blue-500/30 hover:border-blue-500 rounded-2xl p-6 transition-all hover:shadow-lg hover:shadow-blue-500/10"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                  <span className="text-white font-bold text-3xl">A</span>
+                </div>
+                <div>
+                  <p className="font-bold text-foreground text-lg">AMD Logistics</p>
+                  <p className="text-sm text-muted-foreground mt-1">Gestión de flotas y logística</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/login"
+              className="group relative bg-card border-2 border-[#C1262B]/30 hover:border-[#C1262B] rounded-2xl p-6 transition-all hover:shadow-lg hover:shadow-[#C1262B]/10"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="group-hover:scale-105 transition-transform">
+                  <MalaInfluenciaLogo size={64} />
+                </div>
+                <div>
+                  <p className="font-bold text-foreground text-lg">Mala Influencia</p>
+                  <p className="text-sm text-muted-foreground mt-1">Gestión de cocina y ventas</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {isLoggedIn && (
+            <div className="mt-8">
               <Link
                 href={dashboardHref}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
+                className="inline-flex bg-violet-600 hover:bg-violet-700 text-white px-8 py-3 rounded-xl font-semibold transition-colors"
               >
                 Ir al Dashboard
               </Link>
-            ) : (
-              <Link
-                href="/signup"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
-              >
-                Crear Cuenta Gratis
-              </Link>
-            )}
-            <Link
-              href="#features"
-              className="border border-border hover:border-muted-foreground text-muted-foreground hover:text-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors w-full sm:w-auto"
-            >
-              Ver Características
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Features */}
-        <div id="features" className="mt-32 grid md:grid-cols-3 gap-8">
+        <div id="features" className="mt-16 grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {features.map((feature) => (
             <div
               key={feature.title}
               className="bg-card border border-border rounded-2xl p-6 hover:border-muted-foreground transition-colors"
             >
-              <div className="text-blue-500 mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
+              <div className={`${feature.color} mb-4`}>{feature.icon}</div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground">{feature.description}</p>
             </div>
           ))}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="container mx-auto px-6 py-12 border-t border-border mt-20">
-        <div className="text-center text-muted-foreground">
-          <p>© 2024 Fleet SaaS. Sistema Multi-Tenant con Next.js + Supabase.</p>
+      <footer className="container mx-auto px-6 py-12 border-t border-border mt-12">
+        <div className="text-center text-muted-foreground text-sm">
+          <p>© 2025 Merlin. Gestión empresarial inteligente.</p>
         </div>
       </footer>
-
-      {/* Debug Status */}
-      <DatabaseStatus />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { loginAmd, setupAmd, getAmdSetupState, getOrgSetupState, signUpAndJoinOrg, loginAndJoinOrg } from '@/features/auth/actions';
+import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
 
 type Mode = 'select' | 'otra' | 'amd' | 'mala-influencia';
 
@@ -37,13 +38,17 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Logo Merlin */}
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2">
-            <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-3xl">A</span>
+            <div className="size-14 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg className="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
-            <span className="text-foreground font-bold text-2xl tracking-tight">AMD Logistics</span>
+            <span className="text-foreground font-bold text-xl tracking-tight">Merlin</span>
           </div>
         </div>
 
@@ -62,23 +67,23 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <button
                   onClick={() => setMode('amd')}
-                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500 rounded-xl hover:bg-blue-500/5 transition-colors text-left"
+                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-blue-500/40 rounded-xl hover:border-blue-500 hover:bg-blue-500/5 transition-all text-left"
                 >
-                  <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-lg">A</span>
+                  <div className="size-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow">
+                    <span className="text-white font-bold text-xl">A</span>
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">AMD Logistics</p>
-                    <p className="text-xs text-muted-foreground">Acceso al sistema interno</p>
+                    <p className="text-xs text-muted-foreground">Gestión de flotas y logística</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setMode('mala-influencia')}
-                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-orange-500 rounded-xl hover:bg-orange-500/5 transition-colors text-left"
+                  className="w-full flex items-center gap-4 p-4 bg-background border-2 border-[#C1262B]/30 rounded-xl hover:border-[#C1262B] hover:bg-[#C1262B]/5 transition-all text-left"
                 >
-                  <div className="size-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-lg">M</span>
+                  <div className="flex-shrink-0">
+                    <MalaInfluenciaLogo size={48} />
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">Mala Influencia</p>
@@ -90,7 +95,7 @@ export default function LoginPage() {
                   onClick={() => setMode('otra')}
                   className="w-full flex items-center gap-4 p-4 bg-background border border-border rounded-xl hover:bg-accent transition-colors text-left"
                 >
-                  <div className="size-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="size-12 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
                     <span className="text-muted-foreground font-bold text-lg">?</span>
                   </div>
                   <div>
@@ -162,8 +167,8 @@ export default function LoginPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="size-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-lg">A</span>
+                <div className="size-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow">
+                  <span className="text-white font-bold text-xl">A</span>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">AMD Logistics</p>
@@ -316,8 +321,8 @@ export default function LoginPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="size-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-lg">M</span>
+                <div className="flex-shrink-0">
+                  <MalaInfluenciaLogo size={48} />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Mala Influencia</p>
@@ -336,8 +341,8 @@ export default function LoginPage() {
                 <form action={miSignupAction} className="space-y-4">
                   <input type="hidden" name="orgSlug" value="mala-influencia" />
 
-                  <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
-                    <p className="text-orange-400 text-xs text-center">
+                  <div className="bg-[#C1262B]/10 border border-[#C1262B]/20 rounded-lg p-3">
+                    <p className="text-[#C1262B] text-xs text-center">
                       Primer ingreso: registrate y quedarás como administrador
                     </p>
                   </div>
@@ -358,7 +363,7 @@ export default function LoginPage() {
                       autoFocus
                       autoComplete="name"
                       placeholder="Tu nombre"
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                     />
                   </div>
 
@@ -371,7 +376,7 @@ export default function LoginPage() {
                       required
                       autoComplete="email"
                       placeholder="tu@email.com"
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                     />
                   </div>
 
@@ -386,7 +391,7 @@ export default function LoginPage() {
                         minLength={8}
                         autoComplete="new-password"
                         placeholder="Mínimo 8 caracteres"
-                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                       />
                       <button
                         type="button"
@@ -408,14 +413,14 @@ export default function LoginPage() {
                       required
                       minLength={8}
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={miSignupPending}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#C1262B] hover:bg-[#a01f24] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {miSignupPending ? 'Registrando…' : 'Registrarte y entrar'}
                   </button>
@@ -443,7 +448,7 @@ export default function LoginPage() {
                       autoFocus
                       autoComplete="email"
                       placeholder="tu@email.com"
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                     />
                   </div>
 
@@ -457,7 +462,7 @@ export default function LoginPage() {
                         required
                         autoComplete="current-password"
                         placeholder="••••••••"
-                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#C1262B] focus:border-transparent"
                       />
                       <button
                         type="button"
@@ -473,7 +478,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={miLoginPending}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#C1262B] hover:bg-[#a01f24] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {miLoginPending ? 'Ingresando…' : 'Ingresar'}
                   </button>

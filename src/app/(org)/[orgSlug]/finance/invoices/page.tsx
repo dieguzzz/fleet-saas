@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 import InvoiceScanner from '@/features/finance/components/InvoiceScanner';
 
-export const metadata: Metadata = { title: 'Facturas — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Facturas — Merlin' };
 
 export default async function InvoicesPage({
   params,

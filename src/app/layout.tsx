@@ -18,13 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fleet SaaS",
-  description: "Gestión de flota vehicular",
+  title: "Merlin",
+  description: "Gestión empresarial inteligente",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Fleet SaaS",
+    title: "Merlin",
   },
 };
 

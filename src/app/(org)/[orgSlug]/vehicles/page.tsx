@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
-export const metadata: Metadata = { title: 'Vehículos — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Vehículos — Merlin' };
 
 export default async function VehiclesPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;

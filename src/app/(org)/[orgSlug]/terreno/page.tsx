@@ -10,7 +10,7 @@ import { StatCard } from '@/components/ui/stat-card';
 import { SectionCard } from '@/components/ui/section-card';
 import type { LandTenant, LandPayment } from '@/types/database';
 
-export const metadata: Metadata = { title: 'Terreno — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Terreno — Merlin' };
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

@@ -6,7 +6,7 @@ import { getProducts } from '@/features/products/actions';
 import ProductList from '@/features/products/components/ProductList';
 import { PageHeader } from '@/components/ui/page-header';
 
-export const metadata: Metadata = { title: 'Productos — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Productos — Merlin' };
 
 export default async function ProductsPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;

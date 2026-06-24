@@ -4,7 +4,7 @@ import { getProduct } from '@/features/products/actions';
 import ProductForm from '@/features/products/components/ProductForm';
 import { PageHeader } from '@/components/ui/page-header';
 
-export const metadata: Metadata = { title: 'Editar Producto — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Editar Producto — Merlin' };
 
 export default async function EditProductPage({
   params,

@@ -20,11 +20,15 @@ export default function SignUpPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="size-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">F</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-2">
+            <div className="size-14 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg className="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
-            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
+            <span className="text-foreground font-bold text-xl tracking-tight">Merlin</span>
           </Link>
         </div>
 
@@ -49,7 +53,7 @@ export default function SignUpPage() {
                 required
                 autoComplete="name"
                 placeholder="Juan Pérez"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -64,7 +68,7 @@ export default function SignUpPage() {
                 required
                 autoComplete="email"
                 placeholder="tu@email.com"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -83,7 +87,7 @@ export default function SignUpPage() {
                   placeholder="Mínimo 8 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pr-11 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 />
                 <button
                   type="button"
@@ -121,7 +125,7 @@ export default function SignUpPage() {
                 placeholder="Repetí la contraseña"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className={`w-full px-4 py-3 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-blue-500'}`}
+                className={`w-full px-4 py-3 bg-background border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:border-transparent ${mismatch ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-violet-500'}`}
               />
               {mismatch && <p className="text-xs text-red-400 mt-1">Las contraseñas no coinciden.</p>}
             </div>
@@ -129,7 +133,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={isPending || mismatch}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? 'Creando cuenta...' : 'Crear Cuenta'}
             </button>
@@ -138,7 +142,7 @@ export default function SignUpPage() {
           <div className="mt-6 text-center">
             <p className="text-muted-foreground">
               ¿Ya tienes cuenta?{' '}
-              <Link href="/login" className="text-blue-400 hover:text-blue-300">
+              <Link href="/login" className="text-violet-400 hover:text-violet-300">
                 Iniciar sesión
               </Link>
             </p>

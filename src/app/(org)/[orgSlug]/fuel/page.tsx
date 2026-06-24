@@ -8,7 +8,7 @@ import NewFuelRecordModal from '@/features/fuel/components/NewFuelRecordModal';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
 
-export const metadata: Metadata = { title: 'Combustible — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Combustible — Merlin' };
 
 function fmt(n: number) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

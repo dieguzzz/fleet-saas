@@ -7,7 +7,7 @@ import EmployeeList from '@/features/employees/components/EmployeeList';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
 
-export const metadata: Metadata = { title: 'Empleados — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Empleados — Merlin' };
 
 export default async function EmployeesPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params;
