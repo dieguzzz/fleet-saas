@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { InvoiceList } from '@/features/finance/components/InvoiceList';
+import { getSalesByProduct } from '@/features/finance/actions';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 import InvoiceScanner from '@/features/finance/components/InvoiceScanner';
+import SalesByProductReport from '@/features/finance/components/SalesByProductReport';
+import type { OrgType } from '@/types/database';
 
 export const metadata: Metadata = { title: 'Facturas — Merlin' };
 
@@ -19,7 +23,12 @@ export default async function InvoicesPage({
 }) {
   const { orgSlug } = await params;
   const { tab } = await searchParams;
-  const activeTab = tab === 'pagos' ? 'pagos' : 'cobros';
+
+  const headersList = await headers();
+  const orgType = (headersList.get('x-org-type') as OrgType) || 'fleet';
+
+  const validTabs = orgType === 'kitchen' ? ['cobros', 'pagos', 'productos'] : ['cobros', 'pagos'];
+  const activeTab = validTabs.includes(tab ?? '') ? (tab as string) : 'cobros';
 
   const org = await getOrganization(orgSlug);
   if (!org) notFound();
@@ -77,12 +86,40 @@ export default async function InvoicesPage({
               Pagos
             </span>
           </Link>
+          {orgType === 'kitchen' && (
+            <Link
+              href={`/${orgSlug}/finance/invoices?tab=productos`}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'productos'
+                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Ventas por Producto
+              </span>
+            </Link>
+          )}
         </nav>
       </div>
 
-      <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><SkeletonRow key={i}/>)}</div>}>
-        <InvoiceList orgId={org.id} orgSlug={org.slug} type={activeTab === 'pagos' ? 'pago' : 'cobro'} />
-      </Suspense>
+      {activeTab === 'productos' ? (
+        <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><SkeletonRow key={i}/>)}</div>}>
+          <SalesByProductSection orgId={org.id} />
+        </Suspense>
+      ) : (
+        <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><SkeletonRow key={i}/>)}</div>}>
+          <InvoiceList orgId={org.id} orgSlug={org.slug} type={activeTab === 'pagos' ? 'pago' : 'cobro'} />
+        </Suspense>
+      )}
     </div>
   );
+}
+
+async function SalesByProductSection({ orgId }: { orgId: string }) {
+  const { data } = await getSalesByProduct(orgId);
+  return <SalesByProductReport data={data ?? []} />;
 }

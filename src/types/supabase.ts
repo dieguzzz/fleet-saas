@@ -710,6 +710,65 @@ export type Database = {
           },
         ]
       }
+      invoice_items: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          invoice_id: string
+          organization_id: string
+          product_id: string | null
+          quantity: number
+          sort_order: number | null
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          invoice_id: string
+          organization_id: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          invoice_id?: string
+          organization_id?: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       land_payments: {
         Row: {
           amount: number
@@ -1082,6 +1141,58 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_ingredients: {
+        Row: {
+          created_at: string | null
+          id: string
+          inventory_item_id: string
+          notes: string | null
+          organization_id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          inventory_item_id: string
+          notes?: string | null
+          organization_id: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          inventory_item_id?: string
+          notes?: string | null
+          organization_id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ingredients_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
             referencedColumns: ["id"]
           },
         ]

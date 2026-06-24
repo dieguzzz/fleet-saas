@@ -3,9 +3,10 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/services/supabase/client';
-import { createInvoice, updateInvoice, updateInvoiceAttachmentUrl, type CreateInvoiceInput } from '../actions';
-import type { Invoice } from '@/types/database';
+import { createInvoice, updateInvoice, updateInvoiceAttachmentUrl, saveInvoiceLineItems, type CreateInvoiceInput, type LineItemInput } from '../actions';
+import type { Invoice, Product, OrgType } from '@/types/database';
 import ContactModal from '@/features/contacts/components/ContactModal';
+import InvoiceLineItems from './InvoiceLineItems';
 
 interface ContactOption { id: string; name: string; company: string | null; tax_id?: string | null }
 
@@ -27,9 +28,11 @@ interface InvoiceFormProps {
   invoice?: Invoice;
   contacts?: ContactOption[];
   scannerData?: ScannerData;
+  orgType?: OrgType;
+  products?: Product[];
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData, orgType = 'fleet', products = [] }: InvoiceFormProps) {
   const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +122,26 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
         const result = await createInvoice(orgId, invoiceData);
         if (result.error) throw new Error(result.error);
         invoiceId = result.data!.id;
+      }
+      // Save line items for kitchen orgs
+      if (orgType === 'kitchen') {
+        const lineCount = Number(formData.get('line_count') ?? 0);
+        const lineItems: LineItemInput[] = [];
+        for (let i = 0; i < lineCount; i++) {
+          const desc = formData.get(`line_description_${i}`) as string;
+          if (!desc) continue;
+          lineItems.push({
+            product_id: (formData.get(`line_product_id_${i}`) as string) || null,
+            description: desc,
+            quantity: Number(formData.get(`line_quantity_${i}`)) || 1,
+            unit_price: Number(formData.get(`line_unit_price_${i}`)) || 0,
+            sort_order: i,
+          });
+        }
+        if (lineItems.length > 0) {
+          const lineResult = await saveInvoiceLineItems(invoiceId, orgId, lineItems);
+          if (lineResult.error) throw new Error(lineResult.error);
+        }
       }
       if (file) await uploadFile(invoiceId);
       push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
@@ -265,6 +288,15 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 placeholder="Notas opcionales..."
               />
             </div>
+
+            {orgType === 'kitchen' && (
+              <div className="pt-2">
+                <InvoiceLineItems
+                  products={products}
+                  onTotalsChange={(sub) => { setSubtotal(sub); setTax(0); }}
+                />
+              </div>
+            )}
           </div>
         </div>
 

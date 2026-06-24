@@ -272,6 +272,33 @@ export interface Product {
   updated_at: string | null;
 }
 
+export interface RecipeIngredient {
+  id: string;
+  organization_id: string;
+  product_id: string;
+  inventory_item_id: string;
+  quantity: number;
+  notes: string | null;
+  created_at: string | null;
+  // joined
+  inventory_item?: InventoryItem;
+}
+
+export interface InvoiceItem {
+  id: string;
+  organization_id: string;
+  invoice_id: string;
+  product_id: string | null;
+  description: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+  sort_order: number;
+  created_at: string | null;
+  // joined
+  product?: Product;
+}
+
 export interface AuditLog {
   id: string;
   organization_id: string;
@@ -506,6 +533,12 @@ export interface Database {
         Update: Partial<Omit<Product, 'id' | 'organization_id' | 'created_at' | 'updated_at'>>;
         Relationships: [];
       };
+      recipe_ingredients: {
+        Row: RecipeIngredient;
+        Insert: Omit<RecipeIngredient, 'id' | 'created_at' | 'inventory_item'>;
+        Update: Partial<Pick<RecipeIngredient, 'quantity' | 'notes'>>;
+        Relationships: [];
+      };
       organizations: {
         Row: Organization;
         Insert: Omit<Organization, 'id' | 'created_at' | 'updated_at'>;
@@ -534,6 +567,12 @@ export interface Database {
         Row: Invoice;
         Insert: Omit<Invoice, 'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier'>;
         Update: Partial<Omit<Invoice, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'customer' | 'supplier'>>;
+        Relationships: [];
+      };
+      invoice_items: {
+        Row: InvoiceItem;
+        Insert: Omit<InvoiceItem, 'id' | 'created_at' | 'total' | 'product'>;
+        Update: Partial<Pick<InvoiceItem, 'description' | 'quantity' | 'unit_price' | 'product_id' | 'sort_order'>>;
         Relationships: [];
       };
       inventory_items: {

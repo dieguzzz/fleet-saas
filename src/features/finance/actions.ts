@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
-import type { Invoice } from '@/types/database';
+import type { Invoice, InvoiceItem } from '@/types/database';
 
 
 const INVOICE_LIST_SELECT = '*, customer:contacts!invoices_customer_id_fkey(name), supplier:contacts!invoices_supplier_id_fkey(name)';
@@ -186,6 +186,118 @@ export async function getFinanceKPIs(orgId: string) {
     monthlyExpenses: (expenses ?? []).reduce((s, t) => s + Number(t.amount), 0),
     overdueInvoices: overdueCount ?? 0,
     pendingReceivables: (pending ?? []).reduce((s, inv) => s + Number(inv.total ?? 0), 0),
+  };
+}
+
+// Invoice Line Items
+
+export interface LineItemInput {
+  product_id: string | null;
+  description: string;
+  quantity: number;
+  unit_price: number;
+  sort_order: number;
+}
+
+export async function saveInvoiceLineItems(
+  invoiceId: string,
+  orgId: string,
+  lineItems: LineItemInput[]
+) {
+  const supabase = await createClient();
+
+  // Delete existing line items for this invoice
+  await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId);
+
+  if (lineItems.length === 0) return { success: true };
+
+  const rows = lineItems.map((item, i) => ({
+    organization_id: orgId,
+    invoice_id: invoiceId,
+    product_id: item.product_id || null,
+    description: item.description,
+    quantity: item.quantity,
+    unit_price: item.unit_price,
+    sort_order: i,
+  }));
+
+  const { error } = await supabase.from('invoice_items').insert(rows);
+
+  if (error) {
+    console.error('Error saving invoice line items:', error);
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function getInvoiceLineItems(invoiceId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('invoice_items')
+    .select('*, product:products(id, name, sell_price)')
+    .eq('invoice_id', invoiceId)
+    .order('sort_order');
+
+  if (error) return { error: error.message };
+  return { data: data as unknown as InvoiceItem[] };
+}
+
+export async function getSalesByProduct(orgId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('invoice_items')
+    .select(`
+      product_id,
+      description,
+      quantity,
+      unit_price,
+      total,
+      invoice:invoices!inner(invoice_type, status),
+      product:products(name, cost_estimate)
+    `)
+    .eq('organization_id', orgId);
+
+  if (error) {
+    console.error('Error fetching sales by product:', error);
+    return { error: error.message };
+  }
+
+  const grouped = new Map<string, { product_name: string; units_sold: number; total_revenue: number; cost_estimate: number | null }>();
+
+  for (const row of (data ?? []) as unknown as Array<{
+    product_id: string | null;
+    description: string;
+    quantity: number;
+    total: number;
+    invoice: { invoice_type: string; status: string };
+    product: { name: string; cost_estimate: number | null } | null;
+  }>) {
+    if (row.invoice.invoice_type !== 'cobro') continue;
+    if (row.invoice.status !== 'paid') continue;
+
+    const key = row.product_id ?? `_desc_${row.description}`;
+    const existing = grouped.get(key);
+    if (existing) {
+      existing.units_sold += Number(row.quantity);
+      existing.total_revenue += Number(row.total);
+    } else {
+      grouped.set(key, {
+        product_name: row.product?.name ?? row.description,
+        units_sold: Number(row.quantity),
+        total_revenue: Number(row.total),
+        cost_estimate: row.product?.cost_estimate != null ? Number(row.product.cost_estimate) : null,
+      });
+    }
+  }
+
+  return {
+    data: Array.from(grouped.entries()).map(([product_id, rest]) => ({
+      product_id: product_id.startsWith('_desc_') ? null : product_id,
+      ...rest,
+    })),
   };
 }
 
