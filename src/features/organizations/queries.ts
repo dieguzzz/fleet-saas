@@ -87,3 +87,36 @@ export async function getOrganizationStats(orgId: string) {
     contacts: contactsCount || 0,
   };
 }
+
+export async function getKitchenStats(orgId: string) {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+
+  const [
+    { count: productsCount },
+    { count: contactsCount },
+    { count: inventoryCount },
+  ] = await Promise.all([
+    sb
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', orgId)
+      .eq('is_active', true),
+    sb
+      .from('contacts')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', orgId),
+    sb
+      .from('inventory_items')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', orgId),
+  ]);
+
+  return {
+    products: productsCount || 0,
+    contacts: contactsCount || 0,
+    inventory: inventoryCount || 0,
+  };
+}

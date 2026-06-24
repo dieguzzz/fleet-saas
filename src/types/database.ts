@@ -207,6 +207,7 @@ export interface Contact {
   email: string | null;
   address: string | null;
   notes: string | null;
+  tax_id: string | null;
   is_emergency: boolean | null;
   metadata: Json | null;
   created_at: string | null;
@@ -311,6 +312,8 @@ export interface Invoice {
   total: number | null;
   notes: string | null;
   attachment_url: string | null;
+  cufe: string | null;
+  dgi_url: string | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined

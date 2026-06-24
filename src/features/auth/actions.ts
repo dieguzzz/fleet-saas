@@ -195,6 +195,77 @@ export async function updateProfile(prevState: unknown, formData: FormData) {
   return { success: true };
 }
 
+export async function getOrgSetupState(orgSlug: string): Promise<{ exists: boolean; name: string | null; needsSetup: boolean }> {
+  const supabase = await createClient();
+
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id, name')
+    .eq('slug', orgSlug)
+    .single();
+
+  if (!org) return { exists: false, name: null, needsSetup: true };
+
+  const { count } = await supabase
+    .from('organization_members')
+    .select('id', { count: 'exact', head: true })
+    .eq('organization_id', org.id);
+
+  return { exists: true, name: org.name, needsSetup: (count ?? 0) === 0 };
+}
+
+export async function signUpAndJoinOrg(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const fullName = formData.get('fullName') as string;
+  const orgSlug = formData.get('orgSlug') as string;
+  const confirm = formData.get('confirm') as string;
+
+  if (!email || !password || !fullName || !orgSlug) return { error: 'Faltan campos requeridos' };
+  if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres' };
+  if (password !== confirm) return { error: 'Las contraseñas no coinciden' };
+
+  const { error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: fullName } },
+  });
+
+  if (signUpError) return { error: signUpError.message };
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) return { error: signInError.message };
+
+  const { data: joinResult } = await supabase.rpc('join_org' as never, { p_org_slug: orgSlug } as never);
+  const result = joinResult as unknown as { error?: string; slug?: string } | null;
+  if (result?.error) return { error: result.error };
+
+  revalidatePath('/', 'layout');
+  redirect(`/${orgSlug}`);
+}
+
+export async function loginAndJoinOrg(prevState: unknown, formData: FormData) {
+  const supabase = await createClient();
+
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const orgSlug = formData.get('orgSlug') as string;
+
+  if (!email || !password || !orgSlug) return { error: 'Faltan campos requeridos' };
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) return { error: signInError.message };
+
+  const { data: joinResult } = await supabase.rpc('join_org' as never, { p_org_slug: orgSlug } as never);
+  const result = joinResult as unknown as { error?: string; slug?: string } | null;
+  if (result?.error) return { error: result.error };
+
+  revalidatePath('/', 'layout');
+  redirect(`/${orgSlug}`);
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

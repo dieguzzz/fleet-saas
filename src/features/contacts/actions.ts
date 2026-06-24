@@ -120,7 +120,7 @@ export async function getCustomersAndSuppliers(orgId: string) {
   const supabase = await createClient();
   return await supabase
     .from('contacts')
-    .select('id, name, role, company')
+    .select('id, name, role, company, tax_id')
     .eq('organization_id', orgId)
     .in('role', ['customer', 'supplier'])
     .order('name');

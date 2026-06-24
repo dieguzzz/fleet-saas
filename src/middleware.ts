@@ -113,7 +113,7 @@ export async function middleware(request: NextRequest) {
       .from('organization_members')
       .select(`
         role,
-        organization:organizations!inner(id, slug)
+        organization:organizations!inner(id, slug, org_type)
       `)
       .eq('user_id', user!.id)
       .eq('organizations.slug', orgSlug)
@@ -138,10 +138,23 @@ export async function middleware(request: NextRequest) {
 
     // Add org context to headers for downstream use
     if (membership) {
-      const org = membership.organization as unknown as { id: string };
+      const org = membership.organization as unknown as { id: string; org_type?: string };
+      const orgType = org.org_type || 'fleet';
       supabaseResponse.headers.set('x-org-id', org.id);
       supabaseResponse.headers.set('x-org-role', membership.role);
       supabaseResponse.headers.set('x-org-slug', orgSlug);
+      supabaseResponse.headers.set('x-org-type', orgType);
+
+      const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
+      const kitchenOnlySegments = new Set(['products']);
+      const secondSegment = pathname.split('/')[2];
+
+      if (secondSegment && fleetOnlySegments.has(secondSegment) && orgType !== 'fleet') {
+        return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
+      }
+      if (secondSegment && kitchenOnlySegments.has(secondSegment) && orgType !== 'kitchen') {
+        return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
+      }
     }
   }
 
