@@ -64,7 +64,8 @@ async function FinanceStrip({ orgId, orgSlug }: { orgId: string; orgSlug: string
   const kpis = await getFinanceKPIs(orgId);
 
   function fmt(n: number) {
-    if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`;
+    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}k`;
     return `$${n.toFixed(0)}`;
   }
 
@@ -219,7 +220,12 @@ async function RecentActivity({ orgId, orgSlug, orgType }: { orgId: string; orgS
   const dotColor = { success: 'bg-emerald-500', warning: 'bg-amber-500', info: 'bg-blue-500' };
 
   if (recent.length === 0) {
-    return <p className="text-sm text-muted-foreground italic py-4">Sin actividad reciente.</p>;
+    return (
+      <div className="py-6 text-center">
+        <p className="text-sm text-muted-foreground">No hay actividad reciente.</p>
+        <p className="text-xs text-muted-foreground mt-1">Crea un viaje o registra un gasto para empezar.</p>
+      </div>
+    );
   }
 
   return (

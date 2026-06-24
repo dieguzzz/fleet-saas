@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { memo, useRef, useState } from 'react';
+import { memo, useRef, useState, useMemo } from 'react';
 import { m, useMotionValue, animate } from 'framer-motion';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Input } from '@/components/ui/input';
 
 interface Vehicle {
   id: string;
@@ -40,6 +41,9 @@ const TYPE_LABEL: Record<string, string> = {
   motorcycle: 'Moto',
 };
 
+type SortKey = 'name' | 'status' | 'type';
+type StatusFilter = 'all' | 'active' | 'maintenance' | 'inactive';
+
 const ACTION_WIDTH = 80;
 
 const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSlug }: { vehicle: Vehicle; orgSlug: string }) {
@@ -66,7 +70,6 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
 
   return (
     <div className="relative overflow-hidden rounded-xl border border-border bg-card">
-      {/* Action panel revealed on swipe left */}
       <div className="absolute right-0 top-0 h-full flex items-stretch" style={{ width: ACTION_WIDTH }}>
         <Link
           href={`/${orgSlug}/vehicles/${vehicle.id}`}
@@ -79,7 +82,6 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
         </Link>
       </div>
 
-      {/* Draggable card */}
       <m.div
         drag="x"
         dragConstraints={{ left: -ACTION_WIDTH, right: 0 }}
@@ -111,7 +113,6 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_CLASS[vehicle.status] ?? ''}`}>
               {STATUS_LABEL[vehicle.status] ?? vehicle.status}
             </span>
-            {/* Swipe hint */}
             {!revealed && (
               <span className="text-[10px] text-muted-foreground/50 flex items-center gap-0.5">
                 <svg className="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +128,62 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
   );
 });
 
+function SortButton({ label, active, direction, onClick }: { label: string; active: boolean; direction: 'asc' | 'desc'; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="flex items-center gap-1 group">
+      <span>{label}</span>
+      <svg className={`size-3.5 transition-transform ${active ? 'text-foreground' : 'text-transparent group-hover:text-muted-foreground'} ${active && direction === 'desc' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
+  );
+}
+
 const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleListProps) {
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [sortKey, setSortKey] = useState<SortKey>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  }
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    let result = vehicles;
+
+    if (statusFilter !== 'all') {
+      result = result.filter(v => v.status === statusFilter);
+    }
+
+    if (q) {
+      result = result.filter(v =>
+        v.name.toLowerCase().includes(q) ||
+        (v.plate_number && v.plate_number.toLowerCase().includes(q)) ||
+        (v.brand && v.brand.toLowerCase().includes(q)) ||
+        (v.model && v.model.toLowerCase().includes(q))
+      );
+    }
+
+    return [...result].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === 'name') {
+        cmp = a.name.localeCompare(b.name);
+      } else if (sortKey === 'status') {
+        cmp = (a.status ?? '').localeCompare(b.status ?? '');
+      } else if (sortKey === 'type') {
+        cmp = (a.type ?? '').localeCompare(b.type ?? '');
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [vehicles, search, statusFilter, sortKey, sortDir]);
+
   if (vehicles.length === 0) {
     return (
       <EmptyState
@@ -146,56 +202,136 @@ const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleList
     );
   }
 
-  return (
-    <>
-      {/* Mobile: swipeable cards */}
-      <div className="lg:hidden space-y-3">
-        {vehicles.map((vehicle) => (
-          <SwipeableVehicleCard key={vehicle.id} vehicle={vehicle} orgSlug={orgSlug} />
-        ))}
-      </div>
+  const statusCounts = {
+    all: vehicles.length,
+    active: vehicles.filter(v => v.status === 'active').length,
+    maintenance: vehicles.filter(v => v.status === 'maintenance').length,
+    inactive: vehicles.filter(v => v.status === 'inactive').length,
+  };
 
-      {/* Desktop: table */}
-      <div className="hidden lg:block w-full bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-muted-foreground">
-            <thead className="bg-muted/50 font-medium uppercase text-xs">
-              <tr>
-                <th className="px-6 py-3">Vehículo</th>
-                <th className="px-6 py-3">Tipo</th>
-                <th className="px-6 py-3">Placa</th>
-                <th className="px-6 py-3">Estado</th>
-                <th className="px-6 py-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {vehicles.map((vehicle) => (
-                <tr key={vehicle.id} className="hover:bg-accent/30 transition-colors">
-                  <td className="px-6 py-4 font-medium text-foreground">
-                    <div className="flex flex-col">
-                      <span>{vehicle.name}</span>
-                      <span className="text-xs text-muted-foreground">{vehicle.brand} {vehicle.model}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">{vehicle.type ? (TYPE_LABEL[vehicle.type] ?? vehicle.type) : '-'}</td>
-                  <td className="px-6 py-4 font-mono">{vehicle.plate_number || '-'}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_CLASS[vehicle.status] ?? ''}`}>
-                      {STATUS_LABEL[vehicle.status] ?? vehicle.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <Link href={`/${orgSlug}/vehicles/${vehicle.id}`} className="text-primary hover:text-primary/80 font-medium hover:underline">
-                      Editar
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+  const filterOptions: { key: StatusFilter; label: string }[] = [
+    { key: 'all', label: 'Todos' },
+    { key: 'active', label: 'Activos' },
+    { key: 'maintenance', label: 'Mantenim.' },
+    { key: 'inactive', label: 'Inactivos' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Toolbar: search + status filter */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <Input
+            placeholder="Buscar por nombre, placa, marca..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="flex gap-1 p-1 bg-muted rounded-lg shrink-0">
+          {filterOptions.map(opt => (
+            <button
+              key={opt.key}
+              onClick={() => setStatusFilter(opt.key)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                statusFilter === opt.key
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {opt.label}
+              {statusCounts[opt.key] > 0 && (
+                <span className="ml-1 tabular-nums">{statusCounts[opt.key]}</span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
-    </>
+
+      {/* Results count */}
+      {(search || statusFilter !== 'all') && (
+        <p className="text-xs text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? 'vehículo' : 'vehículos'}
+          {search && <> para &ldquo;{search}&rdquo;</>}
+          {statusFilter !== 'all' && filtered.length === 0 && (
+            <button onClick={() => { setSearch(''); setStatusFilter('all'); }} className="ml-2 text-primary hover:underline">
+              Limpiar filtros
+            </button>
+          )}
+        </p>
+      )}
+
+      {filtered.length === 0 ? (
+        <div className="py-12 text-center">
+          <p className="text-sm text-muted-foreground">No se encontraron vehículos con esos filtros.</p>
+          <button
+            onClick={() => { setSearch(''); setStatusFilter('all'); }}
+            className="mt-2 text-sm text-primary hover:underline"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Mobile: swipeable cards */}
+          <div className="lg:hidden space-y-3">
+            {filtered.map((vehicle) => (
+              <SwipeableVehicleCard key={vehicle.id} vehicle={vehicle} orgSlug={orgSlug} />
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden lg:block w-full bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-muted-foreground">
+                <thead className="bg-muted/50 font-medium uppercase text-xs">
+                  <tr>
+                    <th className="px-6 py-3">
+                      <SortButton label="Vehículo" active={sortKey === 'name'} direction={sortDir} onClick={() => handleSort('name')} />
+                    </th>
+                    <th className="px-6 py-3">
+                      <SortButton label="Tipo" active={sortKey === 'type'} direction={sortDir} onClick={() => handleSort('type')} />
+                    </th>
+                    <th className="px-6 py-3">Placa</th>
+                    <th className="px-6 py-3">
+                      <SortButton label="Estado" active={sortKey === 'status'} direction={sortDir} onClick={() => handleSort('status')} />
+                    </th>
+                    <th className="px-6 py-3 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filtered.map((vehicle) => (
+                    <tr key={vehicle.id} className="hover:bg-accent/30 transition-colors">
+                      <td className="px-6 py-4 font-medium text-foreground">
+                        <div className="flex flex-col">
+                          <span>{vehicle.name}</span>
+                          <span className="text-xs text-muted-foreground">{vehicle.brand} {vehicle.model}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">{vehicle.type ? (TYPE_LABEL[vehicle.type] ?? vehicle.type) : '-'}</td>
+                      <td className="px-6 py-4 font-mono">{vehicle.plate_number || '-'}</td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_CLASS[vehicle.status] ?? ''}`}>
+                          {STATUS_LABEL[vehicle.status] ?? vehicle.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <Link href={`/${orgSlug}/vehicles/${vehicle.id}`} className="text-primary hover:text-primary/80 font-medium hover:underline">
+                          Editar
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 });
 
