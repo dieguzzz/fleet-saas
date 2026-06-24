@@ -1,14 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
 import { startImpersonation } from '@/lib/impersonation';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { m } from 'framer-motion';
-import DogAnimation from '@/components/dog/DogAnimation';
-import { readDogConfig, DOG_CONFIG_EVENT } from '@/lib/dogConfig';
-import type { DogUserConfig } from '@/lib/dogConfig';
-import type { DogBreed } from '@/components/dog/dogConstants';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -26,20 +21,9 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
     ? allOrganizations
     : organizations;
 
-  const [dogCfg, setDogCfg] = useState<DogUserConfig | null>(null);
-  useEffect(() => {
-    setDogCfg(readDogConfig());
-    const sync = () => setDogCfg(readDogConfig());
-    window.addEventListener(DOG_CONFIG_EVENT, sync);
-    return () => window.removeEventListener(DOG_CONFIG_EVENT, sync);
-  }, []);
-
-  const dogSize      = dogCfg?.size ?? 53;
-  const forcedBreed  = (dogCfg?.breed && dogCfg.breed !== 'auto') ? dogCfg.breed as DogBreed : undefined;
-
   return (
     <m.header
-      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900] overflow-visible"
+      className="h-14 bg-card border-b border-border flex items-center gap-3 px-4 shrink-0 lg:!translate-y-0 relative z-[900]"
       animate={{ y: isVisible ? 0 : -56 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
@@ -59,28 +43,8 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
       </div>
 
-      {/* Dog walking area (mobile) — absolute so it doesn't push layout */}
-      <div className="lg:hidden absolute inset-x-0 inset-y-0 pointer-events-none overflow-visible" style={{ zIndex: 5 }}>
-        <DogAnimation
-          key={`mobile-${dogSize}-${forcedBreed ?? 'auto'}`}
-          inline
-          dogSize={Math.min(dogSize, 48)}
-          forcedBreed={forcedBreed}
-          silent
-          muted
-        />
-      </div>
-
-      {/* Spacer + dog walking area (desktop) */}
-      <div className="hidden lg:block flex-1 relative h-14">
-        <DogAnimation
-          key={`desktop-${dogSize}-${forcedBreed ?? 'auto'}`}
-          inline
-          dogSize={dogSize}
-          forcedBreed={forcedBreed}
-          silent
-        />
-      </div>
+      {/* Spacer (desktop) */}
+      <div className="hidden lg:block flex-1" />
 
       {/* Right side */}
       <div className="flex items-center gap-2">

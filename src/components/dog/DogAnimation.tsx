@@ -281,7 +281,8 @@ export default function DogAnimation({
     if (!container) return;
     const el = document.createElement('div');
     el.textContent = '🐾';
-    el.style.cssText = `position:absolute;bottom:28px;left:${x}px;font-size:0.7rem;pointer-events:none;transform:scaleX(${flip ? -1 : 1});animation:paw-fade 1.4s ease-out forwards;z-index:1;opacity:0;`;
+    const pawBottom = inline ? '28px' : '6px';
+    el.style.cssText = `position:absolute;bottom:${pawBottom};left:${x}px;font-size:0.7rem;pointer-events:none;transform:scaleX(${flip ? -1 : 1});animation:paw-fade 1.4s ease-out forwards;z-index:1;opacity:0;`;
     container.appendChild(el);
     setTimeout(() => el.remove(), 1500);
   }
@@ -1202,7 +1203,7 @@ export default function DogAnimation({
 
   const containerStyle: React.CSSProperties = inline
     ? { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible', zIndex: 10 }
-    : { position: 'fixed', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex };
+    : { position: 'absolute', bottom: 0, left: 0, width: '100%', height: 0, pointerEvents: 'none', zIndex };
 
   return (
     <div
@@ -1215,11 +1216,11 @@ export default function DogAnimation({
         className={wrapperClassName}
         style={{
           position: 'absolute',
-          bottom: inline ? '0' : '-28px',
+          bottom: inline ? '0' : '3px',
           width: `${DOG_SIZE}px`,
           transform: `translateX(${currentPixelPosition}px)`,
           transitionDuration:       showTransition ? `${moveDuration}s`  : undefined,
-          transitionTimingFunction: showTransition ? 'ease-in-out'        : undefined,
+          transitionTimingFunction: showTransition ? 'cubic-bezier(.25,.1,.25,1)' : undefined,
         }}
         onMouseDown={onDogMouseDown}
         onClick={onDogClick}

@@ -8,7 +8,7 @@ export interface DogUserConfig {
   breed: DogBreed | 'auto';
 }
 
-export const DEFAULT_DOG_CONFIG: DogUserConfig = { size: 53, breed: 'auto' };
+export const DEFAULT_DOG_CONFIG: DogUserConfig = { size: 64, breed: 'auto' };
 
 export function readDogConfig(): DogUserConfig {
   if (typeof window === 'undefined') return DEFAULT_DOG_CONFIG;

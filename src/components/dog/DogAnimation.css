@@ -1,6 +1,7 @@
 @keyframes bubble-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.85); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1);    }
+  0%   { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.85); }
+  60%  { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.03); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1);    }
 }
 @keyframes zzz-up {
   0%   { opacity: 0;   transform: translateY(0)     scale(0.6); }
@@ -100,6 +101,7 @@
   width: 100px;
   user-select: none;
   -webkit-user-select: none;
+  transition: opacity 0.5s ease;
 }
 
 .dog-jumping  { animation: dog-jump    0.7s cubic-bezier(.36,.07,.19,.97); }
@@ -114,8 +116,8 @@
   bottom: 102px;
   left: 50%;
   transform: translateX(-50%);
-  background: white;
-  color: #1f2937;
+  background: var(--card, #fff);
+  color: var(--card-foreground, #1f2937);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 5px 11px;
@@ -124,9 +126,9 @@
   max-width: min(220px, 60vw);
   text-align: center;
   line-height: 1.3;
-  box-shadow: 0 3px 10px rgba(0,0,0,.18);
-  border: 1px solid #e5e7eb;
-  animation: bubble-in .22s ease-out;
+  box-shadow: 0 3px 12px rgba(0,0,0,.15);
+  border: 1px solid var(--border, #e5e7eb);
+  animation: bubble-in .3s cubic-bezier(.34,1.56,.64,1);
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -140,9 +142,9 @@
   transform: translateX(-50%) rotate(45deg);
   width: 8px;
   height: 8px;
-  background: white;
-  border-right: 1px solid #e5e7eb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--card, #fff);
+  border-right: 1px solid var(--border, #e5e7eb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
 }
 .dog-bubble--sleep        { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; }
 .dog-bubble--sleep::after { background: #ede9fe; border-color: #c4b5fd; }
@@ -163,8 +165,8 @@
   top: -5px;
   border-right: none;
   border-bottom: none;
-  border-left: 1px solid #e5e7eb;
-  border-top: 1px solid #e5e7eb;
+  border-left: 1px solid var(--border, #e5e7eb);
+  border-top: 1px solid var(--border, #e5e7eb);
 }
 
 .pee-puddle {
@@ -225,15 +227,16 @@
 
 .dog-shadow {
   position: absolute;
-  bottom: 28px;
+  bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70px;
-  height: 10px;
-  background: rgba(0,0,0,.35);
+  width: 60%;
+  height: 6px;
+  background: rgba(0,0,0,.18);
   border-radius: 50%;
-  filter: blur(4px);
-  animation: shadow-pulse 1.8s ease-in-out infinite;
+  filter: blur(3px);
+  animation: shadow-pulse 2.2s ease-in-out infinite;
+  transition: opacity 0.4s ease;
 }
 .dog-zoomies .dog-shadow { animation: none; transform: translateX(-50%) scaleX(0.7); opacity: .15; }
 
@@ -242,4 +245,77 @@
   image-rendering: pixelated;
   position: relative;
   z-index: 2;
+  transition: filter 0.6s ease, transform 0.15s ease;
+}
+
+/* ── Dog Strip (bottom bar) ─────────────────────────────────────────── */
+.dog-strip {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  overflow: visible;
+  transition: height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s ease;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.dog-strip--collapsed {
+  height: 6px;
+  pointer-events: none;
+}
+.dog-strip--collapsed .dog-animation-root,
+.dog-strip--collapsed .dog-strip__ground {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.dog-strip--collapsed .dog-strip__toggle {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.dog-strip__ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--dog-ground, rgba(120,120,120,0.12)) 15%,
+    var(--dog-ground, rgba(120,120,120,0.12)) 85%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  transition: opacity 0.35s ease;
+}
+
+.dog-strip__toggle {
+  position: absolute;
+  right: 12px;
+  top: -16px;
+  width: 28px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  z-index: 60;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+.dog-strip:hover .dog-strip__toggle,
+.dog-strip--collapsed .dog-strip__toggle {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dog-strip__toggle:hover {
+  background: var(--accent, #f3f4f6);
+}
+.dog-strip__toggle-icon {
+  font-size: 0.65rem;
+  line-height: 1;
+  user-select: none;
 }
