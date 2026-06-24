@@ -1,5 +1,5 @@
 import InvoiceDetail from '@/features/finance/components/InvoiceDetail';
-import { getInvoice } from '@/features/finance/actions';
+import { getInvoice, getInvoiceLineItems } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
 import { notFound } from 'next/navigation';
 
@@ -20,11 +20,14 @@ export default async function InvoicePage({
   if (!org) notFound();
   const orgId = (org as unknown as { id: string }).id;
 
-  const { data: invoice } = await getInvoice(invoiceId, orgId);
+  const [{ data: invoice }, { data: lineItems }] = await Promise.all([
+    getInvoice(invoiceId, orgId),
+    getInvoiceLineItems(invoiceId),
+  ]);
 
   if (!invoice) {
     notFound();
   }
 
-  return <InvoiceDetail orgSlug={orgSlug} invoice={invoice as any} />;
+  return <InvoiceDetail orgSlug={orgSlug} invoice={invoice as any} lineItems={lineItems ?? []} />;
 }

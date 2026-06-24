@@ -43,9 +43,19 @@ interface Invoice {
   supplier: { name: string } | null;
 }
 
+interface StructuredLineItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+  product?: { id: string; name: string; sell_price: number | null } | null;
+}
+
 interface InvoiceDetailProps {
   orgSlug: string;
   invoice: Invoice;
+  lineItems?: StructuredLineItem[];
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -64,7 +74,7 @@ const STATUS_CLASSES: Record<string, string> = {
   cancelled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
 };
 
-export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) {
+export default function InvoiceDetail({ orgSlug, invoice, lineItems = [] }: InvoiceDetailProps) {
   const status = invoice.status ?? 'draft';
   const [attachmentUrl, setAttachmentUrl] = useState<string | null>(invoice.attachment_url);
   const [attachmentVersion, setAttachmentVersion] = useState(0);
@@ -129,7 +139,16 @@ export default function InvoiceDetail({ orgSlug, invoice }: InvoiceDetailProps) 
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {!invoice.items || invoice.items.length === 0 ? (
+              {lineItems.length > 0 ? (
+                lineItems.map((item) => (
+                  <tr key={item.id}>
+                    <td className="py-4 px-4 text-foreground">{item.description}</td>
+                    <td className="py-4 px-4 text-foreground text-right">{item.quantity}</td>
+                    <td className="py-4 px-4 text-foreground text-right">${Number(item.unit_price).toFixed(2)}</td>
+                    <td className="py-4 px-4 text-foreground text-right font-medium">${Number(item.total).toFixed(2)}</td>
+                  </tr>
+                ))
+              ) : !invoice.items || invoice.items.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-4 text-center text-muted-foreground italic">
                     No hay ítems registrados

@@ -6,6 +6,7 @@ import { createClient } from '@/services/supabase/server';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionCard } from '@/components/ui/section-card';
 import ExpiryAlertsWidget from '@/features/vehicle-documents/components/ExpiryAlertsWidget';
+import KitchenSalesWidget from '@/features/finance/components/KitchenSalesWidget';
 
 interface DashboardPageProps {
   params: Promise<{ orgSlug: string }>;
@@ -64,7 +65,8 @@ async function FinanceStrip({ orgId, orgSlug }: { orgId: string; orgSlug: string
   const kpis = await getFinanceKPIs(orgId);
 
   function fmt(n: number) {
-    if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`;
+    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}k`;
     return `$${n.toFixed(0)}`;
   }
 
@@ -219,7 +221,12 @@ async function RecentActivity({ orgId, orgSlug, orgType }: { orgId: string; orgS
   const dotColor = { success: 'bg-emerald-500', warning: 'bg-amber-500', info: 'bg-blue-500' };
 
   if (recent.length === 0) {
-    return <p className="text-sm text-muted-foreground italic py-4">Sin actividad reciente.</p>;
+    return (
+      <div className="py-6 text-center">
+        <p className="text-sm text-muted-foreground">No hay actividad reciente.</p>
+        <p className="text-xs text-muted-foreground mt-1">Crea un viaje o registra un gasto para empezar.</p>
+      </div>
+    );
   }
 
   return (
@@ -325,7 +332,7 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
             </Suspense>
           </SectionCard>
 
-          {orgType === 'fleet' && (
+          {orgType === 'fleet' ? (
             <SectionCard
               className="lg:col-span-3"
               title="Vencimientos próximos"
@@ -337,6 +344,20 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
             >
               <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
                 <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
+              </Suspense>
+            </SectionCard>
+          ) : (
+            <SectionCard
+              className="lg:col-span-3"
+              title="Ventas"
+              action={
+                <Link href={`/${orgSlug}/finance/invoices?tab=productos`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  Ver reporte
+                </Link>
+              }
+            >
+              <Suspense fallback={<div className="space-y-2">{[1,2].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
+                <KitchenSalesWidget orgId={org.id} />
               </Suspense>
             </SectionCard>
           )}

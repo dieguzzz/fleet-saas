@@ -1,7 +1,10 @@
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm';
 import { getOrganization } from '@/features/organizations/queries';
 import { getCustomersAndSuppliers } from '@/features/contacts/actions';
+import { getProducts } from '@/features/products/actions';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import type { OrgType } from '@/types/database';
 
 function dgiDateToISO(d?: string): string | undefined {
   if (!d) return undefined;
@@ -32,10 +35,15 @@ export default async function NewInvoicePage({
   const org = await getOrganization(orgSlug);
   if (!org) notFound();
 
+  const headersList = await headers();
+  const orgType = (headersList.get('x-org-type') as OrgType) || 'fleet';
+
   const { data: contactsRaw } = await getCustomersAndSuppliers(org.id);
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
     .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
+
+  const products = orgType === 'kitchen' ? (await getProducts(org.id)).data ?? [] : [];
 
   const scannerData = (ruc || cufe || dgi_url) ? {
     ruc,
@@ -57,6 +65,8 @@ export default async function NewInvoicePage({
         invoiceType={invoiceType as 'cobro' | 'pago'}
         contacts={contacts}
         scannerData={scannerData}
+        orgType={orgType}
+        products={products}
       />
     </div>
   );

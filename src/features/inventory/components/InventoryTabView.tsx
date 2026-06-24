@@ -9,14 +9,24 @@ import {
   INVENTORY_CATEGORY_LABELS,
   type InventoryCategory,
   type InventoryItem,
+  type OrgType,
 } from '@/types/database';
 
-const TABS: { id: InventoryCategory; label: string }[] = [
+const FLEET_TABS: { id: InventoryCategory; label: string }[] = [
   { id: 'parts', label: 'Repuestos' },
   { id: 'fluids', label: 'Fluidos' },
   { id: 'tires', label: 'Neumáticos' },
   { id: 'tools', label: 'Herramientas' },
   { id: 'consumables', label: 'Consumibles' },
+  { id: 'other', label: 'Otro' },
+];
+
+const KITCHEN_TABS: { id: InventoryCategory; label: string }[] = [
+  { id: 'ingredients', label: 'Ingredientes' },
+  { id: 'meats', label: 'Carnes' },
+  { id: 'produce', label: 'Vegetales' },
+  { id: 'spices', label: 'Especias' },
+  { id: 'packaging', label: 'Empaque' },
   { id: 'other', label: 'Otro' },
 ];
 
@@ -163,17 +173,20 @@ function InventoryTable({ items, orgId, orgSlug }: { items: InventoryItem[]; org
 export default function InventoryTabView({
   orgId,
   orgSlug,
+  orgType = 'fleet',
   items,
 }: {
   orgId: string;
   orgSlug: string;
+  orgType?: OrgType;
   items: InventoryItem[];
 }) {
-  const [activeTab, setActiveTab] = useState<InventoryCategory>('parts');
+  const tabs = orgType === 'kitchen' ? KITCHEN_TABS : FLEET_TABS;
+  const [activeTab, setActiveTab] = useState<InventoryCategory>(tabs[0].id);
   const [search, setSearch] = useState('');
 
   const lowCounts = useMemo(() =>
-    Object.fromEntries(TABS.map(t => [
+    Object.fromEntries(tabs.map(t => [
       t.id,
       items.filter(i => (i.category ?? 'other') === t.id && isLow(i)).length,
     ])),
@@ -195,7 +208,7 @@ export default function InventoryTabView({
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {/* Tabs */}
         <div className="flex items-center gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
-          {TABS.map(tab => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setSearch(''); }}

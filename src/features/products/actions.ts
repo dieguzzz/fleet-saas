@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { tryResolveOrgId } from '@/lib/org-resolver';
 import { logAudit } from '@/lib/audit';
-import type { Product } from '@/types/database';
+import type { Product, RecipeIngredient, InventoryItem } from '@/types/database';
 
 export type ProductFormState = { error?: string; success?: boolean } | null;
 
@@ -190,4 +190,118 @@ export async function deleteProductAction(productId: string, orgSlug: string): P
 
   revalidatePath(`/${orgSlug}/products`);
   return {};
+}
+
+// Recipe Ingredients
+
+export async function getRecipeIngredients(productId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('recipe_ingredients')
+    .select('*, inventory_item:inventory_items(id, name, unit, cost_per_unit, current_stock)')
+    .eq('product_id', productId)
+    .order('created_at');
+
+  if (error) {
+    console.error('Error fetching recipe ingredients:', error);
+    return { error: error.message };
+  }
+
+  return { data: data as unknown as RecipeIngredient[] };
+}
+
+export async function getInventoryItemsForRecipe(orgId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .select('id, name, unit, cost_per_unit, category')
+    .eq('organization_id', orgId)
+    .order('name');
+
+  if (error) return { error: error.message };
+  return { data: data as unknown as Pick<InventoryItem, 'id' | 'name' | 'unit' | 'cost_per_unit' | 'category'>[] };
+}
+
+const recipeIngredientSchema = z.object({
+  product_id: z.string().uuid(),
+  inventory_item_id: z.string().uuid(),
+  quantity: z.coerce.number().positive('La cantidad debe ser mayor a 0'),
+  notes: z.string().optional(),
+});
+
+export async function addRecipeIngredientAction(
+  prevState: ProductFormState,
+  formData: FormData
+): Promise<ProductFormState> {
+  const supabase = await createClient();
+  const orgSlug = formData.get('orgSlug') as string;
+
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+
+  const validated = recipeIngredientSchema.safeParse({
+    product_id: formData.get('product_id'),
+    inventory_item_id: formData.get('inventory_item_id'),
+    quantity: formData.get('quantity'),
+    notes: (formData.get('notes') as string) || undefined,
+  });
+
+  if (!validated.success) return { error: validated.error.issues[0].message };
+
+  const { error } = await supabase.from('recipe_ingredients').insert({
+    organization_id: orgId,
+    product_id: validated.data.product_id,
+    inventory_item_id: validated.data.inventory_item_id,
+    quantity: validated.data.quantity,
+    notes: validated.data.notes ?? null,
+  });
+
+  if (error) {
+    if (error.code === '23505') return { error: 'Este ingrediente ya está en la receta' };
+    console.error('Error adding recipe ingredient:', error);
+    return { error: 'Error al agregar ingrediente' };
+  }
+
+  revalidatePath(`/${orgSlug}/products`);
+  return { success: true };
+}
+
+export async function removeRecipeIngredientAction(ingredientId: string, orgSlug: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('recipe_ingredients')
+    .delete()
+    .eq('id', ingredientId);
+
+  if (error) {
+    console.error('Error removing recipe ingredient:', error);
+    return { error: 'Error al eliminar ingrediente' };
+  }
+
+  revalidatePath(`/${orgSlug}/products`);
+  return { success: true };
+}
+
+export async function updateRecipeIngredientAction(
+  ingredientId: string,
+  quantity: number,
+  orgSlug: string
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('recipe_ingredients')
+    .update({ quantity })
+    .eq('id', ingredientId);
+
+  if (error) {
+    console.error('Error updating recipe ingredient:', error);
+    return { error: 'Error al actualizar ingrediente' };
+  }
+
+  revalidatePath(`/${orgSlug}/products`);
+  return { success: true };
 }
