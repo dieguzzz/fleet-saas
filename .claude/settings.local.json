@@ -55,7 +55,8 @@
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__get-logs",
       "mcp__ad597f71-1b77-467b-8eeb-d7d6d10dab0d__redeploy",
       "mcp__18bfff64-df54-414f-93aa-c3f7de2a4fc8__generate_typescript_types",
-      "mcp__Supabase__apply_migration"
+      "mcp__Supabase__apply_migration",
+      "mcp__Supabase__get_publishable_keys"
     ]
   },
   "enableAllProjectMcpServers": true,
