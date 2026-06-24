@@ -52,6 +52,7 @@ export interface Profile {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
+  is_super_admin?: boolean | null;
   created_at: string | null;
   updated_at: string | null;
 }

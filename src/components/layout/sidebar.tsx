@@ -357,6 +357,22 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
           })}
         </nav>
 
+        {/* Super Admin link */}
+        {user?.is_super_admin && (
+          <div className="px-3 pb-2">
+            <Link
+              href="/admin"
+              onClick={() => { haptic(); onClose(); }}
+              className="flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors text-sm font-medium"
+            >
+              <svg className="size-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Super Admin
+            </Link>
+          </div>
+        )}
+
         {/* User footer */}
         <div className="p-3 border-t border-sidebar-border space-y-1">
           <Link

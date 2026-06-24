@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTenantStore, useCurrentOrg } from '@/store/tenant-store';
+import { startImpersonation } from '@/lib/impersonation';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { m } from 'framer-motion';
 import DogAnimation from '@/components/dog/DogAnimation';
@@ -16,8 +17,14 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle, isVisible }: HeaderProps) {
   const organizations = useTenantStore((s) => s.organizations);
+  const allOrganizations = useTenantStore((s) => s.allOrganizations);
+  const isSuperAdmin = useTenantStore((s) => s.isSuperAdmin);
   const currentOrg = useCurrentOrg();
   const user = useTenantStore((s) => s.user);
+
+  const switcherOrgs = isSuperAdmin && allOrganizations.length > 0
+    ? allOrganizations
+    : organizations;
 
   const [dogCfg, setDogCfg] = useState<DogUserConfig | null>(null);
   useEffect(() => {
@@ -77,14 +84,21 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-2">
-        {/* Org switcher — only if multiple orgs */}
-        {organizations.length > 1 && (
+        {/* Org switcher */}
+        {switcherOrgs.length > 1 && (
           <select
             value={currentOrg?.slug || ''}
-            onChange={(e) => { window.location.href = `/${e.target.value}`; }}
-            className="bg-muted border-0 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[130px] cursor-pointer"
+            onChange={async (e) => {
+              const slug = e.target.value;
+              const isMember = organizations.some((o) => o.slug === slug);
+              if (!isMember && isSuperAdmin) {
+                await startImpersonation(slug);
+              }
+              window.location.href = `/${slug}`;
+            }}
+            className="bg-muted border-0 rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-[160px] cursor-pointer"
           >
-            {organizations.map((org) => (
+            {switcherOrgs.map((org) => (
               <option key={org.id} value={org.slug}>{org.name}</option>
             ))}
           </select>

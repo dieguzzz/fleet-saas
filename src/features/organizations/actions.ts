@@ -51,6 +51,57 @@ export async function createOrganization(_prevState: CreateOrgState, formData: F
   return { success: true, slug: org.org_slug };
 }
 
+export type CreateOrgAdminState = { error?: string; success?: boolean; slug?: string } | null;
+
+export async function createOrganizationAsAdmin(_prevState: CreateOrgAdminState, formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'No autenticado.' };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile } = await (supabase as any)
+    .from('profiles')
+    .select('is_super_admin')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.is_super_admin) {
+    return { error: 'No autorizado. Se requiere acceso Super Admin.' };
+  }
+
+  const name = formData.get('name') as string;
+  let slug = formData.get('slug') as string | null;
+  const orgType = (formData.get('org_type') as string) || 'fleet';
+
+  if (!name) return { error: 'El nombre es requerido.' };
+  if (!slug) slug = generateSlug(name);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existing } = await (supabase as any)
+    .from('organizations')
+    .select('id')
+    .eq('slug', slug)
+    .single();
+
+  if (existing) return { error: `El slug "${slug}" ya existe.` };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('organizations')
+    .insert({ name, slug, org_type: orgType });
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin');
+  return { success: true, slug };
+}
+
 export async function updateOrganization(
   orgId: string,
   data: { name?: string; logo_url?: string; settings?: Json }
