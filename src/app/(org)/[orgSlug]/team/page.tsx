@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
-export const metadata: Metadata = { title: 'Equipo — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Equipo — Merlin' };
 
 export default async function TeamPage({
   params,

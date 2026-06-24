@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrganization, type CreateOrgState } from '@/features/organizations/actions';
+import { MerlinLogoLink } from '@/components/logos/MerlinLogo';
 
 export default function OnboardingPage() {
   const { push } = useRouter();
@@ -21,14 +22,8 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="size-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">F</span>
-            </div>
-            <span className="text-foreground font-semibold text-2xl">Fleet SaaS</span>
-          </Link>
+          <MerlinLogoLink size={48} />
         </div>
 
         {/* Form Card */}

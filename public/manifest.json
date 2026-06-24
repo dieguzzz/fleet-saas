@@ -1,7 +1,7 @@
 {
-  "name": "Fleet SaaS",
-  "short_name": "Fleet",
-  "description": "Gestión de flota vehicular",
+  "name": "Merlin",
+  "short_name": "Merlin",
+  "description": "Gestión empresarial inteligente",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -8,7 +8,7 @@ import { TripList } from '@/features/trips/components/TripList';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
-export const metadata: Metadata = { title: 'Viajes — Fleet SaaS' };
+export const metadata: Metadata = { title: 'Viajes — Merlin' };
 
 async function TripsListContainer({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
   const { data: trips, error } = await getTrips(orgId);

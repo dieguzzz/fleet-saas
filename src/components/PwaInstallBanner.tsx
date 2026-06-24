@@ -90,7 +90,7 @@ export function PwaInstallBanner() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold leading-tight">Instalar Fleet SaaS</p>
+          <p className="text-sm font-semibold leading-tight">Instalar Merlin</p>
           {isIosDevice ? (
             <p className="text-xs text-sidebar-foreground/70 mt-0.5 leading-snug">
               Toca{' '}

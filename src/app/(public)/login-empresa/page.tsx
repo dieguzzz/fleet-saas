@@ -15,10 +15,14 @@ export default function LoginEmpresaPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex flex-col items-center gap-2">
-            <div className="size-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-3xl">A</span>
+            <div className="size-14 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg className="size-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
-            <span className="text-foreground font-bold text-2xl tracking-tight">AMD Logistics</span>
+            <span className="text-foreground font-bold text-xl tracking-tight">Merlin</span>
           </div>
         </div>
 
@@ -53,7 +57,7 @@ export default function LoginEmpresaPage() {
                 autoFocus
                 autoComplete="email"
                 placeholder="tu@empresa.com"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -68,20 +72,20 @@ export default function LoginEmpresaPage() {
                 required
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? 'Ingresando...' : 'Ingresar'}
             </button>
 
             <p className="text-center text-sm text-muted-foreground">
-              <Link href="/forgot-password" className="text-blue-500 hover:text-blue-400">
+              <Link href="/forgot-password" className="text-violet-500 hover:text-violet-400">
                 ¿Olvidaste tu contraseña?
               </Link>
             </p>
