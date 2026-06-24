@@ -23,6 +23,9 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
   const setUser = useTenantStore((s) => s.setUser);
   const setOrganizations = useTenantStore((s) => s.setOrganizations);
   const setIsLoading = useTenantStore((s) => s.setIsLoading);
+  const setIsSuperAdmin = useTenantStore((s) => s.setIsSuperAdmin);
+  const setAllOrganizations = useTenantStore((s) => s.setAllOrganizations);
+  const startImpersonationStore = useTenantStore((s) => s.startImpersonation);
   const isImpersonating = useTenantStore((s) => s.isImpersonating);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,7 +110,21 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
         .eq('id', user.id)
         .single();
 
-      if (profile) setUser(profile as Profile);
+      if (profile) {
+        setUser(profile as Profile);
+        const isSA = !!(profile as Profile).is_super_admin;
+        setIsSuperAdmin(isSA);
+
+        // Super admin: load all organizations for the switcher
+        if (isSA) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: allOrgs } = await (supabase as any)
+            .from('organizations')
+            .select('*')
+            .order('name');
+          if (allOrgs) setAllOrganizations(allOrgs as Organization[]);
+        }
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: memberships } = await (supabase as any)
@@ -130,6 +147,18 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
             currentMembership.organization as Organization,
             currentMembership.role as OrgRole
           );
+        } else if ((profile as Profile).is_super_admin) {
+          // Super admin visiting an org they're not a member of — impersonation mode
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: impOrg } = await (supabase as any)
+            .from('organizations')
+            .select('*')
+            .eq('slug', orgSlug)
+            .single();
+          if (impOrg) {
+            setCurrentOrg(impOrg as Organization, 'owner');
+            startImpersonationStore(impOrg as Organization);
+          }
         }
       }
 
@@ -137,7 +166,8 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
     };
 
     loadTenantData();
-  }, [orgSlug, setCurrentOrg, setUser, setOrganizations, setIsLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orgSlug]);
 
   return (
     <div

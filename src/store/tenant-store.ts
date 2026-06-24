@@ -15,6 +15,12 @@ interface TenantState {
   organizations: Organization[];
   setOrganizations: (orgs: Organization[]) => void;
 
+  // Super admin
+  isSuperAdmin: boolean;
+  setIsSuperAdmin: (v: boolean) => void;
+  allOrganizations: Organization[];
+  setAllOrganizations: (orgs: Organization[]) => void;
+
   // Impersonation
   isImpersonating: boolean;
   impersonatedOrg: Organization | null;
@@ -34,6 +40,8 @@ const initialState = {
   currentOrg: null,
   currentRole: null,
   organizations: [],
+  isSuperAdmin: false,
+  allOrganizations: [],
   isImpersonating: false,
   impersonatedOrg: null,
   isLoading: true,
@@ -48,6 +56,9 @@ export const useTenantStore = create<TenantState>((set) => ({
     set({ currentOrg: org, currentRole: role }),
 
   setOrganizations: (organizations) => set({ organizations }),
+
+  setIsSuperAdmin: (isSuperAdmin) => set({ isSuperAdmin }),
+  setAllOrganizations: (allOrganizations) => set({ allOrganizations }),
 
   startImpersonation: (org) =>
     set({

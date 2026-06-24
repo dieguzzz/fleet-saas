@@ -131,8 +131,59 @@ export async function middleware(request: NextRequest) {
         if (!profile?.is_super_admin) {
           return NextResponse.redirect(new URL('/unauthorized', request.url));
         }
+        // Set org context headers for impersonated session
+        const impersonatingOrgId = request.cookies.get('impersonating_org_id')?.value;
+        if (impersonatingOrgId) {
+          const { data: impOrg } = await supabase
+            .from('organizations')
+            .select('id, slug, org_type')
+            .eq('slug', orgSlug)
+            .single();
+          if (impOrg) {
+            const orgType = (impOrg as any).org_type || 'fleet';
+            supabaseResponse.headers.set('x-org-id', impOrg.id);
+            supabaseResponse.headers.set('x-org-role', 'owner');
+            supabaseResponse.headers.set('x-org-slug', orgSlug);
+            supabaseResponse.headers.set('x-org-type', orgType);
+
+            const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
+            const kitchenOnlySegments = new Set(['products']);
+            const secondSegment = pathname.split('/')[2];
+
+            if (secondSegment && fleetOnlySegments.has(secondSegment) && orgType !== 'fleet') {
+              return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
+            }
+            if (secondSegment && kitchenOnlySegments.has(secondSegment) && orgType !== 'kitchen') {
+              return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
+            }
+          }
+        }
       } else {
-        return NextResponse.redirect(new URL('/unauthorized', request.url));
+        // Super admin without impersonation cookie — auto-start impersonation
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_super_admin')
+          .eq('id', user!.id)
+          .single();
+        if (profile?.is_super_admin) {
+          // Allow access but without cookie — layout will handle setting up impersonation state
+          const { data: directOrg } = await supabase
+            .from('organizations')
+            .select('id, slug, org_type')
+            .eq('slug', orgSlug)
+            .single();
+          if (directOrg) {
+            const orgType = (directOrg as any).org_type || 'fleet';
+            supabaseResponse.headers.set('x-org-id', directOrg.id);
+            supabaseResponse.headers.set('x-org-role', 'owner');
+            supabaseResponse.headers.set('x-org-slug', orgSlug);
+            supabaseResponse.headers.set('x-org-type', orgType);
+          } else {
+            return NextResponse.redirect(new URL('/unauthorized', request.url));
+          }
+        } else {
+          return NextResponse.redirect(new URL('/unauthorized', request.url));
+        }
       }
     }
 
