@@ -92,8 +92,8 @@ export default function DogSettingsPanel() {
           <span className="text-xs text-muted-foreground">Pequeño</span>
           <input
             type="range"
-            min={36}
-            max={72}
+            min={40}
+            max={100}
             step={2}
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}

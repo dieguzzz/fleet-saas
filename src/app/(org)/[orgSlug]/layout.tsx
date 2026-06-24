@@ -6,6 +6,7 @@ import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
+import DogStrip from '@/components/dog/DogStrip';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
 import type { Organization, Profile, OrgRole } from '@/types/database';
@@ -208,6 +209,7 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
               {children}
             </div>
           </main>
+          <DogStrip />
         </div>
       </div>
 
