@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { getOrganization, getOrganizationStats } from '@/features/organizations/queries';
+import { getOrganization, getOrganizationStats, getKitchenStats } from '@/features/organizations/queries';
 import { getFinanceKPIs } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
 import { PageHeader } from '@/components/ui/page-header';
@@ -14,7 +14,61 @@ interface DashboardPageProps {
   params: Promise<{ orgSlug: string }>;
 }
 
-async function DashboardStats({ orgSlug, orgId }: { orgSlug: string; orgId: string }) {
+async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; orgId: string; orgType: string }) {
+  if (orgType === 'kitchen') {
+    const stats = await getKitchenStats(orgId);
+
+    const statCards = [
+      {
+        label: 'Productos', value: stats.products, href: `/${orgSlug}/products`,
+        gradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
+        icon: (
+          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`,
+        gradient: 'bg-gradient-to-br from-purple-500 to-purple-600',
+        icon: (
+          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Inventario', value: stats.inventory, href: `/${orgSlug}/inventory/items`,
+        gradient: 'bg-gradient-to-br from-blue-500 to-blue-600',
+        icon: (
+          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          </svg>
+        ),
+      },
+    ];
+
+    return (
+      <div className="grid grid-cols-3 gap-3 lg:gap-6">
+        {statCards.map((stat) => (
+          <Link key={stat.label} href={stat.href} className="group">
+            <StatCard
+              label={stat.label}
+              value={
+                <div className="flex items-center justify-between mt-1">
+                  <span>{stat.value}</span>
+                  <span className="text-muted-foreground">{stat.icon}</span>
+                </div>
+              }
+              iconGradient={stat.gradient}
+              className="hover:shadow-md transition-shadow group-active:scale-95"
+            />
+          </Link>
+        ))}
+      </div>
+    );
+  }
+
   const stats = await getOrganizationStats(orgId);
 
   const statCards = [
@@ -115,33 +169,41 @@ function FinanceSkeleton() {
   );
 }
 
-async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
+async function RecentActivity({ orgId, orgSlug, orgType }: { orgId: string; orgSlug: string; orgType: string }) {
   const supabase = await createClient();
-
-  const [{ data: trips }, { data: maintenance }, { data: invoices }] = await Promise.all([
-    supabase
-      .from('trips')
-      .select('id, origin, destination, status, started_at, updated_at')
-      .eq('organization_id', orgId)
-      .order('updated_at', { ascending: false })
-      .limit(3),
-    supabase
-      .from('maintenance_records')
-      .select('id, type, performed_at, vehicle_id')
-      .eq('organization_id', orgId)
-      .order('performed_at', { ascending: false })
-      .limit(3),
-    supabase
-      .from('invoices')
-      .select('id, invoice_number, status, date, invoice_type')
-      .eq('organization_id', orgId)
-      .order('date', { ascending: false })
-      .limit(3),
-  ]);
 
   type TripRow = { id: string; origin: string; destination: string; status: string | null; started_at: string | null; updated_at: string | null };
   type MaintRow = { id: string; type: string; performed_at: string; vehicle_id: string };
   type InvRow = { id: string; invoice_number: string; status: string | null; date: string; invoice_type: string };
+
+  let trips: TripRow[] = [];
+  let maintenance: MaintRow[] = [];
+
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select('id, invoice_number, status, date, invoice_type')
+    .eq('organization_id', orgId)
+    .order('date', { ascending: false })
+    .limit(3);
+
+  if (orgType === 'fleet') {
+    const [tripsResult, maintResult] = await Promise.all([
+      supabase
+        .from('trips')
+        .select('id, origin, destination, status, started_at, updated_at')
+        .eq('organization_id', orgId)
+        .order('updated_at', { ascending: false })
+        .limit(3),
+      supabase
+        .from('maintenance_records')
+        .select('id, type, performed_at, vehicle_id')
+        .eq('organization_id', orgId)
+        .order('performed_at', { ascending: false })
+        .limit(3),
+    ]);
+    trips = (tripsResult.data as unknown as TripRow[] | null) ?? [];
+    maintenance = (maintResult.data as unknown as MaintRow[] | null) ?? [];
+  }
 
   function formatDate(dateStr: string | null) {
     if (!dateStr) return '';
@@ -152,7 +214,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
   type ActivityItem = { id: string; text: string; time: string; rawTime: string; type: 'success' | 'warning' | 'info'; href: string };
   const items: ActivityItem[] = [];
 
-  for (const t of (trips as unknown as TripRow[] | null) ?? []) {
+  for (const t of trips) {
     items.push({
       id: `trip-${t.id}`,
       text: `Viaje: ${t.origin} → ${t.destination}`,
@@ -163,7 +225,7 @@ async function RecentActivity({ orgId, orgSlug }: { orgId: string; orgSlug: stri
     });
   }
 
-  for (const m of (maintenance as unknown as MaintRow[] | null) ?? []) {
+  for (const m of maintenance) {
     items.push({
       id: `maint-${m.id}`,
       text: `Mantenimiento: ${m.type}`,
@@ -215,12 +277,31 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
 
   if (!org) return <div>Organización no encontrada</div>;
 
+  const orgType = org.org_type || 'fleet';
+
+  const quickActions = orgType === 'kitchen'
+    ? [
+        { href: `/${orgSlug}/products/new`, label: '+ Nuevo Producto' },
+        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: '+ Nueva Factura de Cobro' },
+        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: '+ Nueva Factura de Pago' },
+        { href: `/${orgSlug}/contacts/new`, label: '+ Nuevo Contacto' },
+        { href: `/${orgSlug}/inventory/items`, label: '→ Ver Inventario' },
+      ]
+    : [
+        { href: `/${orgSlug}/vehicles/new`, label: '+ Nuevo Vehículo' },
+        { href: `/${orgSlug}/trips/new`, label: '+ Nuevo Viaje' },
+        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: '+ Nueva Factura de Cobro' },
+        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: '+ Nueva Factura de Pago' },
+        { href: `/${orgSlug}/contacts/new`, label: '+ Nuevo Contacto' },
+        { href: `/${orgSlug}/inventory/items`, label: '→ Ver Inventario' },
+      ];
+
   return (
     <div className="space-y-6">
       <PageHeader title={`Bienvenido a ${org.name}`} description="Resumen general de tu organización" />
 
       <Suspense fallback={<StatsSkeleton />}>
-        <DashboardStats orgSlug={orgSlug} orgId={org.id} />
+        <DashboardStats orgSlug={orgSlug} orgId={org.id} orgType={orgType} />
       </Suspense>
 
       <Suspense fallback={<FinanceSkeleton />}>
@@ -234,28 +315,23 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-8" />)}
             </div>
           }>
-            <RecentActivity orgId={org.id} orgSlug={orgSlug} />
+            <RecentActivity orgId={org.id} orgSlug={orgSlug} orgType={orgType} />
           </Suspense>
         </SectionCard>
 
-        <SectionCard className="lg:col-span-3" title="Vencimientos próximos">
-          <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
-            <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
-          </Suspense>
-        </SectionCard>
+        {orgType === 'fleet' && (
+          <SectionCard className="lg:col-span-3" title="Vencimientos próximos">
+            <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
+              <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
+            </Suspense>
+          </SectionCard>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
         <SectionCard className="lg:col-span-4" title="Acciones Rápidas">
           <div className="space-y-1">
-            {[
-              { href: `/${orgSlug}/vehicles/new`, label: '+ Nuevo Vehículo' },
-              { href: `/${orgSlug}/trips/new`, label: '+ Nuevo Viaje' },
-              { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: '+ Nueva Factura de Cobro' },
-              { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: '+ Nueva Factura de Pago' },
-              { href: `/${orgSlug}/contacts/new`, label: '+ Nuevo Contacto' },
-              { href: `/${orgSlug}/inventory/items`, label: '→ Ver Inventario' },
-            ].map((a) => (
+            {quickActions.map((a) => (
               <Link
                 key={a.href}
                 href={a.href}
