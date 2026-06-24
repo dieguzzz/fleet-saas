@@ -6,6 +6,7 @@ import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
 export const metadata: Metadata = { title: 'Vehículos — Merlin' };
@@ -27,10 +28,9 @@ export default async function VehiclesPage({ params }: { params: Promise<{ orgSl
         title="Vehículos"
         description="Gestiona la flota de vehículos de tu organización."
         action={
-          <Link href={`/${orgSlug}/vehicles/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-            + Nuevo Vehículo
-          </Link>
+          <Button asChild>
+            <Link href={`/${orgSlug}/vehicles/new`}>+ Nuevo Vehículo</Link>
+          </Button>
         }
       />
       <Suspense fallback={<div className="space-y-2">{[1,2,3,4].map(i=><SkeletonRow key={i}/>)}</div>}>

@@ -6,6 +6,7 @@ import { getTenants, getPaymentsByMonth } from '@/features/terrain/actions';
 import { TenantList } from '@/features/terrain/components/TenantList';
 import { MonthlyPayments } from '@/features/terrain/components/MonthlyPayments';
 import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionCard } from '@/components/ui/section-card';
 import type { LandTenant, LandPayment } from '@/types/database';
@@ -52,12 +53,9 @@ export default async function TerrenoPage({ params }: { params: Promise<{ orgSlu
         title="Terreno"
         description="Control de pagos de renta del terreno"
         action={
-          <Link
-            href={`/${orgSlug}/terreno/new`}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-          >
-            + Nuevo inquilino
-          </Link>
+          <Button asChild>
+            <Link href={`/${orgSlug}/terreno/new`}>+ Nuevo inquilino</Link>
+          </Button>
         }
       />
 

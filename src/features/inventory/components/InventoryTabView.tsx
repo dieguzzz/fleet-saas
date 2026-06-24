@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useTransition } from 'react';
 import { deleteInventoryItemAction } from '../actions';
+import { Button } from '@/components/ui/button';
 import InventoryItemModal from './InventoryItemModal';
 import StockMovementModal from './StockMovementModal';
 import {
@@ -231,9 +232,7 @@ export default function InventoryTabView({
             orgSlug={orgSlug}
             defaultCategory={activeTab}
             trigger={
-              <button className="shrink-0 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                + Nuevo
-              </button>
+              <Button className="shrink-0">+ Nuevo</Button>
             }
           />
         </div>
