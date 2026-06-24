@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-24T00:00:00Z",
+  "title": "Design System: Merlin",
+  "extensions": {
+    "colorMeta": {
+      "violet-brand": {
+        "role": "primary",
+        "displayName": "Violet Brand",
+        "canonical": "oklch(0.541 0.245 293)",
+        "tonalRamp": [
+          "oklch(0.20 0.08 293)",
+          "oklch(0.30 0.12 293)",
+          "oklch(0.40 0.18 293)",
+          "oklch(0.541 0.245 293)",
+          "oklch(0.65 0.20 293)",
+          "oklch(0.75 0.15 293)",
+          "oklch(0.85 0.08 293)",
+          "oklch(0.95 0.03 293)"
+        ]
+      },
+      "indigo-deep": {
+        "role": "primary",
+        "displayName": "Indigo Deep",
+        "canonical": "oklch(0.496 0.232 264)",
+        "tonalRamp": [
+          "oklch(0.20 0.08 264)",
+          "oklch(0.30 0.12 264)",
+          "oklch(0.40 0.18 264)",
+          "oklch(0.496 0.232 264)",
+          "oklch(0.60 0.18 264)",
+          "oklch(0.72 0.12 264)",
+          "oklch(0.85 0.06 264)",
+          "oklch(0.95 0.02 264)"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink Dark",
+        "canonical": "oklch(0.145 0 0)",
+        "tonalRamp": [
+          "oklch(0.145 0 0)",
+          "oklch(0.205 0 0)",
+          "oklch(0.269 0 0)",
+          "oklch(0.40 0 0)",
+          "oklch(0.556 0 0)",
+          "oklch(0.708 0 0)",
+          "oklch(0.85 0 0)",
+          "oklch(0.97 0 0)"
+        ]
+      },
+      "destructive-red": {
+        "role": "semantic",
+        "displayName": "Destructive Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.25 0.10 27)",
+          "oklch(0.35 0.15 27)",
+          "oklch(0.45 0.20 27)",
+          "oklch(0.577 0.245 27)",
+          "oklch(0.65 0.20 27)",
+          "oklch(0.75 0.14 27)",
+          "oklch(0.85 0.08 27)",
+          "oklch(0.95 0.03 27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Landing page hero headlines only. Never inside the app shell." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles: h1 inside org routes." },
+      "title": { "displayName": "Title", "purpose": "Card headers, section labels, sidebar group headers." },
+      "body": { "displayName": "Body", "purpose": "Running text, table cells, descriptions. Max 65-75ch." },
+      "label": { "displayName": "Label", "purpose": "Form labels, metadata, badge text. Uppercase in form context." },
+      "mono": { "displayName": "Mono", "purpose": "Code, tabular data, timestamps, IDs." }
+    },
+    "shadows": [
+      { "name": "xs", "value": "0 1px 2px rgba(0,0,0,0.05)", "purpose": "Default card shadow. Nearly imperceptible lift." },
+      { "name": "sm", "value": "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)", "purpose": "Dropdowns, popovers." },
+      { "name": "lg", "value": "0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)", "purpose": "Dialogs, modals." }
+    ],
+    "motion": [
+      { "name": "spring-default", "value": "type: spring, stiffness: 300, damping: 30", "purpose": "Sidebar open/close, header hide/show. Framer Motion spring." },
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "CSS transitions: color, background, opacity." },
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Enter animations, element reveals." },
+      { "name": "duration-fast", "value": "150ms", "purpose": "Hover states, toggle switches." },
+      { "name": "duration-normal", "value": "200ms", "purpose": "Standard transitions." },
+      { "name": "duration-slow", "value": "350ms", "purpose": "Layout shifts, sidebar transitions." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action button. Violet background, white text.",
+      "html": "<button class=\"ds-btn-primary\">Guardar</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; background: oklch(0.541 0.245 293); color: #fff; font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; } .ds-btn-primary:hover { background: oklch(0.48 0.22 293); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(1 0 0), 0 0 0 5px oklch(0.541 0.245 293 / 0.5); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action button. Transparent with border.",
+      "html": "<button class=\"ds-btn-outline\">Cancelar</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; background: transparent; color: oklch(0.145 0 0); font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid oklch(0.922 0 0); border-radius: 8px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background 0.15s ease, border-color 0.15s ease; } .ds-btn-outline:hover { background: oklch(0.97 0 0); } .ds-btn-outline:focus-visible { outline: none; border-color: oklch(0.708 0 0); box-shadow: 0 0 0 3px oklch(0.708 0 0 / 0.5); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary action in toolbars and nav. No border, no background at rest.",
+      "html": "<button class=\"ds-btn-ghost\">Editar</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 8px 16px; background: transparent; color: oklch(0.301 0 0); font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; } .ds-btn-ghost:hover { background: oklch(0.97 0 0); color: oklch(0.145 0 0); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.708 0 0 / 0.5); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Standard content container with border and gentle shadow.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card__title\">Vehículos</div><div class=\"ds-card__body\">12 activos, 3 en mantenimiento</div></div>",
+      "css": ".ds-card { background: oklch(1 0 0); border: 1px solid oklch(0.922 0 0); border-radius: 18px; padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); } .ds-card__title { font-family: Geist, system-ui, sans-serif; font-size: 1rem; font-weight: 600; color: oklch(0.145 0 0); margin-bottom: 4px; } .ds-card__body { font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; color: oklch(0.556 0 0); }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Standard text input with label.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field__label\">NOMBRE</label><input class=\"ds-field__input\" placeholder=\"Ej: Toyota Hilux\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 2px; } .ds-field__label { font-family: Geist, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; color: oklch(0.556 0 0); text-transform: uppercase; letter-spacing: 0.05em; } .ds-field__input { height: 36px; padding: 4px 12px; background: transparent; border: 1px solid oklch(0.922 0 0); border-radius: 8px; font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; color: oklch(0.145 0 0); transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-field__input::placeholder { color: oklch(0.556 0 0); } .ds-field__input:focus { outline: none; border-color: oklch(0.708 0 0); box-shadow: 0 0 0 3px oklch(0.708 0 0 / 0.2); }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Sidebar navigation item with icon and label.",
+      "html": "<a class=\"ds-nav-item ds-nav-item--active\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6\"/></svg><span>Dashboard</span></a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; font-family: Geist, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; color: oklch(0.556 0 0); text-decoration: none; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; } .ds-nav-item:hover { background: oklch(0.97 0 0); color: oklch(0.145 0 0); } .ds-nav-item--active { background: oklch(0.97 0 0); color: oklch(0.145 0 0); font-weight: 600; } .ds-nav-icon { width: 20px; height: 20px; flex-shrink: 0; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Colored status indicator for active, warning, error states.",
+      "html": "<span class=\"ds-badge ds-badge--success\">Activo</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-family: Geist, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; } .ds-badge--success { background: oklch(0.92 0.04 145); color: oklch(0.35 0.12 145); } .ds-badge--warning { background: oklch(0.92 0.06 85); color: oklch(0.40 0.12 85); } .ds-badge--error { background: oklch(0.92 0.04 27); color: oklch(0.40 0.12 27); } .ds-badge--info { background: oklch(0.92 0.04 260); color: oklch(0.40 0.12 260); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Herramienta de Bolsillo",
+    "overview": "Merlin is a pocket tool — compact, direct, always at hand. Like a digital Swiss Army knife for Latin American SMBs managing fleets, kitchens, finances, and teams. The interface disappears into the task: no chrome competes with the data, no decoration exists without function. Every screen answers one question fast, whether the user is a business owner at a desk or a field operator checking their phone under the sun.\n\nThe system is achromatic by doctrine. Pure neutral grays carry the structure; a single violet accent marks interactive elements and brand moments. This restraint is not minimalism for its own sake — it's operational clarity. When violet appears, it means something.\n\nThe feel is soft and welcoming, not cold or clinical. Gently rounded corners, smooth transitions, and generous touch targets communicate that this tool was built for real people with busy hands, not for design portfolios.",
+    "keyCharacteristics": [
+      "Achromatic structure with a single violet accent",
+      "Soft, rounded component language (10-18px radii on containers)",
+      "Mobile-real: 44px touch targets, one-hand operation",
+      "Progressive disclosure over information density",
+      "Full light/dark theme parity via OKLCH tokens",
+      "Geist type family throughout (sans + mono)"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Violet is the only chromatic color in the structural palette. Status colors appear contextually in badges and alerts — they never carry structural weight.", "section": "colors" },
+      { "name": "The Dark Parity Rule", "body": "Every light-mode surface has a dark-mode counterpart. No component may hardcode bg-white or text-black. Semantic tokens are the only source of truth.", "section": "colors" },
+      { "name": "The Weight Ladder Rule", "body": "Hierarchy is expressed through weight (700 → 600 → 500 → 400), not size alone. Size steps are small; weight does the heavy lifting.", "section": "typography" },
+      { "name": "The Flat-at-Rest Rule", "body": "Surfaces are flat at rest. Shadows appear as response to elevation change or interaction, never as decoration.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use semantic tokens (bg-card, text-foreground, border-border) for every surface.",
+      "Do maintain 4.5:1 contrast ratio on all body text.",
+      "Do use 44px minimum touch targets on every interactive element.",
+      "Do reveal complexity progressively.",
+      "Do pair every bg-*-100 badge with its dark:bg-*-900/30 dark:text-*-300 counterpart.",
+      "Do use text-wrap: balance on headings and text-wrap: pretty on body prose."
+    ],
+    "donts": [
+      "Don't use hardcoded colors (bg-white, text-black, bg-slate-800) in any component.",
+      "Don't use border-left or border-right > 1px as a colored accent stripe.",
+      "Don't create ERP-like interfaces: no 30-field forms, no tables-only UI, no nested navigation.",
+      "Don't add a second chromatic accent color beyond violet.",
+      "Don't use gradient text (background-clip: text).",
+      "Don't nest cards inside cards.",
+      "Don't use shadows heavier than shadow-sm on cards at rest.",
+      "Don't add motion that blocks content visibility.",
+      "Don't skip prefers-reduced-motion alternatives."
+    ]
+  }
+}
