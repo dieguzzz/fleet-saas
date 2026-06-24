@@ -6,6 +6,7 @@ import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import { TripList } from '@/features/trips/components/TripList';
 import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
 export const metadata: Metadata = { title: 'Viajes — Merlin' };
@@ -27,10 +28,9 @@ export default async function TripsPage({ params }: { params: Promise<{ orgSlug:
         title="Viajes"
         description="Gestiona tus viajes en curso y planificados."
         action={
-          <Link href={`/${org.slug}/trips/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-            + Nuevo Viaje
-          </Link>
+          <Button asChild>
+            <Link href={`/${org.slug}/trips/new`}>+ Nuevo Viaje</Link>
+          </Button>
         }
       />
       <Suspense fallback={<div className="space-y-2">{[1,2,3,4].map(i=><SkeletonRow key={i}/>)}</div>}>

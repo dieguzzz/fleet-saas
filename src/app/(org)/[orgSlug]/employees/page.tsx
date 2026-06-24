@@ -5,6 +5,7 @@ import { createClient } from '@/services/supabase/server';
 import { getEmployees } from '@/features/employees/actions';
 import EmployeeList from '@/features/employees/components/EmployeeList';
 import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/stat-card';
 
 export const metadata: Metadata = { title: 'Empleados — Merlin' };
@@ -33,10 +34,9 @@ export default async function EmployeesPage({ params }: { params: Promise<{ orgS
         title="Empleados"
         description="Gestión del personal de la flota"
         action={
-          <Link href={`/${orgSlug}/employees/new`}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-            + Agregar empleado
-          </Link>
+          <Button asChild>
+            <Link href={`/${orgSlug}/employees/new`}>+ Agregar empleado</Link>
+          </Button>
         }
       />
 

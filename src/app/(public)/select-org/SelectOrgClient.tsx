@@ -30,7 +30,7 @@ export default function SelectOrgClient({ orgs }: { orgs: Org[] }) {
               onClick={() => push(`/${org.slug}`)}
               className="w-full flex items-center gap-4 bg-card border border-border rounded-xl p-4 hover:bg-accent transition-colors text-left"
             >
-              <div className="size-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+              <div className="size-10 bg-primary rounded-lg flex items-center justify-center shrink-0">
                 <Building2 className="size-5 text-white" />
               </div>
               <div>

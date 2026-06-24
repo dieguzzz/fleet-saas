@@ -336,11 +336,11 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
                             // 44px minimum touch target height
                             'min-h-[44px]',
                             active
-                              ? 'bg-blue-600/20 text-blue-300 font-medium'
+                              ? 'bg-primary/20 text-primary-foreground font-medium'
                               : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
                           )}
                         >
-                          <span className={cn(active ? 'text-blue-400' : 'text-muted-foreground')}>
+                          <span className={cn(active ? 'text-primary' : 'text-muted-foreground')}>
                             {item.icon}
                           </span>
                           {item.label}

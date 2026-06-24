@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useTransition } from 'react';
 import { deleteContact } from '../actions';
+import { Button } from '@/components/ui/button';
 import ContactModal from './ContactModal';
 import {
   CONTACT_ROLE_LABELS,
@@ -242,9 +243,7 @@ export default function ContactsTabView({ orgSlug, contacts }: { orgSlug: string
             orgSlug={orgSlug}
             defaultRole={getDefaultRole(activeTab)}
             trigger={
-              <button className="shrink-0 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                + Nuevo
-              </button>
+              <Button className="shrink-0">+ Nuevo</Button>
             }
           />
         </div>
