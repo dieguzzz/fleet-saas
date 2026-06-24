@@ -3,11 +3,8 @@ import Link from 'next/link';
 import { getOrganization, getOrganizationStats, getKitchenStats } from '@/features/organizations/queries';
 import { getFinanceKPIs } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
-import { PageHeader } from '@/components/ui/page-header';
-import { StatCard } from '@/components/ui/stat-card';
-import { SkeletonCard } from '@/components/ui/skeleton';
-import { SectionCard } from '@/components/ui/section-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SectionCard } from '@/components/ui/section-card';
 import ExpiryAlertsWidget from '@/features/vehicle-documents/components/ExpiryAlertsWidget';
 
 interface DashboardPageProps {
@@ -17,52 +14,22 @@ interface DashboardPageProps {
 async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; orgId: string; orgType: string }) {
   if (orgType === 'kitchen') {
     const stats = await getKitchenStats(orgId);
-
-    const statCards = [
-      {
-        label: 'Productos', value: stats.products, href: `/${orgSlug}/products`,
-        gradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
-        icon: (
-          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        ),
-      },
-      {
-        label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`,
-        gradient: 'bg-gradient-to-br from-purple-500 to-purple-600',
-        icon: (
-          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        ),
-      },
-      {
-        label: 'Inventario', value: stats.inventory, href: `/${orgSlug}/inventory/items`,
-        gradient: 'bg-gradient-to-br from-blue-500 to-blue-600',
-        icon: (
-          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-          </svg>
-        ),
-      },
+    const metrics = [
+      { label: 'Productos', value: stats.products, href: `/${orgSlug}/products` },
+      { label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts` },
+      { label: 'Inventario', value: stats.inventory, href: `/${orgSlug}/inventory/items` },
     ];
 
     return (
-      <div className="grid grid-cols-3 gap-3 lg:gap-6">
-        {statCards.map((stat) => (
-          <Link key={stat.label} href={stat.href} className="group">
-            <StatCard
-              label={stat.label}
-              value={
-                <div className="flex items-center justify-between mt-1">
-                  <span>{stat.value}</span>
-                  <span className="text-muted-foreground">{stat.icon}</span>
-                </div>
-              }
-              iconGradient={stat.gradient}
-              className="hover:shadow-md transition-shadow group-active:scale-95"
-            />
+      <div className="flex items-baseline gap-8 lg:gap-12 flex-wrap">
+        {metrics.map((m) => (
+          <Link key={m.label} href={m.href} className="group">
+            <span className="text-3xl font-bold text-foreground tabular-nums group-hover:text-primary transition-colors">
+              {m.value}
+            </span>
+            <span className="ml-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+              {m.label}
+            </span>
           </Link>
         ))}
       </div>
@@ -70,101 +37,100 @@ async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; or
   }
 
   const stats = await getOrganizationStats(orgId);
-
-  const statCards = [
-    {
-      label: 'Vehículos', value: stats.vehicles, href: `/${orgSlug}/vehicles`,
-      gradient: 'bg-gradient-to-br from-blue-500 to-blue-600',
-      icon: (
-        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2-.001M13 16H9m4 0h2m2 0h1l1-4.5H13V6m0 0h2l3 4.5" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Viajes', value: stats.trips, href: `/${orgSlug}/trips`,
-      gradient: 'bg-gradient-to-br from-green-500 to-green-600',
-      icon: (
-        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Mantenimientos', value: stats.maintenance, href: `/${orgSlug}/maintenance`,
-      gradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
-      icon: (
-        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts`,
-      gradient: 'bg-gradient-to-br from-purple-500 to-purple-600',
-      icon: (
-        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
+  const metrics = [
+    { label: 'Vehículos', value: stats.vehicles, href: `/${orgSlug}/vehicles` },
+    { label: 'Viajes', value: stats.trips, href: `/${orgSlug}/trips` },
+    { label: 'Mantenimientos', value: stats.maintenance, href: `/${orgSlug}/maintenance` },
+    { label: 'Contactos', value: stats.contacts, href: `/${orgSlug}/contacts` },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
-      {statCards.map((stat) => (
-        <Link
-          key={stat.label}
-          href={stat.href}
-          className="group"
-        >
-          <StatCard
-            label={stat.label}
-            value={
-              <div className="flex items-center justify-between mt-1">
-                <span>{stat.value}</span>
-                <span className="text-muted-foreground">{stat.icon}</span>
-              </div>
-            }
-            iconGradient={stat.gradient}
-            className="hover:shadow-md transition-shadow group-active:scale-95"
-          />
+    <div className="flex items-baseline gap-8 lg:gap-12 flex-wrap">
+      {metrics.map((m) => (
+        <Link key={m.label} href={m.href} className="group">
+          <span className="text-3xl font-bold text-foreground tabular-nums group-hover:text-primary transition-colors">
+            {m.value}
+          </span>
+          <span className="ml-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+            {m.label}
+          </span>
         </Link>
       ))}
     </div>
   );
 }
 
-async function FinanceKPIs({ orgId }: { orgId: string }) {
+async function FinanceStrip({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
   const kpis = await getFinanceKPIs(orgId);
+
+  function fmt(n: number) {
+    if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`;
+    return `$${n.toFixed(0)}`;
+  }
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <StatCard label="Ingresos del mes" value={`$${kpis.monthlyIncome.toFixed(2)}`} tone="success" />
-      <StatCard label="Gastos del mes" value={`$${kpis.monthlyExpenses.toFixed(2)}`} tone="danger" />
-      <StatCard
-        label="Facturas vencidas"
-        value={String(kpis.overdueInvoices)}
-        tone={kpis.overdueInvoices > 0 ? 'warning' : 'default'}
-      />
-      <StatCard label="Por cobrar" value={`$${kpis.pendingReceivables.toFixed(2)}`} tone="info" />
-    </div>
+    <Link
+      href={`/${orgSlug}/finance`}
+      className="flex items-center gap-6 lg:gap-10 flex-wrap rounded-xl border border-border bg-card px-5 py-3.5 shadow-sm hover:shadow-md transition-shadow group"
+    >
+      <div className="flex items-center gap-2">
+        <div className="size-2 rounded-full bg-emerald-500" />
+        <span className="text-sm text-muted-foreground">Ingresos</span>
+        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+          {fmt(kpis.monthlyIncome)}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="size-2 rounded-full bg-red-500" />
+        <span className="text-sm text-muted-foreground">Gastos</span>
+        <span className="text-sm font-semibold text-red-600 dark:text-red-400 tabular-nums">
+          {fmt(kpis.monthlyExpenses)}
+        </span>
+      </div>
+      {kpis.overdueInvoices > 0 && (
+        <div className="flex items-center gap-2">
+          <div className="size-2 rounded-full bg-amber-500" />
+          <span className="text-sm font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
+            {kpis.overdueInvoices}
+          </span>
+          <span className="text-sm text-muted-foreground">vencidas</span>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">Por cobrar</span>
+        <span className="text-sm font-semibold text-foreground tabular-nums">
+          {fmt(kpis.pendingReceivables)}
+        </span>
+      </div>
+      <svg className="size-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </Link>
   );
 }
 
 function StatsSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
-      {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+    <div className="flex items-baseline gap-8 lg:gap-12">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex items-baseline gap-2">
+          <Skeleton className="h-8 w-12" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      ))}
     </div>
   );
 }
 
-function FinanceSkeleton() {
+function FinanceStripSkeleton() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+    <div className="flex items-center gap-6 rounded-xl border border-border bg-card px-5 py-3.5 shadow-sm">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex items-center gap-2">
+          <Skeleton className="size-2 rounded-full" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      ))}
     </div>
   );
 }
@@ -253,18 +219,56 @@ async function RecentActivity({ orgId, orgSlug, orgType }: { orgId: string; orgS
   const dotColor = { success: 'bg-emerald-500', warning: 'bg-amber-500', info: 'bg-blue-500' };
 
   if (recent.length === 0) {
-    return <p className="text-sm text-muted-foreground italic">Sin actividad reciente.</p>;
+    return <p className="text-sm text-muted-foreground italic py-4">Sin actividad reciente.</p>;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {recent.map((item) => (
-        <Link key={item.id} href={item.href} className="flex items-start gap-3 group">
+        <Link key={item.id} href={item.href} className="flex items-start gap-3 group rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors -mx-3">
           <div className={`size-2 rounded-full mt-1.5 shrink-0 ${dotColor[item.type]}`} />
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors truncate">{item.text}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors truncate">{item.text}</p>
             <p className="text-xs text-muted-foreground">{item.time}</p>
           </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function QuickActions({ orgSlug, orgType }: { orgSlug: string; orgType: string }) {
+  const actions = orgType === 'kitchen'
+    ? [
+        { href: `/${orgSlug}/products/new`, label: 'Producto', icon: 'M12 4v16m8-8H4' },
+        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: 'Cobro', icon: 'M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z' },
+        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: 'Pago', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
+        { href: `/${orgSlug}/contacts/new`, label: 'Contacto', icon: 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' },
+        { href: `/${orgSlug}/inventory/items`, label: 'Inventario', icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' },
+      ]
+    : [
+        { href: `/${orgSlug}/vehicles/new`, label: 'Vehículo', icon: 'M12 4v16m8-8H4' },
+        { href: `/${orgSlug}/trips/new`, label: 'Viaje', icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' },
+        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: 'Cobro', icon: 'M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z' },
+        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: 'Pago', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
+        { href: `/${orgSlug}/contacts/new`, label: 'Contacto', icon: 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z' },
+        { href: `/${orgSlug}/inventory/items`, label: 'Inventario', icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' },
+      ];
+
+  return (
+    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      {actions.map((a) => (
+        <Link
+          key={a.href}
+          href={a.href}
+          className="flex flex-col items-center gap-2 rounded-xl py-3 px-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        >
+          <div className="size-10 rounded-lg bg-muted flex items-center justify-center">
+            <svg className="size-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d={a.icon} />
+            </svg>
+          </div>
+          <span className="text-xs font-medium">{a.label}</span>
         </Link>
       ))}
     </div>
@@ -279,68 +283,70 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
 
   const orgType = org.org_type || 'fleet';
 
-  const quickActions = orgType === 'kitchen'
-    ? [
-        { href: `/${orgSlug}/products/new`, label: '+ Nuevo Producto' },
-        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: '+ Nueva Factura de Cobro' },
-        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: '+ Nueva Factura de Pago' },
-        { href: `/${orgSlug}/contacts/new`, label: '+ Nuevo Contacto' },
-        { href: `/${orgSlug}/inventory/items`, label: '→ Ver Inventario' },
-      ]
-    : [
-        { href: `/${orgSlug}/vehicles/new`, label: '+ Nuevo Vehículo' },
-        { href: `/${orgSlug}/trips/new`, label: '+ Nuevo Viaje' },
-        { href: `/${orgSlug}/finance/invoices/new?type=cobro`, label: '+ Nueva Factura de Cobro' },
-        { href: `/${orgSlug}/finance/invoices/new?type=pago`, label: '+ Nueva Factura de Pago' },
-        { href: `/${orgSlug}/contacts/new`, label: '+ Nuevo Contacto' },
-        { href: `/${orgSlug}/inventory/items`, label: '→ Ver Inventario' },
-      ];
-
   return (
-    <div className="space-y-6">
-      <PageHeader title={`Bienvenido a ${org.name}`} description="Resumen general de tu organización" />
+    <div className="space-y-2">
+      {/* Header + Stats strip */}
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">{org.name}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Resumen general</p>
+        </div>
 
-      <Suspense fallback={<StatsSkeleton />}>
-        <DashboardStats orgSlug={orgSlug} orgId={org.id} orgType={orgType} />
-      </Suspense>
-
-      <Suspense fallback={<FinanceSkeleton />}>
-        <FinanceKPIs orgId={org.id} />
-      </Suspense>
-
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
-        <SectionCard className="lg:col-span-4" title="Actividad Reciente">
-          <Suspense fallback={
-            <div className="space-y-3">
-              {[1, 2, 3].map(i => <Skeleton key={i} className="h-8" />)}
-            </div>
-          }>
-            <RecentActivity orgId={org.id} orgSlug={orgSlug} orgType={orgType} />
-          </Suspense>
-        </SectionCard>
-
-        {orgType === 'fleet' && (
-          <SectionCard className="lg:col-span-3" title="Vencimientos próximos">
-            <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
-              <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
-            </Suspense>
-          </SectionCard>
-        )}
+        <Suspense fallback={<StatsSkeleton />}>
+          <DashboardStats orgSlug={orgSlug} orgId={org.id} orgType={orgType} />
+        </Suspense>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
-        <SectionCard className="lg:col-span-4" title="Acciones Rápidas">
-          <div className="space-y-1">
-            {quickActions.map((a) => (
-              <Link
-                key={a.href}
-                href={a.href}
-                className="block w-full text-left px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-              >
-                {a.label}
+      {/* Finance strip — compact KPIs */}
+      <div className="pt-4">
+        <Suspense fallback={<FinanceStripSkeleton />}>
+          <FinanceStrip orgId={org.id} orgSlug={orgSlug} />
+        </Suspense>
+      </div>
+
+      {/* Main content grid */}
+      <div className="pt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-4 lg:gap-6">
+          <SectionCard
+            className="lg:col-span-4"
+            title="Actividad Reciente"
+            action={
+              <Link href={`/${orgSlug}/finance`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Ver todo
               </Link>
-            ))}
-          </div>
+            }
+          >
+            <Suspense fallback={
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => <Skeleton key={i} className="h-8" />)}
+              </div>
+            }>
+              <RecentActivity orgId={org.id} orgSlug={orgSlug} orgType={orgType} />
+            </Suspense>
+          </SectionCard>
+
+          {orgType === 'fleet' && (
+            <SectionCard
+              className="lg:col-span-3"
+              title="Vencimientos próximos"
+              action={
+                <Link href={`/${orgSlug}/vehicles`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  Ver todo
+                </Link>
+              }
+            >
+              <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><Skeleton key={i} className="h-10"/>)}</div>}>
+                <ExpiryAlertsWidget orgId={org.id} orgSlug={orgSlug} />
+              </Suspense>
+            </SectionCard>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="pt-2">
+        <SectionCard title="Acciones Rápidas">
+          <QuickActions orgSlug={orgSlug} orgType={orgType} />
         </SectionCard>
       </div>
     </div>
