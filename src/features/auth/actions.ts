@@ -19,6 +19,7 @@ export async function signUp(prevState: unknown, formData: FormData) {
       data: {
         full_name: fullName,
       },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/auth/callback?next=/onboarding`,
     },
   });
 
