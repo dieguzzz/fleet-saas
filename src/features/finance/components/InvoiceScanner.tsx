@@ -157,9 +157,9 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
       <button
         onClick={handleScanClick}
         disabled={scanning}
-        className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 min-h-11 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
       >
-        <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
         </svg>
         {scanning ? 'Escaneando...' : 'Escanear QR'}
@@ -205,9 +205,9 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
               href={result.dgiUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-primary hover:bg-accent transition-colors"
+              className="flex items-center gap-2 rounded-lg border border-border px-3 min-h-11 text-sm font-medium text-primary hover:bg-accent transition-colors"
             >
-              <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               Ver en portal DGI
@@ -216,13 +216,13 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
           <div className="flex gap-2">
             <button
               onClick={handleUseData}
-              className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="flex-1 rounded-lg bg-primary px-4 min-h-11 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               Crear factura con estos datos
             </button>
             <button
               onClick={() => { setResult(null); setError(null); handleScanClick(); }}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent"
+              className="rounded-lg border border-border px-4 min-h-11 text-sm font-medium text-muted-foreground hover:bg-accent"
             >
               Escanear otra
             </button>
