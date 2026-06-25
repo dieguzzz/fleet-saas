@@ -218,7 +218,7 @@ export async function getOrgSetupState(orgSlug: string): Promise<{ exists: boole
 export async function signUpAndJoinOrg(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get('email') as string;
+  const email = (formData.get('email') as string)?.trim().toLowerCase();
   const password = formData.get('password') as string;
   const fullName = formData.get('fullName') as string;
   const orgSlug = formData.get('orgSlug') as string;
@@ -234,14 +234,24 @@ export async function signUpAndJoinOrg(prevState: unknown, formData: FormData) {
     options: { data: { full_name: fullName } },
   });
 
-  if (signUpError) return { error: signUpError.message };
+  if (signUpError) {
+    const msg = signUpError.message;
+    if (/security purposes.*after (\d+) second/i.test(msg)) {
+      const secs = msg.match(/after (\d+) second/i)?.[1] ?? '30';
+      return { error: `rate_limit:${secs}` };
+    }
+    return { error: msg };
+  }
+
+  const { data: joinResult } = await (supabase.rpc as unknown as (fn: string, args: Record<string, string>) => Promise<{ data: Record<string, unknown> | null; error: unknown }>)('confirm_and_join_org', {
+    p_email: email,
+    p_org_slug: orgSlug,
+  });
+  const result = joinResult as { error?: string; slug?: string } | null;
+  if (result?.error) return { error: result.error };
 
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
   if (signInError) return { error: signInError.message };
-
-  const { data: joinResult } = await supabase.rpc('join_org' as never, { p_org_slug: orgSlug } as never);
-  const result = joinResult as unknown as { error?: string; slug?: string } | null;
-  if (result?.error) return { error: result.error };
 
   revalidatePath('/', 'layout');
   redirect(`/${orgSlug}`);
