@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { deleteProductAction } from '@/features/products/actions';
 import { EmptyState } from '@/components/ui/empty-state';
-import type { Product } from '@/types/database';
+import type { Product, ProductCategory } from '@/types/database';
+import { PRODUCT_CATEGORY_LABELS } from '@/types/database';
 
 function fmt(n: number) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -102,7 +103,7 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
                     {p.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{p.description}</p>}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{p.category || '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{PRODUCT_CATEGORY_LABELS[p.category as ProductCategory] ?? p.category ?? '—'}</td>
                 <td className="px-4 py-3 text-right font-medium text-foreground">${fmt(p.sell_price ?? 0)}</td>
                 <td className="px-4 py-3 text-right text-muted-foreground hidden md:table-cell">${fmt(p.cost_estimate ?? 0)}</td>
                 <td className="px-4 py-3 text-center hidden md:table-cell">

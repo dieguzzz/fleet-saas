@@ -35,6 +35,19 @@ export const INVENTORY_CATEGORY_LABELS: Record<InventoryCategory, string> = {
   other: 'Otro',
 };
 
+export type ProductCategory = 'smoked_meats' | 'grilled' | 'sides' | 'sauces' | 'combos' | 'beverages' | 'desserts' | 'other';
+
+export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
+  smoked_meats: 'Ahumados',
+  grilled: 'Parrilla',
+  sides: 'Acompañantes',
+  sauces: 'Salsas',
+  combos: 'Combos',
+  beverages: 'Bebidas',
+  desserts: 'Postres',
+  other: 'Otro',
+};
+
 // Entity interfaces for easier usage
 export interface Organization {
   id: string;
