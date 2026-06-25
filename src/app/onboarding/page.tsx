@@ -1,13 +1,15 @@
 'use client';
 
-import Link from 'next/link';
-import { useActionState, useEffect } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrganization, type CreateOrgState } from '@/features/organizations/actions';
 import { MerlinLogoLink } from '@/components/logos/MerlinLogo';
 
+type OrgTypeOption = 'fleet' | 'kitchen';
+
 export default function OnboardingPage() {
   const { push } = useRouter();
+  const [orgType, setOrgType] = useState<OrgTypeOption>('fleet');
   const [state, formAction, pending] = useActionState<CreateOrgState, FormData>(
     createOrganization,
     null
@@ -26,7 +28,6 @@ export default function OnboardingPage() {
           <MerlinLogoLink size={48} />
         </div>
 
-        {/* Form Card */}
         <div className="bg-card border border-border rounded-2xl p-8">
           <h1 className="text-2xl font-bold text-foreground text-center mb-2">
             Crea tu Organización
@@ -43,6 +44,59 @@ export default function OnboardingPage() {
 
           <form action={formAction} className="space-y-5">
             <div>
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Tipo de negocio
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOrgType('fleet')}
+                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
+                    orgType === 'fleet'
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-border hover:border-muted-foreground'
+                  }`}
+                >
+                  <span className="text-2xl">🚛</span>
+                  <span className="text-sm font-semibold text-foreground">Flota</span>
+                  <span className="text-[11px] text-muted-foreground leading-tight text-center">
+                    Vehículos, viajes, mantenimiento
+                  </span>
+                  {orgType === 'fleet' && (
+                    <div className="absolute top-2 right-2 size-5 bg-primary rounded-full flex items-center justify-center">
+                      <svg className="size-3 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrgType('kitchen')}
+                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
+                    orgType === 'kitchen'
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-border hover:border-muted-foreground'
+                  }`}
+                >
+                  <span className="text-2xl">🍳</span>
+                  <span className="text-sm font-semibold text-foreground">Cocina</span>
+                  <span className="text-[11px] text-muted-foreground leading-tight text-center">
+                    Productos, recetas, inventario
+                  </span>
+                  {orgType === 'kitchen' && (
+                    <div className="absolute top-2 right-2 size-5 bg-primary rounded-full flex items-center justify-center">
+                      <svg className="size-3 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              </div>
+              <input type="hidden" name="org_type" value={orgType} />
+            </div>
+
+            <div>
               <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                 Nombre de la Organización
               </label>
@@ -51,37 +105,18 @@ export default function OnboardingPage() {
                 name="name"
                 type="text"
                 required
-                placeholder="Mi Empresa"
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder={orgType === 'kitchen' ? 'Mi Restaurante' : 'Mi Empresa'}
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
               />
-            </div>
-
-            <div>
-              <label htmlFor="slug" className="block text-sm font-medium text-foreground mb-2">
-                URL de la Organización
-              </label>
-              <div className="flex items-center">
-                <span className="text-muted-foreground bg-muted border border-r-0 border-border px-3 py-3 rounded-l-lg">
-                  fleet-saas.com/
-                </span>
-                <input
-                  id="slug"
-                  name="slug"
-                  type="text"
-                  placeholder="mi-empresa"
-                  pattern="[a-z0-9\-]+"
-                  className="flex-1 px-4 py-3 bg-background border border-border rounded-r-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Solo minúsculas, números y guiones
+              <p className="text-xs text-muted-foreground mt-1.5">
+                La URL se generará automáticamente del nombre
               </p>
             </div>
 
             <button
               type="submit"
               disabled={pending}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground py-3 rounded-lg font-semibold transition-colors"
             >
               {pending ? 'Creando...' : 'Crear Organización'}
             </button>

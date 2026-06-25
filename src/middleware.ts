@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user exists and trying to access login/signup/login-empresa, redirect to dashboard
-  if (user && (pathname === '/login' || pathname === '/signup' || pathname === '/login-empresa')) {
+  if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/login-empresa')) {
     const { data: memberships } = await supabase
       .from('organization_members')
       .select('organization:organizations(slug)')

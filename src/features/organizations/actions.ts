@@ -20,6 +20,7 @@ export async function createOrganization(_prevState: CreateOrgState, formData: F
 
   const name = formData.get('name') as string;
   let slug = formData.get('slug') as string | null;
+  const orgType = (formData.get('org_type') as string) || 'fleet';
 
   if (!slug) {
     slug = generateSlug(name);
@@ -38,6 +39,7 @@ export async function createOrganization(_prevState: CreateOrgState, formData: F
     .rpc('create_organization_for_user', {
       p_name: name,
       p_slug: slug,
+      p_org_type: orgType,
     })
     .single();
 
