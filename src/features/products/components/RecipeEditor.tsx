@@ -175,7 +175,7 @@ export default function RecipeEditor({
                 <tr>
                   <th className="px-4 py-2.5 text-left">Ingrediente</th>
                   <th className="px-4 py-2.5 text-left">Cantidad</th>
-                  <th className="px-4 py-2.5 text-right">Costo/u</th>
+                  <th className="px-4 py-2.5 text-right">Costo unitario</th>
                   <th className="px-4 py-2.5 text-right">Subtotal</th>
                   <th className="px-4 py-2.5" />
                 </tr>
@@ -211,6 +211,13 @@ export default function RecipeEditor({
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {ingredients.length === 0 && (
+        <div className="py-8 text-center border border-dashed border-border rounded-xl">
+          <p className="text-sm text-muted-foreground">Este producto no tiene receta aún.</p>
+          <p className="text-xs text-muted-foreground mt-1">Agregá ingredientes del inventario para calcular el costo real.</p>
         </div>
       )}
 

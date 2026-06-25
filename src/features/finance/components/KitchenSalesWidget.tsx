@@ -26,32 +26,47 @@ export default async function KitchenSalesWidget({ orgId }: KitchenSalesWidgetPr
 
   const todaySales = (todaySalesResult.data ?? []).reduce((s, r) => s + Number(r.total ?? 0), 0);
 
-  // Aggregate top product from line items
   const productCounts = new Map<string, number>();
   for (const item of (topProductResult.data ?? []) as unknown as Array<{ description: string; quantity: number; product: { name: string } | null }>) {
     const name = item.product?.name ?? item.description;
     productCounts.set(name, (productCounts.get(name) ?? 0) + Number(item.quantity));
   }
 
-  let topProduct = '—';
-  let topQty = 0;
-  for (const [name, qty] of productCounts) {
-    if (qty > topQty) {
-      topProduct = name;
-      topQty = qty;
-    }
+  const topProducts = Array.from(productCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  if (todaySales === 0 && topProducts.length === 0) {
+    return (
+      <div className="py-4 text-center">
+        <p className="text-sm text-muted-foreground">Sin ventas registradas este mes.</p>
+        <p className="text-xs text-muted-foreground mt-1">Creá facturas de cobro con productos para ver estadísticas acá.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
-      <div>
-        <span className="text-xs text-muted-foreground">Ventas hoy</span>
-        <p className="text-lg font-bold text-foreground">${todaySales.toFixed(2)}</p>
-      </div>
-      {topQty > 0 && (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
         <div>
-          <span className="text-xs text-muted-foreground">Más vendido (mes)</span>
-          <p className="text-sm font-semibold text-foreground">{topProduct} <span className="text-muted-foreground font-normal">×{topQty}</span></p>
+          <span className="text-xs text-muted-foreground">Ventas hoy</span>
+          <p className="text-lg font-bold text-foreground">${todaySales.toFixed(2)}</p>
+        </div>
+      </div>
+      {topProducts.length > 0 && (
+        <div>
+          <p className="text-xs text-muted-foreground mb-2">Más vendidos del mes</p>
+          <div className="space-y-1.5">
+            {topProducts.map(([name, qty], i) => (
+              <div key={name} className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-xs font-semibold text-muted-foreground w-4">{i + 1}.</span>
+                  <span className="text-sm text-foreground truncate">{name}</span>
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">×{qty}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
