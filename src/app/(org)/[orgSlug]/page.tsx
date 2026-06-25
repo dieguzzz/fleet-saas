@@ -224,7 +224,9 @@ async function RecentActivity({ orgId, orgSlug, orgType }: { orgId: string; orgS
     return (
       <div className="py-6 text-center">
         <p className="text-sm text-muted-foreground">No hay actividad reciente.</p>
-        <p className="text-xs text-muted-foreground mt-1">Crea un viaje o registra un gasto para empezar.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {orgType === 'kitchen' ? 'Registra una factura o agrega un producto para empezar.' : 'Crea un viaje o registra un gasto para empezar.'}
+        </p>
       </div>
     );
   }

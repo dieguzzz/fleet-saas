@@ -4,8 +4,12 @@ import { useActionState } from 'react';
 import { createInventoryItem } from '@/features/inventory/actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { INVENTORY_CATEGORY_LABELS, type InventoryCategory, type OrgType } from '@/types/database';
 
-export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
+const FLEET_CATEGORIES: InventoryCategory[] = ['parts', 'fluids', 'tires', 'tools', 'consumables', 'other'];
+const KITCHEN_CATEGORIES: InventoryCategory[] = ['ingredients', 'meats', 'produce', 'spices', 'packaging', 'other'];
+
+export default function InventoryItemForm({ orgSlug, orgType = 'fleet' }: { orgSlug: string; orgType?: OrgType }) {
   const [state, formAction, isPending] = useActionState(createInventoryItem, null);
 
   return (
@@ -21,23 +25,20 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
         <div>
           <label htmlFor="name" className="field-label">Nombre del Ítem *</label>
           <input id="name" name="name" type="text" required
-            placeholder="Ej. Aceite Sintético 5W-30" className="field-input" />
+            placeholder={orgType === 'kitchen' ? 'Ej. Harina de trigo' : 'Ej. Aceite Sintético 5W-30'} className="field-input" />
         </div>
 
         <div>
           <label htmlFor="sku" className="field-label">SKU / Código</label>
-          <input id="sku" name="sku" type="text" placeholder="OIL-5W30-001" className="field-input" />
+          <input id="sku" name="sku" type="text" placeholder={orgType === 'kitchen' ? 'HAR-001' : 'OIL-5W30-001'} className="field-input" />
         </div>
 
         <div>
           <label htmlFor="category" className="field-label">Categoría</label>
           <select id="category" name="category" className="field-input">
-            <option value="parts">Repuestos</option>
-            <option value="fluids">Fluidos</option>
-            <option value="tires">Neumáticos</option>
-            <option value="tools">Herramientas</option>
-            <option value="consumables">Consumibles</option>
-            <option value="other">Otro</option>
+            {(orgType === 'kitchen' ? KITCHEN_CATEGORIES : FLEET_CATEGORIES).map(cat => (
+              <option key={cat} value={cat}>{INVENTORY_CATEGORY_LABELS[cat]}</option>
+            ))}
           </select>
         </div>
 
@@ -56,7 +57,7 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
         <div>
           <label htmlFor="unit" className="field-label">Unidad de Medida</label>
           <input id="unit" name="unit" type="text" defaultValue="unidades"
-            placeholder="unidades, litros, cajas" className="field-input" />
+            placeholder={orgType === 'kitchen' ? 'kg, litros, unidades' : 'unidades, litros, cajas'} className="field-input" />
         </div>
 
         <div>
@@ -67,7 +68,7 @@ export default function InventoryItemForm({ orgSlug }: { orgSlug: string }) {
 
         <div>
           <label htmlFor="location" className="field-label">Ubicación en Almacén</label>
-          <input id="location" name="location" type="text" placeholder="Estante A-4" className="field-input" />
+          <input id="location" name="location" type="text" placeholder={orgType === 'kitchen' ? 'Refrigerador 2' : 'Estante A-4'} className="field-input" />
         </div>
 
         <div className="sm:col-span-2 lg:col-span-3">

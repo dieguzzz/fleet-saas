@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { upsertNotificationPreferences } from '../actions';
 import type { NotificationPreferences } from '@/types/database';
+import type { OrgType } from '@/types/database';
 import { Button } from '@/components/ui/button';
 
 function SubmitButton() {
@@ -47,10 +48,11 @@ function ToggleRow({ name, label, description, defaultChecked }: ToggleRowProps)
 interface Props {
   orgId: string;
   orgSlug: string;
+  orgType?: OrgType;
   prefs: NotificationPreferences | null;
 }
 
-export default function NotificationPreferencesForm({ orgId, orgSlug, prefs }: Props) {
+export default function NotificationPreferencesForm({ orgId, orgSlug, orgType = 'fleet', prefs }: Props) {
   const [state, formAction] = useActionState(upsertNotificationPreferences, null);
 
   const d = (key: keyof NotificationPreferences, fallback: boolean) =>
@@ -73,18 +75,22 @@ export default function NotificationPreferencesForm({ orgId, orgSlug, prefs }: P
       )}
 
       <div className="divide-y divide-border">
-        <ToggleRow
-          name="vehicle_document_expiry"
-          label="Vencimiento de documentos"
-          description="Recibí un aviso cuando un seguro, VTV o patente esté próximo a vencer."
-          defaultChecked={d('vehicle_document_expiry', true)}
-        />
-        <ToggleRow
-          name="maintenance_due"
-          label="Mantenimiento próximo"
-          description="Aviso cuando un vehículo tiene mantenimiento programado cercano."
-          defaultChecked={d('maintenance_due', true)}
-        />
+        {orgType === 'fleet' && (
+          <>
+            <ToggleRow
+              name="vehicle_document_expiry"
+              label="Vencimiento de documentos"
+              description="Recibí un aviso cuando un seguro, VTV o patente esté próximo a vencer."
+              defaultChecked={d('vehicle_document_expiry', true)}
+            />
+            <ToggleRow
+              name="maintenance_due"
+              label="Mantenimiento próximo"
+              description="Aviso cuando un vehículo tiene mantenimiento programado cercano."
+              defaultChecked={d('maintenance_due', true)}
+            />
+          </>
+        )}
         <ToggleRow
           name="low_inventory_stock"
           label="Stock bajo en inventario"
@@ -97,12 +103,14 @@ export default function NotificationPreferencesForm({ orgId, orgSlug, prefs }: P
           description="Notificación cuando alguien acepta una invitación a la organización."
           defaultChecked={d('new_team_member', false)}
         />
-        <ToggleRow
-          name="trip_completed"
-          label="Viaje completado"
-          description="Aviso cuando un viaje cambia a estado completado."
-          defaultChecked={d('trip_completed', false)}
-        />
+        {orgType === 'fleet' && (
+          <ToggleRow
+            name="trip_completed"
+            label="Viaje completado"
+            description="Aviso cuando un viaje cambia a estado completado."
+            defaultChecked={d('trip_completed', false)}
+          />
+        )}
       </div>
 
       <div className="border-t border-border pt-5 mt-2">
