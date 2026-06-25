@@ -38,10 +38,15 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         </svg>
       </button>
 
-      {/* Org name (mobile — since sidebar is hidden) */}
-      <div className="lg:hidden flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
-      </div>
+      {/* Org name (mobile — only when there's no switcher) */}
+      {switcherOrgs.length <= 1 && (
+        <div className="lg:hidden flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
+        </div>
+      )}
+      {switcherOrgs.length > 1 && (
+        <div className="lg:hidden flex-1" />
+      )}
 
       {/* Spacer (desktop) */}
       <div className="hidden lg:block flex-1" />
