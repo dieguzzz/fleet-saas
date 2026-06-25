@@ -75,7 +75,7 @@ function DeleteButton({ itemId, orgSlug }: { itemId: string; orgSlug: string }) 
   );
 }
 
-function ItemRow({ item, orgId, orgSlug }: { item: InventoryItem; orgId: string; orgSlug: string }) {
+function ItemRow({ item, orgId, orgSlug, orgType }: { item: InventoryItem; orgId: string; orgSlug: string; orgType: OrgType }) {
   const [movementOpen, setMovementOpen] = useState(false);
   const low = isLow(item);
 
@@ -110,7 +110,7 @@ function ItemRow({ item, orgId, orgSlug }: { item: InventoryItem; orgId: string;
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
               </svg>
             </button>
-            <InventoryItemModal orgSlug={orgSlug} item={item} trigger={
+            <InventoryItemModal orgSlug={orgSlug} orgType={orgType} item={item} trigger={
               <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Editar">
                 <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -133,7 +133,7 @@ function ItemRow({ item, orgId, orgSlug }: { item: InventoryItem; orgId: string;
   );
 }
 
-function InventoryTable({ items, orgId, orgSlug }: { items: InventoryItem[]; orgId: string; orgSlug: string }) {
+function InventoryTable({ items, orgId, orgSlug, orgType }: { items: InventoryItem[]; orgId: string; orgSlug: string; orgType: OrgType }) {
   if (items.length === 0) {
     return <p className="text-center py-12 text-sm text-muted-foreground">Sin ítems en esta categoría.</p>;
   }
@@ -161,7 +161,7 @@ function InventoryTable({ items, orgId, orgSlug }: { items: InventoryItem[]; org
           </thead>
           <tbody className="divide-y divide-border">
             {sorted.map(item => (
-              <ItemRow key={item.id} item={item} orgId={orgId} orgSlug={orgSlug} />
+              <ItemRow key={item.id} item={item} orgId={orgId} orgSlug={orgSlug} orgType={orgType} />
             ))}
           </tbody>
         </table>
@@ -243,6 +243,7 @@ export default function InventoryTabView({
           </div>
           <InventoryItemModal
             orgSlug={orgSlug}
+            orgType={orgType}
             defaultCategory={activeTab}
             trigger={
               <Button className="shrink-0">+ Nuevo</Button>
@@ -251,7 +252,7 @@ export default function InventoryTabView({
         </div>
       </div>
 
-      <InventoryTable items={filtered} orgId={orgId} orgSlug={orgSlug} />
+      <InventoryTable items={filtered} orgId={orgId} orgSlug={orgSlug} orgType={orgType} />
     </div>
   );
 }
