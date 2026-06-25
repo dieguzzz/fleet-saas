@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useCurrentOrg, useCurrentRole, useCurrentUser } from '@/store/tenant-store';
 import { hasPermission, type Permission } from '@/lib/permissions';
 import { signOut } from '@/features/auth/actions';
+import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
 
 interface NavItem {
   href: string;
@@ -284,7 +285,9 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
             onClick={() => { haptic(); onClose(); }}
           >
             <div className="size-9 rounded-xl overflow-hidden shrink-0 shadow-sm">
-              {org.logo_url ? (
+              {org.slug === 'mala-influencia' ? (
+                <MalaInfluenciaLogo size={36} />
+              ) : org.logo_url ? (
                 <Image src={org.logo_url} alt={org.name} width={36} height={36} className="w-full h-full object-cover" unoptimized />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center font-bold text-base text-white">
@@ -345,7 +348,7 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
                           </span>
                           {item.label}
                           {active && (
-                            <span className="ml-auto size-1.5 rounded-full bg-blue-400 shrink-0" />
+                            <span className="ml-auto size-1.5 rounded-full bg-primary shrink-0" />
                           )}
                         </Link>
                       </li>

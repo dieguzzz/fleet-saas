@@ -11,6 +11,10 @@ import { createClient } from '@/services/supabase/client';
 import type { Organization, Profile, OrgRole } from '@/types/database';
 import { toast } from 'sonner';
 
+const ORG_THEMES: Record<string, string> = {
+  'mala-influencia': 'theme-mala-influencia',
+};
+
 interface OrgLayoutProps {
   children: ReactNode;
 }
@@ -62,6 +66,19 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
     }
     lastScrollY.current = currentY;
   }
+
+  // Per-org theme class on <html>
+  useEffect(() => {
+    const themeClass = ORG_THEMES[orgSlug];
+    if (themeClass) {
+      document.documentElement.classList.add(themeClass);
+    }
+    return () => {
+      if (themeClass) {
+        document.documentElement.classList.remove(themeClass);
+      }
+    };
+  }, [orgSlug]);
 
   // Close sidebar when navigating
   useEffect(() => {
