@@ -29,7 +29,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-foreground text-center mb-2">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-2" style={{ textWrap: 'balance' }}>
             Crea tu Organización
           </h1>
           <p className="text-muted-foreground text-center mb-6">
@@ -37,7 +37,7 @@ export default function OnboardingPage() {
           </p>
 
           {state?.error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-300 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm dark:bg-red-900/50 dark:border-red-700 dark:text-red-300">
               {state.error}
             </div>
           )}
@@ -51,15 +51,15 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setOrgType('fleet')}
-                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
+                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-5 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     orgType === 'fleet'
                       ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
                       : 'border-border hover:border-muted-foreground'
                   }`}
                 >
-                  <span className="text-2xl">🚛</span>
+                  <span className="text-2xl" aria-hidden="true">🚛</span>
                   <span className="text-sm font-semibold text-foreground">Flota</span>
-                  <span className="text-[11px] text-muted-foreground leading-tight text-center">
+                  <span className="text-xs text-muted-foreground leading-tight text-center">
                     Vehículos, viajes, mantenimiento
                   </span>
                   {orgType === 'fleet' && (
@@ -73,15 +73,15 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setOrgType('kitchen')}
-                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
+                  className={`relative flex flex-col items-center gap-2 rounded-xl border-2 p-5 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     orgType === 'kitchen'
                       ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
                       : 'border-border hover:border-muted-foreground'
                   }`}
                 >
-                  <span className="text-2xl">🍳</span>
+                  <span className="text-2xl" aria-hidden="true">🍳</span>
                   <span className="text-sm font-semibold text-foreground">Cocina</span>
-                  <span className="text-[11px] text-muted-foreground leading-tight text-center">
+                  <span className="text-xs text-muted-foreground leading-tight text-center">
                     Productos, recetas, inventario
                   </span>
                   {orgType === 'kitchen' && (
@@ -106,7 +106,7 @@ export default function OnboardingPage() {
                 type="text"
                 required
                 placeholder={orgType === 'kitchen' ? 'Mi Restaurante' : 'Mi Empresa'}
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                className="field-input py-3"
               />
               <p className="text-xs text-muted-foreground mt-1.5">
                 La URL se generará automáticamente del nombre
