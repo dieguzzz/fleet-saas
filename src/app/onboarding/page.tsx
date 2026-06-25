@@ -32,7 +32,7 @@ export default function OnboardingPage() {
             Crea tu Organización
           </h1>
           <p className="text-muted-foreground text-center mb-6">
-            Configura tu espacio de trabajo para gestionar tu flota
+            Configura tu espacio de trabajo para empezar
           </p>
 
           {state?.error && (

@@ -14,6 +14,7 @@ export default async function NotificationsSettingsPage({
   if (!org) notFound();
 
   const prefs = await getNotificationPreferences(org.id);
+  const orgType = org.org_type || 'fleet';
 
   return (
     <div className="space-y-6">
@@ -33,7 +34,7 @@ export default async function NotificationsSettingsPage({
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <NotificationPreferencesForm orgId={org.id} orgSlug={orgSlug} prefs={prefs} />
+        <NotificationPreferencesForm orgId={org.id} orgSlug={orgSlug} orgType={orgType} prefs={prefs} />
       </div>
     </div>
   );

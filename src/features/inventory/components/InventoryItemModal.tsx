@@ -66,7 +66,7 @@ export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, d
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <label htmlFor="item_name" className="field-label">Nombre *</label>
-                  <input id="item_name" name="name" type="text" required defaultValue={item?.name ?? ''} placeholder="Aceite Sintético 5W-30" className="field-input" />
+                  <input id="item_name" name="name" type="text" required defaultValue={item?.name ?? ''} placeholder={orgType === 'kitchen' ? 'Harina de trigo' : 'Aceite Sintético 5W-30'} className="field-input" />
                 </div>
 
                 <div>
@@ -80,7 +80,7 @@ export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, d
 
                 <div>
                   <label htmlFor="sku" className="field-label">SKU / Código</label>
-                  <input id="sku" name="sku" type="text" defaultValue={item?.sku ?? ''} placeholder="OIL-001" className="field-input" />
+                  <input id="sku" name="sku" type="text" defaultValue={item?.sku ?? ''} placeholder={orgType === 'kitchen' ? 'HAR-001' : 'OIL-001'} className="field-input" />
                 </div>
 
                 {!item && (
@@ -97,7 +97,7 @@ export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, d
 
                 <div>
                   <label htmlFor="unit" className="field-label">Unidad</label>
-                  <input id="unit" name="unit" type="text" defaultValue={item?.unit ?? 'unidades'} placeholder="unidades, litros..." className="field-input" />
+                  <input id="unit" name="unit" type="text" defaultValue={item?.unit ?? 'unidades'} placeholder={orgType === 'kitchen' ? 'kg, litros, unidades...' : 'unidades, litros...'} className="field-input" />
                 </div>
 
                 <div>
@@ -107,7 +107,7 @@ export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, d
 
                 <div>
                   <label htmlFor="location" className="field-label">Ubicación</label>
-                  <input id="location" name="location" type="text" defaultValue={item?.location ?? ''} placeholder="Estante A-4" className="field-input" />
+                  <input id="location" name="location" type="text" defaultValue={item?.location ?? ''} placeholder={orgType === 'kitchen' ? 'Refrigerador 2' : 'Estante A-4'} className="field-input" />
                 </div>
 
                 <div className="col-span-2">
