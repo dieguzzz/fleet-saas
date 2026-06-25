@@ -1596,7 +1596,7 @@ export type Database = {
     }
     Functions: {
       create_organization_for_user: {
-        Args: { p_name: string; p_slug: string }
+        Args: { p_name: string; p_slug: string; p_org_type?: string }
         Returns: {
           org_id: string
           org_name: string

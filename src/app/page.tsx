@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DollarSign, Package, Users, ShieldCheck, UtensilsCrossed, Truck } from 'lucide-react';
-import { createClient } from '@/services/supabase/server';
 import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
 
 export const metadata: Metadata = {
@@ -9,26 +8,7 @@ export const metadata: Metadata = {
   description: 'Administrá flotas, cocinas, inventario, finanzas y equipos desde un solo lugar.',
 };
 
-async function getAuthState() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: membership } = await supabase
-    .from('organization_members')
-    .select('organizations(slug)')
-    .eq('user_id', user.id)
-    .limit(1)
-    .single();
-
-  const org = membership?.organizations as { slug: string } | null;
-  return { orgSlug: org?.slug ?? null };
-}
-
 export default async function HomePage() {
-  const auth = await getAuthState();
-  const isLoggedIn = auth !== null;
-  const dashboardHref = auth?.orgSlug ? `/${auth.orgSlug}` : '/onboarding';
 
   const features = [
     {
@@ -85,29 +65,18 @@ export default async function HomePage() {
             <span className="text-foreground font-bold text-xl tracking-tight">Merlin</span>
           </div>
           <div className="flex items-center gap-4">
-            {isLoggedIn ? (
-              <Link
-                href={dashboardHref}
-                className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                Ir al Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  href="/login"
-                  className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Comenzar
-                </Link>
-              </>
-            )}
+            <Link
+              href="/login"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              href="/login"
+              className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Comenzar
+            </Link>
           </div>
         </nav>
       </header>
@@ -158,16 +127,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {isLoggedIn && (
-            <div className="mt-8">
-              <Link
-                href={dashboardHref}
-                className="inline-flex bg-violet-600 hover:bg-violet-700 text-white px-8 py-3 rounded-xl font-semibold transition-colors"
-              >
-                Ir al Dashboard
-              </Link>
-            </div>
-          )}
         </div>
 
         {/* Features */}
