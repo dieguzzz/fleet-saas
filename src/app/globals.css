@@ -115,6 +115,42 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ── Per-org theme: Mala Influencia ── */
+.theme-mala-influencia,
+.theme-mala-influencia.dark {
+  --background: oklch(0.13 0.005 60);
+  --foreground: oklch(0.93 0.02 90);
+  --card: oklch(0.18 0.005 60);
+  --card-foreground: oklch(0.93 0.02 90);
+  --popover: oklch(0.18 0.005 60);
+  --popover-foreground: oklch(0.93 0.02 90);
+  --primary: oklch(0.50 0.18 25);
+  --primary-foreground: oklch(0.93 0.02 90);
+  --secondary: oklch(0.22 0.005 60);
+  --secondary-foreground: oklch(0.93 0.02 90);
+  --muted: oklch(0.22 0.005 60);
+  --muted-foreground: oklch(0.70 0.02 85);
+  --accent: oklch(0.63 0.14 75);
+  --accent-foreground: oklch(0.13 0.005 60);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.93 0.02 90 / 12%);
+  --input: oklch(0.93 0.02 90 / 18%);
+  --ring: oklch(0.50 0.18 25);
+  --chart-1: oklch(0.50 0.18 25);
+  --chart-2: oklch(0.63 0.14 75);
+  --chart-3: oklch(0.93 0.02 90);
+  --chart-4: oklch(0.70 0.02 85);
+  --chart-5: oklch(0.40 0.12 25);
+  --sidebar: oklch(0.11 0.005 60);
+  --sidebar-foreground: oklch(0.93 0.02 90);
+  --sidebar-primary: oklch(0.50 0.18 25);
+  --sidebar-primary-foreground: oklch(0.93 0.02 90);
+  --sidebar-accent: oklch(0.63 0.14 75);
+  --sidebar-accent-foreground: oklch(0.13 0.005 60);
+  --sidebar-border: oklch(0.93 0.02 90 / 10%);
+  --sidebar-ring: oklch(0.50 0.18 25);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

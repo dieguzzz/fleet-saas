@@ -8,6 +8,12 @@ import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
 
 type Mode = 'select' | 'otra' | 'amd' | 'mala-influencia';
 
+function parseRateLimit(msg: string | undefined): number | null {
+  if (!msg) return null;
+  const m = msg.match(/^rate_limit:(\d+)$/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
 export default function LoginPage() {
   const { push } = useRouter();
   const [mode, setMode] = useState<Mode>('select');
@@ -20,6 +26,18 @@ export default function LoginPage() {
   const [miNeedsSetup, setMiNeedsSetup] = useState<boolean | null>(null);
   const [miSignupState, miSignupAction, miSignupPending] = useActionState(signUpAndJoinOrg, null);
   const [miLoginState, miLoginAction, miLoginPending] = useActionState(loginAndJoinOrg, null);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    const secs = parseRateLimit(miSignupState?.error);
+    if (secs) setCooldown(secs);
+  }, [miSignupState]);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
 
   useEffect(() => {
     if (mode === 'amd' && needsSetup === null) {
@@ -347,7 +365,15 @@ export default function LoginPage() {
                     </p>
                   </div>
 
-                  {miSignupState?.error && (
+                  {cooldown > 0 && (
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+                      <p className="text-amber-500 text-sm text-center">
+                        Por seguridad, esperá {cooldown} segundos antes de intentar de nuevo.
+                      </p>
+                    </div>
+                  )}
+
+                  {miSignupState?.error && !parseRateLimit(miSignupState.error) && (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                       <p className="text-red-400 text-sm text-center">{miSignupState.error}</p>
                     </div>
@@ -419,10 +445,10 @@ export default function LoginPage() {
 
                   <button
                     type="submit"
-                    disabled={miSignupPending}
+                    disabled={miSignupPending || cooldown > 0}
                     className="w-full bg-[#C1262B] hover:bg-[#a01f24] text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {miSignupPending ? 'Registrando…' : 'Registrarte y entrar'}
+                    {miSignupPending ? 'Registrando…' : cooldown > 0 ? `Esperá ${cooldown}s…` : 'Registrarte y entrar'}
                   </button>
                 </form>
               )}
