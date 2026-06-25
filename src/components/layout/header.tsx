@@ -38,21 +38,16 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
         </svg>
       </button>
 
-      {/* Org name (mobile — only when there's no switcher) */}
-      {switcherOrgs.length <= 1 && (
-        <div className="lg:hidden flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
-        </div>
-      )}
-      {switcherOrgs.length > 1 && (
-        <div className="lg:hidden flex-1" />
-      )}
+      {/* Org name (mobile) */}
+      <div className="lg:hidden flex-1 min-w-0">
+        <p className="text-sm font-semibold text-foreground truncate">{currentOrg?.name}</p>
+      </div>
 
       {/* Spacer (desktop) */}
       <div className="hidden lg:block flex-1" />
 
-      {/* Right side */}
-      <div className="flex items-center gap-2">
+      {/* Right side (desktop only — on mobile these live in the sidebar) */}
+      <div className="hidden lg:flex items-center gap-2">
         {/* Org switcher */}
         {switcherOrgs.length > 1 && (
           <select
@@ -80,7 +75,7 @@ export function Header({ onMenuToggle, isVisible }: HeaderProps) {
           <div className="size-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
             {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
           </div>
-          <span className="hidden lg:block text-sm text-foreground font-medium max-w-[140px] truncate">
+          <span className="text-sm text-foreground font-medium max-w-[140px] truncate">
             {user?.full_name || user?.email}
           </span>
         </div>

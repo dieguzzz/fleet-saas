@@ -10,6 +10,7 @@ import { useCurrentOrg, useCurrentRole, useCurrentUser } from '@/store/tenant-st
 import { hasPermission, type Permission } from '@/lib/permissions';
 import { signOut } from '@/features/auth/actions';
 import { MalaInfluenciaLogo } from '@/components/logos/MalaInfluenciaLogo';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface NavItem {
   href: string;
@@ -375,6 +376,14 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
             </Link>
           </div>
         )}
+
+        {/* Theme toggle (mobile) */}
+        <div className="lg:hidden px-3 pb-2">
+          <div className="flex items-center justify-between px-3 min-h-[44px]">
+            <span className="text-xs text-sidebar-foreground/50">Tema</span>
+            <ThemeToggle />
+          </div>
+        </div>
 
         {/* User footer */}
         <div className="p-3 border-t border-sidebar-border space-y-1">
