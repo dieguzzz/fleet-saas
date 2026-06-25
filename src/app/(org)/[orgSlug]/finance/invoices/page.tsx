@@ -19,10 +19,10 @@ export default async function InvoicesPage({
   searchParams,
 }: {
   params: Promise<{ orgSlug: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; from?: string; to?: string }>;
 }) {
   const { orgSlug } = await params;
-  const { tab } = await searchParams;
+  const { tab, from, to } = await searchParams;
 
   const headersList = await headers();
   const orgType = (headersList.get('x-org-type') as OrgType) || 'fleet';
@@ -108,7 +108,7 @@ export default async function InvoicesPage({
 
       {activeTab === 'productos' ? (
         <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><SkeletonRow key={i}/>)}</div>}>
-          <SalesByProductSection orgId={org.id} />
+          <SalesByProductSection orgId={org.id} orgSlug={orgSlug} dateFrom={from} dateTo={to} />
         </Suspense>
       ) : (
         <Suspense fallback={<div className="space-y-2">{[1,2,3].map(i=><SkeletonRow key={i}/>)}</div>}>
@@ -119,7 +119,7 @@ export default async function InvoicesPage({
   );
 }
 
-async function SalesByProductSection({ orgId }: { orgId: string }) {
-  const { data } = await getSalesByProduct(orgId);
-  return <SalesByProductReport data={data ?? []} />;
+async function SalesByProductSection({ orgId, orgSlug, dateFrom, dateTo }: { orgId: string; orgSlug: string; dateFrom?: string; dateTo?: string }) {
+  const { data } = await getSalesByProduct(orgId, dateFrom, dateTo);
+  return <SalesByProductReport data={data ?? []} orgSlug={orgSlug} dateFrom={dateFrom} dateTo={dateTo} />;
 }

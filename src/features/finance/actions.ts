@@ -244,10 +244,10 @@ export async function getInvoiceLineItems(invoiceId: string) {
   return { data: data as unknown as InvoiceItem[] };
 }
 
-export async function getSalesByProduct(orgId: string) {
+export async function getSalesByProduct(orgId: string, dateFrom?: string, dateTo?: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('invoice_items')
     .select(`
       product_id,
@@ -255,10 +255,15 @@ export async function getSalesByProduct(orgId: string) {
       quantity,
       unit_price,
       total,
-      invoice:invoices!inner(invoice_type, status),
+      invoice:invoices!inner(invoice_type, status, date),
       product:products(name, cost_estimate)
     `)
     .eq('organization_id', orgId);
+
+  if (dateFrom) query = query.gte('invoice.date', dateFrom);
+  if (dateTo) query = query.lte('invoice.date', dateTo);
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching sales by product:', error);
@@ -272,7 +277,7 @@ export async function getSalesByProduct(orgId: string) {
     description: string;
     quantity: number;
     total: number;
-    invoice: { invoice_type: string; status: string };
+    invoice: { invoice_type: string; status: string; date: string };
     product: { name: string; cost_estimate: number | null } | null;
   }>) {
     if (row.invoice.invoice_type !== 'cobro') continue;

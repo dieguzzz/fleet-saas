@@ -155,7 +155,7 @@ function InventoryTable({ items, orgId, orgSlug, orgType }: { items: InventoryIt
               <th className="px-4 py-3 text-left">SKU</th>
               <th className="px-4 py-3 text-right">Stock</th>
               <th className="px-4 py-3 text-right">Mín.</th>
-              <th className="px-4 py-3 text-right">Costo/u</th>
+              <th className="px-4 py-3 text-right">Costo unitario</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
