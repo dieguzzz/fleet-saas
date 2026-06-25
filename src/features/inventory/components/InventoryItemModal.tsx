@@ -7,18 +7,20 @@ import {
   type InventoryItemFormState,
 } from '../actions';
 import { Button } from '@/components/ui/button';
-import { INVENTORY_CATEGORY_LABELS, type InventoryItem } from '@/types/database';
+import { INVENTORY_CATEGORY_LABELS, type InventoryItem, type InventoryCategory, type OrgType } from '@/types/database';
 
-const CATEGORIES = Object.entries(INVENTORY_CATEGORY_LABELS) as [string, string][];
+const FLEET_CATEGORIES: InventoryCategory[] = ['parts', 'fluids', 'tires', 'tools', 'consumables', 'other'];
+const KITCHEN_CATEGORIES: InventoryCategory[] = ['ingredients', 'meats', 'produce', 'spices', 'packaging', 'other'];
 
 interface InventoryItemModalProps {
   orgSlug: string;
+  orgType?: OrgType;
   item?: InventoryItem;
   defaultCategory?: string;
   trigger?: React.ReactNode;
 }
 
-export default function InventoryItemModal({ orgSlug, item, defaultCategory, trigger }: InventoryItemModalProps) {
+export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, defaultCategory, trigger }: InventoryItemModalProps) {
   const [open, setOpen] = useState(false);
 
   const action = item
@@ -69,9 +71,9 @@ export default function InventoryItemModal({ orgSlug, item, defaultCategory, tri
 
                 <div>
                   <label htmlFor="category" className="field-label">Categoría *</label>
-                  <select id="category" name="category" required defaultValue={item?.category ?? defaultCategory ?? 'parts'} className="field-input">
-                    {CATEGORIES.map(([val, label]) => (
-                      <option key={val} value={val}>{label}</option>
+                  <select id="category" name="category" required defaultValue={item?.category ?? defaultCategory ?? (orgType === 'kitchen' ? 'ingredients' : 'parts')} className="field-input">
+                    {(orgType === 'kitchen' ? KITCHEN_CATEGORIES : FLEET_CATEGORIES).map(cat => (
+                      <option key={cat} value={cat}>{INVENTORY_CATEGORY_LABELS[cat]}</option>
                     ))}
                   </select>
                 </div>
