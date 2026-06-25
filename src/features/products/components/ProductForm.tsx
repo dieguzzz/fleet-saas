@@ -5,17 +5,9 @@ import { useRouter } from 'next/navigation';
 import { createProductAction, updateProductAction } from '@/features/products/actions';
 import type { ProductFormState } from '@/features/products/actions';
 import type { Product } from '@/types/database';
+import { PRODUCT_CATEGORY_LABELS } from '@/types/database';
 
-const CATEGORIES = [
-  { value: 'smoked_meats', label: 'Ahumados' },
-  { value: 'grilled', label: 'Parrilla' },
-  { value: 'sides', label: 'Acompañantes' },
-  { value: 'sauces', label: 'Salsas' },
-  { value: 'combos', label: 'Combos' },
-  { value: 'beverages', label: 'Bebidas' },
-  { value: 'desserts', label: 'Postres' },
-  { value: 'other', label: 'Otro' },
-];
+const CATEGORIES = Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => ({ value, label }));
 
 const UNITS = [
   { value: 'unidad', label: 'Unidad' },
