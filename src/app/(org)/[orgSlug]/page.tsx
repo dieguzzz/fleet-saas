@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { getOrganization, getOrganizationStats, getKitchenStats } from '@/features/organizations/queries';
-import { getFinanceKPIs } from '@/features/finance/actions';
 import { createClient } from '@/services/supabase/server';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionCard } from '@/components/ui/section-card';
+import { FinanceOverview } from '@/features/finance/components/FinanceOverview';
 import ExpiryAlertsWidget from '@/features/vehicle-documents/components/ExpiryAlertsWidget';
 import KitchenSalesWidget from '@/features/finance/components/KitchenSalesWidget';
 
@@ -61,56 +61,6 @@ async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; or
   );
 }
 
-async function FinanceStrip({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
-  const kpis = await getFinanceKPIs(orgId);
-
-  function fmt(n: number) {
-    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}k`;
-    return `$${n.toFixed(0)}`;
-  }
-
-  return (
-    <Link
-      href={`/${orgSlug}/finance`}
-      className="flex items-center gap-6 lg:gap-10 flex-wrap rounded-xl border border-border bg-card px-5 py-3.5 shadow-sm hover:shadow-md transition-shadow group"
-    >
-      <div className="flex items-center gap-2">
-        <div className="size-2 rounded-full bg-emerald-500" />
-        <span className="text-sm text-muted-foreground">Ingresos</span>
-        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
-          {fmt(kpis.monthlyIncome)}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="size-2 rounded-full bg-red-500" />
-        <span className="text-sm text-muted-foreground">Gastos</span>
-        <span className="text-sm font-semibold text-red-600 dark:text-red-400 tabular-nums">
-          {fmt(kpis.monthlyExpenses)}
-        </span>
-      </div>
-      {kpis.overdueInvoices > 0 && (
-        <div className="flex items-center gap-2">
-          <div className="size-2 rounded-full bg-amber-500" />
-          <span className="text-sm font-semibold text-amber-600 dark:text-amber-400 tabular-nums">
-            {kpis.overdueInvoices}
-          </span>
-          <span className="text-sm text-muted-foreground">vencidas</span>
-        </div>
-      )}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Por cobrar</span>
-        <span className="text-sm font-semibold text-foreground tabular-nums">
-          {fmt(kpis.pendingReceivables)}
-        </span>
-      </div>
-      <svg className="size-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </Link>
-  );
-}
-
 function StatsSkeleton() {
   return (
     <div className="flex items-baseline gap-8 lg:gap-12">
@@ -124,15 +74,26 @@ function StatsSkeleton() {
   );
 }
 
-function FinanceStripSkeleton() {
+function FinanceOverviewSkeleton() {
   return (
-    <div className="flex items-center gap-6 rounded-xl border border-border bg-card px-5 py-3.5 shadow-sm">
-      {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex items-center gap-2">
-          <Skeleton className="size-2 rounded-full" />
-          <Skeleton className="h-4 w-16" />
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-8 w-28" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {[1, 2].map((i) => (
+          <Skeleton key={i} className="h-32 rounded-xl" />
+        ))}
+      </div>
+      <Skeleton className="h-[340px] rounded-2xl" />
     </div>
   );
 }
@@ -306,10 +267,10 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
         </Suspense>
       </div>
 
-      {/* Finance strip — compact KPIs */}
+      {/* Finance overview — KPIs con comparación mensual + estado de cobros/pagos */}
       <div className="pt-4">
-        <Suspense fallback={<FinanceStripSkeleton />}>
-          <FinanceStrip orgId={org.id} orgSlug={orgSlug} />
+        <Suspense fallback={<FinanceOverviewSkeleton />}>
+          <FinanceOverview orgId={org.id} orgSlug={orgSlug} />
         </Suspense>
       </div>
 

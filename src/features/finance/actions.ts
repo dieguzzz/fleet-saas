@@ -189,6 +189,114 @@ export async function getFinanceKPIs(orgId: string) {
   };
 }
 
+export interface TrendPoint {
+  month: string; // YYYY-MM
+  label: string; // etiqueta corta para el eje (ej. "jul")
+  income: number;
+  expense: number;
+}
+
+export interface InvoiceBalance {
+  pending: number; // total pendiente (sent + draft + overdue)
+  overdue: number; // monto vencido dentro del pendiente
+}
+
+export interface DashboardFinanceKPIs {
+  monthIncome: number;
+  prevMonthIncome: number;
+  monthExpense: number;
+  prevMonthExpense: number;
+  trend: TrendPoint[]; // últimos 6 meses, más antiguo → más reciente
+  receivables: InvoiceBalance; // invoice_type = 'cobro'
+  payables: InvoiceBalance; // invoice_type = 'pago'
+}
+
+const MONTH_LABELS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+/**
+ * KPIs financieros para el dashboard inicial: caja realizada del mes actual y
+ * anterior (comparación MoM), serie de tendencia de 6 meses, y estado de
+ * cuentas por cobrar / por pagar (pendiente + vencido). Solo lee tablas
+ * existentes (financial_transactions e invoices), sin cambios de schema.
+ */
+export async function getDashboardFinanceKPIs(orgId: string): Promise<DashboardFinanceKPIs> {
+  const supabase = await createClient();
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+
+  // Ventana de 6 meses: primer día de hace 5 meses hasta hoy.
+  const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+    .toISOString()
+    .split('T')[0];
+
+  // Buckets vacíos para los 6 meses (garantiza que el gráfico siempre muestre 6 barras).
+  const buckets = new Map<string, TrendPoint>();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    buckets.set(key, { month: key, label: MONTH_LABELS[d.getMonth()], income: 0, expense: 0 });
+  }
+
+  const [{ data: transactions }, { data: receivableRows }, { data: payableRows }] =
+    await Promise.all([
+      supabase
+        .from('financial_transactions')
+        .select('amount, type, transaction_date')
+        .eq('organization_id', orgId)
+        .gte('transaction_date', windowStart)
+        .lte('transaction_date', today),
+      supabase
+        .from('invoices')
+        .select('total, due_date, status')
+        .eq('organization_id', orgId)
+        .eq('invoice_type', 'cobro')
+        .in('status', ['sent', 'draft', 'overdue']),
+      supabase
+        .from('invoices')
+        .select('total, due_date, status')
+        .eq('organization_id', orgId)
+        .eq('invoice_type', 'pago')
+        .in('status', ['sent', 'draft', 'overdue']),
+    ]);
+
+  for (const t of transactions ?? []) {
+    if (!t.transaction_date) continue;
+    const key = t.transaction_date.slice(0, 7); // YYYY-MM
+    const bucket = buckets.get(key);
+    if (!bucket) continue;
+    const amount = Number(t.amount) || 0;
+    if (t.type === 'income') bucket.income += amount;
+    else if (t.type === 'expense') bucket.expense += amount;
+  }
+
+  const trend = Array.from(buckets.values());
+  const current = trend[trend.length - 1];
+  const previous = trend[trend.length - 2];
+
+  function balance(rows: Array<{ total: number | null; due_date: string | null; status: string | null }> | null): InvoiceBalance {
+    let pending = 0;
+    let overdue = 0;
+    for (const inv of rows ?? []) {
+      const total = Number(inv.total ?? 0) || 0;
+      pending += total;
+      if (inv.status === 'overdue' || (inv.due_date && inv.due_date < today)) {
+        overdue += total;
+      }
+    }
+    return { pending, overdue };
+  }
+
+  return {
+    monthIncome: current?.income ?? 0,
+    prevMonthIncome: previous?.income ?? 0,
+    monthExpense: current?.expense ?? 0,
+    prevMonthExpense: previous?.expense ?? 0,
+    trend,
+    receivables: balance(receivableRows),
+    payables: balance(payableRows),
+  };
+}
+
 // Invoice Line Items
 
 export interface LineItemInput {
