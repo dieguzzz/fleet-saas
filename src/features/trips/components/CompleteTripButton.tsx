@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { createClient } from '@/services/supabase/client';
 import { markTripCompleted } from '@/features/trips/actions';
 import { useRouter } from 'next/navigation';
+import { useCurrentOrg } from '@/store/tenant-store';
 
 interface Props {
   tripId: string;
@@ -12,6 +13,7 @@ interface Props {
 
 export function CompleteTripButton({ tripId, orgSlug }: Props) {
   const { refresh } = useRouter();
+  const currentOrg = useCurrentOrg();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -23,12 +25,13 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!currentOrg) { setError('No se pudo determinar la organización'); return; }
     setUploading(true);
     setError('');
     try {
       const supabase = createClient();
       const ext = file.name.split('.').pop();
-      const path = `invoices/end-${tripId}-${Date.now()}.${ext}`;
+      const path = `${currentOrg.id}/invoices/end-${tripId}-${Date.now()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from('trip-documents')
         .upload(path, file, { upsert: true });

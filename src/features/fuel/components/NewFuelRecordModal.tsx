@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 import { createFuelRecord, type FuelFormState } from '@/features/fuel/actions';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/services/supabase/client';
+import { useCurrentOrg } from '@/store/tenant-store';
 
 interface Vehicle { id: string; name: string; plate_number: string | null; }
 interface Employee { id: string; full_name: string; }
@@ -13,6 +14,7 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   vehicles: Vehicle[];
   employees: Employee[];
 }) {
+  const currentOrg = useCurrentOrg();
   const [open, setOpen] = useState(false);
   const [liters, setLiters] = useState('');
   const [pricePerLiter, setPricePerLiter] = useState('');
@@ -33,11 +35,12 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   const handleInvoiceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!currentOrg) { alert('No se pudo determinar la organización'); return; }
     setUploadingInvoice(true);
     try {
       const supabase = createClient();
       const ext = file.name.split('.').pop();
-      const path = `fuel-invoices/${Date.now()}.${ext}`;
+      const path = `${currentOrg.id}/fuel-invoices/${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: true });
       if (error) throw error;
       const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
