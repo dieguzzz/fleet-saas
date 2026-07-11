@@ -237,14 +237,25 @@ export async function getDashboardFinanceKPIs(orgId: string): Promise<DashboardF
     buckets.set(key, { month: key, label: MONTH_LABELS[d.getMonth()], income: 0, expense: 0 });
   }
 
-  const [{ data: transactions }, { data: receivableRows }, { data: payableRows }] =
+  const [{ data: transactions }, { data: paidInvoices }, { data: receivableRows }, { data: payableRows }] =
     await Promise.all([
+      // Caja registrada en el libro manual. Se excluyen las transacciones ligadas
+      // a una factura (invoice_id no nulo) para no duplicar con las facturas pagadas.
       supabase
         .from('financial_transactions')
         .select('amount, type, transaction_date')
         .eq('organization_id', orgId)
+        .is('invoice_id', null)
         .gte('transaction_date', windowStart)
         .lte('transaction_date', today),
+      // Facturas pagadas = caja realizada vía facturación. cobro→ingreso, pago→gasto.
+      supabase
+        .from('invoices')
+        .select('total, date, invoice_type')
+        .eq('organization_id', orgId)
+        .eq('status', 'paid')
+        .gte('date', windowStart)
+        .lte('date', today),
       supabase
         .from('invoices')
         .select('total, due_date, status')
@@ -267,6 +278,18 @@ export async function getDashboardFinanceKPIs(orgId: string): Promise<DashboardF
     const amount = Number(t.amount) || 0;
     if (t.type === 'income') bucket.income += amount;
     else if (t.type === 'expense') bucket.expense += amount;
+  }
+
+  // Facturas pagadas como caja realizada (cobros = ingreso, pagos = gasto),
+  // usando la fecha de la factura para ubicarlas en el mes.
+  for (const inv of paidInvoices ?? []) {
+    if (!inv.date) continue;
+    const key = inv.date.slice(0, 7); // YYYY-MM
+    const bucket = buckets.get(key);
+    if (!bucket) continue;
+    const amount = Number(inv.total ?? 0) || 0;
+    if (inv.invoice_type === 'cobro') bucket.income += amount;
+    else if (inv.invoice_type === 'pago') bucket.expense += amount;
   }
 
   const trend = Array.from(buckets.values());
