@@ -85,6 +85,28 @@ export default async function TripDetailPage({
           )}
         </div>
       </div>
+
+      {/* Banner de ida y regreso: enlaza al tramo hermano */}
+      {trip.leg && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+              ⇄ {trip.leg === 'outbound' ? 'Ida' : 'Vuelta'}
+            </span>
+            <span className="text-muted-foreground">Este viaje es parte de un ida y regreso.</span>
+          </div>
+          {trip.sibling ? (
+            <Link
+              href={`/${orgSlug}/trips/${trip.sibling.id}`}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Ver tramo de {trip.sibling.leg === 'outbound' ? 'ida' : 'vuelta'} ({trip.sibling.origin} → {trip.sibling.destination}) &rarr;
+            </Link>
+          ) : (
+            <span className="text-xs text-muted-foreground">El otro tramo fue eliminado.</span>
+          )}
+        </div>
+      )}
       
       {/* Map Section */}
       <div className="relative w-full h-[400px] bg-muted border rounded-xl overflow-hidden shadow-sm">

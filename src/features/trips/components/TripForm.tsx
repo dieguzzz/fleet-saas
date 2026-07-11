@@ -56,6 +56,7 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
   const [destName, setDestName] = useState('');
   const [selecting, setSelecting] = useState<'origin' | 'destination' | null>(null);
   const [geocoding, setGeocoding] = useState<'origin' | 'destination' | null>(null);
+  const [isRoundTrip, setIsRoundTrip] = useState(false);
 
   const [startInvoiceUrl, setStartInvoiceUrl] = useState('');
   const [uploadingInvoice, setUploadingInvoice] = useState(false);
@@ -286,9 +287,26 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
           )}
         </div>
 
+        {/* Ida y regreso */}
+        <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer hover:bg-accent/50 transition-colors">
+          <input
+            type="checkbox"
+            name="is_round_trip"
+            checked={isRoundTrip}
+            onChange={(e) => setIsRoundTrip(e.target.checked)}
+            className="mt-0.5 size-4 accent-primary"
+          />
+          <span className="text-sm">
+            <span className="font-medium text-foreground">Ida y regreso</span>
+            <span className="block text-xs text-muted-foreground">
+              Crea también el tramo de vuelta (destino → origen) como viaje planificado aparte.
+            </span>
+          </span>
+        </label>
+
         {/* Estado */}
         <div className="space-y-2">
-          <label htmlFor="status">{fieldLabel('Estado')}</label>
+          <label htmlFor="status">{fieldLabel(isRoundTrip ? 'Estado (ida)' : 'Estado')}</label>
           <select id="status" name="status" className="field-input">
             <option value="planned">Planificado</option>
             <option value="in_progress">En Progreso</option>

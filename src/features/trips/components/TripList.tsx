@@ -61,7 +61,12 @@ export function TripList({ trips, orgSlug }: TripListProps) {
               </TableCell>
               <TableCell>{trip.driver?.full_name || '-'}</TableCell>
               <TableCell>
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-0.5">
+                  {trip.leg && (
+                    <span className="inline-flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      ⇄ {trip.leg === 'outbound' ? 'Ida' : 'Vuelta'}
+                    </span>
+                  )}
                   <span className="text-xs text-muted-foreground">De: <span className="text-foreground">{trip.origin}</span></span>
                   <span className="text-xs text-muted-foreground">A: <span className="text-foreground">{trip.destination}</span></span>
                 </div>
