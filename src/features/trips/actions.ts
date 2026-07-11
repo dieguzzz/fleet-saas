@@ -38,7 +38,20 @@ export async function getTrip(id: string) {
     return { error: error.message };
   }
 
-  return { data: data as Trip };
+  const trip = data as Trip;
+
+  // Viaje ida y regreso: adjuntar el tramo hermano (la otra dirección).
+  if (trip.round_trip_group_id) {
+    const { data: sibling } = await supabase
+      .from('trips')
+      .select('id, leg, origin, destination, status')
+      .eq('round_trip_group_id', trip.round_trip_group_id)
+      .neq('id', trip.id)
+      .maybeSingle();
+    trip.sibling = (sibling as Trip['sibling']) ?? null;
+  }
+
+  return { data: trip };
 }
 
 export async function getTripExpenses(tripId: string) {
@@ -72,21 +85,57 @@ export async function createTrip(prevState: unknown, formData: FormData) {
     return { error: 'Organization not found', success: false };
   }
 
-  const { error } = await supabase
-    .from('trips')
-    .insert({
+  const vehicleId = (formData.get('vehicle_id') as string) || null;
+  const driverId = (formData.get('driver_id') as string) || null;
+  const origin = formData.get('origin') as string;
+  const destination = formData.get('destination') as string;
+  const originCoords = formData.get('origin_coords') ? JSON.parse(formData.get('origin_coords') as string) : null;
+  const destinationCoords = formData.get('destination_coords') ? JSON.parse(formData.get('destination_coords') as string) : null;
+  const status = (formData.get('status') as 'planned' | 'in_progress' | 'completed' | 'cancelled') || 'planned';
+  const notes = (formData.get('notes') as string) || null;
+  const startInvoiceUrl = (formData.get('start_invoice_url') as string) || null;
+  const isRoundTrip = formData.get('is_round_trip') === 'on';
+
+  // Tramo de ida (o viaje único si no es ida y regreso).
+  const outbound = {
+    organization_id: orgId,
+    vehicle_id: vehicleId,
+    driver_id: driverId,
+    origin,
+    destination,
+    origin_coords: originCoords,
+    destination_coords: destinationCoords,
+    status,
+    notes,
+    started_at: status === 'in_progress' ? new Date().toISOString() : null,
+    start_invoice_url: startInvoiceUrl,
+    round_trip_group_id: isRoundTrip ? crypto.randomUUID() : null,
+    leg: isRoundTrip ? 'outbound' : null,
+  };
+
+  const rows = [outbound];
+
+  // Tramo de vuelta: inverso de la ida (origen↔destino), mismo vehículo/conductor,
+  // en estado planificado. Comparte el round_trip_group_id.
+  if (isRoundTrip) {
+    rows.push({
       organization_id: orgId,
-      vehicle_id: (formData.get('vehicle_id') as string) || null,
-      driver_id: (formData.get('driver_id') as string) || null,
-      origin: formData.get('origin') as string,
-      destination: formData.get('destination') as string,
-      origin_coords: formData.get('origin_coords') ? JSON.parse(formData.get('origin_coords') as string) : null,
-      destination_coords: formData.get('destination_coords') ? JSON.parse(formData.get('destination_coords') as string) : null,
-      status: (formData.get('status') as 'planned' | 'in_progress' | 'completed' | 'cancelled') || 'planned',
-      notes: formData.get('notes') as string,
-      started_at: formData.get('status') === 'in_progress' ? new Date().toISOString() : null,
-      start_invoice_url: (formData.get('start_invoice_url') as string) || null,
+      vehicle_id: vehicleId,
+      driver_id: driverId,
+      origin: destination,
+      destination: origin,
+      origin_coords: destinationCoords,
+      destination_coords: originCoords,
+      status: 'planned',
+      notes,
+      started_at: null,
+      start_invoice_url: null,
+      round_trip_group_id: outbound.round_trip_group_id,
+      leg: 'return',
     });
+  }
+
+  const { error } = await supabase.from('trips').insert(rows);
 
   if (error) {
     console.error('Error creating trip:', error);

@@ -15,6 +15,7 @@ export type OrgRole = 'owner' | 'admin' | 'collaborator' | 'viewer';
 export type OrgType = 'fleet' | 'kitchen';
 export type VehicleStatus = 'active' | 'maintenance' | 'inactive';
 export type TripStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled';
+export type TripLeg = 'outbound' | 'return';
 export type TransactionType = 'income' | 'expense';
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
@@ -130,11 +131,16 @@ export interface Trip {
   status: TripStatus | null;
   start_invoice_url: string | null;
   end_invoice_url: string | null;
+  // Ida y regreso: ambos tramos comparten round_trip_group_id; leg distingue ida/vuelta.
+  round_trip_group_id: string | null;
+  leg: TripLeg | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined data
   vehicle?: Vehicle;
   driver?: { id: string; full_name: string | null };
+  // Tramo hermano (la otra dirección) en un viaje ida y regreso.
+  sibling?: { id: string; leg: TripLeg | null; origin: string; destination: string; status: TripStatus | null } | null;
 }
 
 export interface TripLocation {

@@ -1412,10 +1412,12 @@ export type Database = {
           ended_at: string | null
           fuel_consumed: number | null
           id: string
+          leg: string | null
           notes: string | null
           organization_id: string
           origin: string
           origin_coords: Json | null
+          round_trip_group_id: string | null
           start_invoice_url: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["trip_status"] | null
@@ -1432,10 +1434,12 @@ export type Database = {
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
+          leg?: string | null
           notes?: string | null
           organization_id: string
           origin: string
           origin_coords?: Json | null
+          round_trip_group_id?: string | null
           start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
@@ -1452,10 +1456,12 @@ export type Database = {
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
+          leg?: string | null
           notes?: string | null
           organization_id?: string
           origin?: string
           origin_coords?: Json | null
+          round_trip_group_id?: string | null
           start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
