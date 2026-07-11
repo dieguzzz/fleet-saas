@@ -38,11 +38,11 @@ export async function createMaintenanceRecord(prevState: CreateMaintenanceState 
     type: formData.get('type'),
     description: formData.get('description'),
     cost: formData.get('cost'),
-    odometer_reading: formData.get('odometer_reading'),
-    performed_by: formData.get('performed_by'),
+    odometer_reading: formData.get('odometer_reading') || undefined,
+    performed_by: formData.get('performed_by') || undefined,
     performed_at: formData.get('performed_at'),
-    next_due_at: formData.get('next_due_at'),
-    next_due_km: formData.get('next_due_km'),
+    next_due_at: formData.get('next_due_at') || undefined,
+    next_due_km: formData.get('next_due_km') || undefined,
   };
 
   const validatedFields = maintenanceSchema.safeParse(rawData);

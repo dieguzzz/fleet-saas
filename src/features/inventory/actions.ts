@@ -247,6 +247,7 @@ export async function recordStockMovement(
     .from('inventory_items')
     .select('current_stock')
     .eq('id', itemId)
+    .eq('organization_id', orgId)
     .single();
 
   if (fetchError || !item) {
@@ -285,7 +286,8 @@ export async function recordStockMovement(
   const { error: updateError } = await supabase
     .from('inventory_items')
     .update({ current_stock: newStock })
-    .eq('id', itemId);
+    .eq('id', itemId)
+    .eq('organization_id', orgId);
 
   if (updateError) {
     return { error: 'Failed to update stock level', success: false };

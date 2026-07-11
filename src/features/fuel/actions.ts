@@ -81,10 +81,12 @@ export async function createFuelRecord(prevState: FuelFormState, formData: FormD
 
 export async function deleteFuelRecord(id: string, orgSlug: string) {
   const supabase = await createClient();
-  const { data: rec } = await supabase.from('fuel_records').select('organization_id, fuel_type, liters').eq('id', id).single();
-  const { error } = await supabase.from('fuel_records').delete().eq('id', id);
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) throw new Error('Organización no encontrada');
+  const { data: rec } = await supabase.from('fuel_records').select('fuel_type, liters').eq('id', id).eq('organization_id', org.id).single();
+  const { error } = await supabase.from('fuel_records').delete().eq('id', id).eq('organization_id', org.id);
   if (error) throw new Error('Error al eliminar registro');
-  if (rec) await logAudit({ organizationId: rec.organization_id, action: 'delete', resourceType: 'fuel_record', resourceId: id, resourceLabel: `${rec.liters}L - ${rec.fuel_type}` });
+  if (rec) await logAudit({ organizationId: org.id, action: 'delete', resourceType: 'fuel_record', resourceId: id, resourceLabel: `${rec.liters}L - ${rec.fuel_type}` });
   revalidatePath(`/${orgSlug}/fuel`);
 }
 

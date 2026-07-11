@@ -187,6 +187,9 @@ export async function createTripExpense(prevState: unknown, formData: FormData) 
 export async function markTripCompleted(tripId: string, orgSlug: string, endInvoiceUrl: string | null) {
   const supabase = await createClient();
 
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase
     .from('trips')
     .update({
@@ -194,7 +197,8 @@ export async function markTripCompleted(tripId: string, orgSlug: string, endInvo
       ended_at: new Date().toISOString(),
       ...(endInvoiceUrl ? { end_invoice_url: endInvoiceUrl } : {}),
     })
-    .eq('id', tripId);
+    .eq('id', tripId)
+    .eq('organization_id', orgId);
 
   if (error) {
     console.error('Error completing trip:', error);
@@ -297,6 +301,6 @@ export async function deleteTripExpense(id: string, orgId: string, tripId: strin
     return { error: error.message };
   }
 
-  revalidatePath('/[orgSlug]/trips/[id]', 'page');
+  revalidatePath('/[orgSlug]/trips/[tripId]', 'page');
   return { success: true };
 }

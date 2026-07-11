@@ -95,13 +95,16 @@ export async function updateTenant(prevState: TenantFormState | null, formData: 
 
   if (!validated.success) return { error: validated.error.issues[0].message };
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase.from('land_tenants').update({
     ...validated.data,
     phone: validated.data.phone || null,
     equipment_description: validated.data.equipment_description || null,
     notes: validated.data.notes || null,
     updated_at: new Date().toISOString(),
-  }).eq('id', tenantId);
+  }).eq('id', tenantId).eq('organization_id', org.id);
 
   if (error) {
     console.error('Error updating tenant:', error);
@@ -115,7 +118,9 @@ export async function updateTenant(prevState: TenantFormState | null, formData: 
 
 export async function deleteTenant(tenantId: string, orgSlug: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from('land_tenants').delete().eq('id', tenantId);
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) throw new Error('Organización no encontrada');
+  const { error } = await supabase.from('land_tenants').delete().eq('id', tenantId).eq('organization_id', org.id);
   if (error) throw new Error('Error al eliminar el inquilino');
   revalidatePath(`/${orgSlug}/terreno`);
 }
@@ -219,6 +224,9 @@ export async function markPaymentPaid(prevState: MarkPaidFormState | null, formD
 
   if (!validated.success) return { error: validated.error.issues[0].message };
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase.from('land_payments').update({
     status: 'paid',
     paid_date: validated.data.paid_date,
@@ -226,7 +234,7 @@ export async function markPaymentPaid(prevState: MarkPaidFormState | null, formD
     payment_method: validated.data.payment_method,
     notes: validated.data.notes || null,
     updated_at: new Date().toISOString(),
-  }).eq('id', paymentId);
+  }).eq('id', paymentId).eq('organization_id', org.id);
 
   if (error) {
     console.error('Error marking payment as paid:', error);
@@ -239,10 +247,13 @@ export async function markPaymentPaid(prevState: MarkPaidFormState | null, formD
 
 export async function updatePaymentReceiptUrl(paymentId: string, orgSlug: string, url: string) {
   const supabase = await createClient();
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) throw new Error('Organización no encontrada');
   const { error } = await supabase
     .from('land_payments')
     .update({ receipt_url: url, updated_at: new Date().toISOString() })
-    .eq('id', paymentId);
+    .eq('id', paymentId)
+    .eq('organization_id', org.id);
 
   if (error) throw new Error('Error al guardar comprobante');
   revalidatePath(`/[orgSlug]/terreno`, 'page');
@@ -250,6 +261,8 @@ export async function updatePaymentReceiptUrl(paymentId: string, orgSlug: string
 
 export async function markPaymentPending(paymentId: string, orgSlug: string) {
   const supabase = await createClient();
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) throw new Error('Organización no encontrada');
   const { error } = await supabase
     .from('land_payments')
     .update({
@@ -260,7 +273,8 @@ export async function markPaymentPending(paymentId: string, orgSlug: string) {
       receipt_url: null,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', paymentId);
+    .eq('id', paymentId)
+    .eq('organization_id', org.id);
 
   if (error) throw new Error('Error al revertir pago');
   revalidatePath(`/[orgSlug]/terreno`, 'page');
