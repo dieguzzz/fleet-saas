@@ -37,8 +37,55 @@ export function TripList({ trips, orgSlug }: TripListProps) {
     );
   }
 
+  const statusLabel = (s: Trip['status']) =>
+    s === 'completed' ? 'Completado' : s === 'in_progress' ? 'En Progreso' : s === 'planned' ? 'Planificado' : s === 'cancelled' ? 'Cancelado' : (s ?? '');
+  const statusClass = (s: Trip['status']) =>
+    s === 'completed' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20'
+      : s === 'in_progress' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-500/20'
+      : s === 'planned' ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-500/20'
+      : s === 'cancelled' ? 'bg-destructive/10 text-destructive ring-destructive/20' : '';
+  const fmtDate = (d: string | null) => d ? (() => { const [y, mo, da] = d.split('T')[0].split('-'); return `${da}/${mo}/${y}`; })() : '-';
+
   return (
-    <div className="rounded-md border overflow-x-auto">
+    <>
+      {/* Mobile: tarjetas tocables */}
+      <div className="md:hidden space-y-3">
+        {trips.map((trip) => (
+          <Link
+            key={trip.id}
+            href={`/${orgSlug}/trips/${trip.id}`}
+            className="block rounded-xl border border-border bg-card p-4 shadow-sm active:bg-accent/50 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium text-foreground truncate">{trip.vehicle?.name || 'Vehículo Desconocido'}</p>
+                {trip.vehicle?.plate_number && (
+                  <p className="text-xs text-muted-foreground">{trip.vehicle.plate_number}</p>
+                )}
+              </div>
+              <span className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${statusClass(trip.status)}`}>
+                {statusLabel(trip.status)}
+              </span>
+            </div>
+            {trip.leg && (
+              <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                ⇄ {trip.leg === 'outbound' ? 'Ida' : 'Vuelta'}
+              </span>
+            )}
+            <div className="mt-2 text-sm">
+              <p className="text-muted-foreground">De: <span className="text-foreground">{trip.origin}</span></p>
+              <p className="text-muted-foreground">A: <span className="text-foreground">{trip.destination}</span></p>
+            </div>
+            <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+              <span>{trip.driver?.full_name || 'Sin conductor'}</span>
+              <span>{fmtDate(trip.started_at)}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Desktop: tabla */}
+      <div className="hidden md:block rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -100,6 +147,7 @@ export function TripList({ trips, orgSlug }: TripListProps) {
           ))}
         </TableBody>
       </Table>
-    </div>
+      </div>
+    </>
   );
 }

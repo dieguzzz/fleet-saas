@@ -82,7 +82,7 @@ export function PwaInstallBanner() {
   if (!show) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] flex items-start justify-between gap-3 bg-sidebar text-sidebar-foreground px-4 py-3 shadow-lg border-b border-border">
+    <div className="fixed bottom-0 left-0 right-0 z-[9999] flex items-start justify-between gap-3 bg-sidebar text-sidebar-foreground px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.12)] border-t border-border rounded-t-2xl lg:hidden">
       <div className="flex items-start gap-3 flex-1 min-w-0">
         {/* Icono */}
         <div className="flex-shrink-0 size-10 rounded-xl bg-primary/10 flex items-center justify-center">
