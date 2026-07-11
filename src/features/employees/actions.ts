@@ -83,20 +83,22 @@ export async function updateEmployee(prevState: EmployeeFormState | null, formDa
 
   if (!validated.success) return { error: validated.error.issues[0].message };
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase.from('employees').update({
     ...validated.data,
     license_expiry: validated.data.license_expiry || null,
     hire_date: validated.data.hire_date || null,
     updated_at: new Date().toISOString(),
-  }).eq('id', employeeId);
+  }).eq('id', employeeId).eq('organization_id', org.id);
 
   if (error) {
     console.error('Error updating employee:', error);
     return { error: 'Error al actualizar empleado' };
   }
 
-  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
-  if (org) await logAudit({ organizationId: org.id, action: 'update', resourceType: 'employee', resourceId: employeeId, resourceLabel: validated.data.full_name });
+  await logAudit({ organizationId: org.id, action: 'update', resourceType: 'employee', resourceId: employeeId, resourceLabel: validated.data.full_name });
 
   revalidatePath(`/${orgSlug}/employees`);
   redirect(`/${orgSlug}/employees`);
@@ -104,10 +106,12 @@ export async function updateEmployee(prevState: EmployeeFormState | null, formDa
 
 export async function deleteEmployee(employeeId: string, orgSlug: string) {
   const supabase = await createClient();
-  const { data: emp } = await supabase.from('employees').select('full_name, organization_id').eq('id', employeeId).single();
-  const { error } = await supabase.from('employees').delete().eq('id', employeeId);
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) throw new Error('Organización no encontrada');
+  const { data: emp } = await supabase.from('employees').select('full_name').eq('id', employeeId).eq('organization_id', org.id).single();
+  const { error } = await supabase.from('employees').delete().eq('id', employeeId).eq('organization_id', org.id);
   if (error) throw new Error('Error al eliminar empleado');
-  if (emp) await logAudit({ organizationId: emp.organization_id, action: 'delete', resourceType: 'employee', resourceId: employeeId, resourceLabel: emp.full_name });
+  if (emp) await logAudit({ organizationId: org.id, action: 'delete', resourceType: 'employee', resourceId: employeeId, resourceLabel: emp.full_name });
   revalidatePath(`/${orgSlug}/employees`);
 }
 

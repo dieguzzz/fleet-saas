@@ -185,6 +185,8 @@ export interface FinancialTransaction {
   reference_id: string | null;
   transaction_date: string;
   attachments: Json | null;
+  invoice_id: string | null;
+  trip_id: string | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -361,6 +363,7 @@ export interface Invoice {
   attachment_url: string | null;
   cufe: string | null;
   dgi_url: string | null;
+  trip_id: string | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined

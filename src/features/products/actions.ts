@@ -71,7 +71,7 @@ export async function createProductAction(
     sell_price: formData.get('sell_price') ? Number(formData.get('sell_price')) : undefined,
     cost_estimate: formData.get('cost_estimate') ? Number(formData.get('cost_estimate')) : undefined,
     unit: (formData.get('unit') as string) || undefined,
-    is_active: formData.get('is_active') ?? 'true',
+    is_active: formData.get('is_active') ?? 'false',
     image_url: (formData.get('image_url') as string) || null,
   };
 
@@ -124,7 +124,7 @@ export async function updateProductAction(
     sell_price: formData.get('sell_price') ? Number(formData.get('sell_price')) : undefined,
     cost_estimate: formData.get('cost_estimate') ? Number(formData.get('cost_estimate')) : undefined,
     unit: (formData.get('unit') as string) || undefined,
-    is_active: formData.get('is_active') ?? 'true',
+    is_active: formData.get('is_active') ?? 'false',
     image_url: (formData.get('image_url') as string) || null,
   };
 
@@ -271,10 +271,14 @@ export async function addRecipeIngredientAction(
 export async function removeRecipeIngredientAction(ingredientId: string, orgSlug: string) {
   const supabase = await createClient();
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase
     .from('recipe_ingredients')
     .delete()
-    .eq('id', ingredientId);
+    .eq('id', ingredientId)
+    .eq('organization_id', org.id);
 
   if (error) {
     console.error('Error removing recipe ingredient:', error);
@@ -292,10 +296,14 @@ export async function updateRecipeIngredientAction(
 ) {
   const supabase = await createClient();
 
+  const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
+  if (!org) return { error: 'Organización no encontrada' };
+
   const { error } = await supabase
     .from('recipe_ingredients')
     .update({ quantity })
-    .eq('id', ingredientId);
+    .eq('id', ingredientId)
+    .eq('organization_id', org.id);
 
   if (error) {
     console.error('Error updating recipe ingredient:', error);

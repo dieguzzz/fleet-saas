@@ -8,6 +8,14 @@ const publicRoutes = ['/', '/login', '/signup', '/invite', '/forgot-password', '
 const adminRoutes = ['/admin'];
 
 export async function middleware(request: NextRequest) {
+  // Headers reenviados al request para que los Server Components los lean vía headers().
+  // Se limpian los x-org-* entrantes para evitar spoofing desde el cliente.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.delete('x-org-id');
+  requestHeaders.delete('x-org-role');
+  requestHeaders.delete('x-org-slug');
+  requestHeaders.delete('x-org-type');
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -141,10 +149,10 @@ export async function middleware(request: NextRequest) {
             .single();
           if (impOrg) {
             const orgType = (impOrg as any).org_type || 'fleet';
-            supabaseResponse.headers.set('x-org-id', impOrg.id);
-            supabaseResponse.headers.set('x-org-role', 'owner');
-            supabaseResponse.headers.set('x-org-slug', orgSlug);
-            supabaseResponse.headers.set('x-org-type', orgType);
+            requestHeaders.set('x-org-id', impOrg.id);
+            requestHeaders.set('x-org-role', 'owner');
+            requestHeaders.set('x-org-slug', orgSlug);
+            requestHeaders.set('x-org-type', orgType);
 
             const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
             const kitchenOnlySegments = new Set(['products']);
@@ -174,10 +182,10 @@ export async function middleware(request: NextRequest) {
             .single();
           if (directOrg) {
             const orgType = (directOrg as any).org_type || 'fleet';
-            supabaseResponse.headers.set('x-org-id', directOrg.id);
-            supabaseResponse.headers.set('x-org-role', 'owner');
-            supabaseResponse.headers.set('x-org-slug', orgSlug);
-            supabaseResponse.headers.set('x-org-type', orgType);
+            requestHeaders.set('x-org-id', directOrg.id);
+            requestHeaders.set('x-org-role', 'owner');
+            requestHeaders.set('x-org-slug', orgSlug);
+            requestHeaders.set('x-org-type', orgType);
           } else {
             return NextResponse.redirect(new URL('/unauthorized', request.url));
           }
@@ -191,10 +199,10 @@ export async function middleware(request: NextRequest) {
     if (membership) {
       const org = membership.organization as unknown as { id: string; org_type?: string };
       const orgType = org.org_type || 'fleet';
-      supabaseResponse.headers.set('x-org-id', org.id);
-      supabaseResponse.headers.set('x-org-role', membership.role);
-      supabaseResponse.headers.set('x-org-slug', orgSlug);
-      supabaseResponse.headers.set('x-org-type', orgType);
+      requestHeaders.set('x-org-id', org.id);
+      requestHeaders.set('x-org-role', membership.role);
+      requestHeaders.set('x-org-slug', orgSlug);
+      requestHeaders.set('x-org-type', orgType);
 
       const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
       const kitchenOnlySegments = new Set(['products']);
@@ -209,7 +217,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return supabaseResponse;
+  // Reenviar los headers x-org-* al request para que los Server Components los lean,
+  // preservando las cookies de sesión que Supabase pudo haber refrescado.
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  supabaseResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));
+  return response;
 }
 
 export const config = {

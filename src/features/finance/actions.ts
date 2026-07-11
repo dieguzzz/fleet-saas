@@ -60,7 +60,7 @@ export async function getInvoice(id: string, orgId: string) {
 // Define types for inputs to avoid mismatch
 export type CreateInvoiceInput = Omit<
   Invoice,
-  'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier' | 'organization_id'
+  'id' | 'created_at' | 'updated_at' | 'customer' | 'supplier' | 'organization_id' | 'trip_id'
 >;
 
 export async function createInvoice(
@@ -165,28 +165,6 @@ export async function deleteInvoice(id: string, orgId: string) {
 
   revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { success: true };
-}
-
-export async function getFinanceKPIs(orgId: string) {
-  const supabase = await createClient();
-  const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-
-  const [{ data: income }, { data: expenses }, { count: overdueCount }, { data: pending }] =
-    await Promise.all([
-      supabase.from('financial_transactions').select('amount').eq('organization_id', orgId).eq('type', 'income').gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-      supabase.from('financial_transactions').select('amount').eq('organization_id', orgId).eq('type', 'expense').gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-      supabase.from('invoices').select('*', { count: 'exact', head: true }).eq('organization_id', orgId).eq('status', 'overdue'),
-      supabase.from('invoices').select('total').eq('organization_id', orgId).in('status', ['sent', 'draft']).eq('invoice_type', 'cobro'),
-    ]);
-
-  return {
-    monthlyIncome: (income ?? []).reduce((s, t) => s + Number(t.amount), 0),
-    monthlyExpenses: (expenses ?? []).reduce((s, t) => s + Number(t.amount), 0),
-    overdueInvoices: overdueCount ?? 0,
-    pendingReceivables: (pending ?? []).reduce((s, inv) => s + Number(inv.total ?? 0), 0),
-  };
 }
 
 export interface TrendPoint {
@@ -338,7 +316,7 @@ export async function saveInvoiceLineItems(
   const supabase = await createClient();
 
   // Delete existing line items for this invoice
-  await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId);
+  await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId).eq('organization_id', orgId);
 
   if (lineItems.length === 0) return { success: true };
 

@@ -146,11 +146,6 @@ export default function ProductForm({ orgSlug, product }: ProductFormProps) {
         <div className="sm:col-span-2">
           <label className="flex items-center gap-2">
             <input
-              type="hidden"
-              name="is_active"
-              value="false"
-            />
-            <input
               type="checkbox"
               name="is_active"
               value="true"
