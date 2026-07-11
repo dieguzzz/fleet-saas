@@ -4,6 +4,7 @@ import { useActionState, useRef, useState, useTransition } from 'react';
 import { createTrip, saveTripLocation, incrementTripLocationUse, deleteTripLocation } from '@/features/trips/actions';
 import Link from 'next/link';
 import { createClient } from '@/services/supabase/client';
+import { useCurrentOrg } from '@/store/tenant-store';
 import dynamic from 'next/dynamic';
 import type { TripLocation } from '@/types/database';
 
@@ -45,6 +46,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
 }
 
 export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: initialLocations }: TripFormProps) {
+  const currentOrg = useCurrentOrg();
   const [state, formAction, isPending] = useActionState(createTrip, null);
   const [locations, setLocations] = useState<TripLocation[]>(initialLocations);
 
@@ -67,11 +69,12 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
   const handleInvoiceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!currentOrg) { alert('No se pudo determinar la organización'); return; }
     setUploadingInvoice(true);
     try {
       const supabase = createClient();
       const ext = file.name.split('.').pop();
-      const path = `invoices/start-${Date.now()}.${ext}`;
+      const path = `${currentOrg.id}/invoices/start-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: true });
       if (error) throw error;
       const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
