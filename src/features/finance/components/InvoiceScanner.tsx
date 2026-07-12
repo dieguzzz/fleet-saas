@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface InvoiceScannerProps {
@@ -17,6 +17,13 @@ interface ScannedData {
   docType?: string;
   raw: string;
 }
+
+type JsQRFn = (
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  opts?: { inversionAttempts?: 'dontInvert' | 'onlyInvert' | 'attemptBoth' | 'invertFirst' }
+) => { data: string } | null;
 
 function parseDgiUrl(url: string): ScannedData | null {
   try {
@@ -75,22 +82,136 @@ function parseQRData(raw: string): ScannedData {
 }
 
 export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
-  const [scanning, setScanning] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [initializing, setInitializing] = useState(false);
   const [result, setResult] = useState<ScannedData | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const jsQRRef = useRef<JsQRFn | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const stopCamera = useCallback(() => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  const handleDetected = useCallback((data: string) => {
+    stopCamera();
+    setResult(parseQRData(data));
+    setError(null);
+    setOpen(false);
+  }, [stopCamera]);
+
+  const scanLoop = useCallback(() => {
+    const video = videoRef.current;
+    const jsQR = jsQRRef.current;
+    if (!video || !jsQR || !streamRef.current) return;
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+      let canvas = canvasRef.current;
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvasRef.current = canvas;
+      }
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+        if (code && code.data) {
+          handleDetected(code.data);
+          return;
+        }
+      }
+    }
+    rafRef.current = requestAnimationFrame(scanLoop);
+  }, [handleDetected]);
+
+  // Enciende la cámara mientras el modal está abierto; la apaga al cerrar/desmontar.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        if (!jsQRRef.current) {
+          jsQRRef.current = (await import('jsqr')).default as unknown as JsQRFn;
+        }
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw Object.assign(new Error('no-camera'), { name: 'NotFoundError' });
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        streamRef.current = stream;
+        const video = videoRef.current;
+        if (!video) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        video.srcObject = stream;
+        await video.play();
+        if (cancelled) return;
+        setInitializing(false);
+        rafRef.current = requestAnimationFrame(scanLoop);
+      } catch (err) {
+        if (cancelled) return;
+        setInitializing(false);
+        const name = (err as { name?: string })?.name;
+        if (name === 'NotAllowedError' || name === 'SecurityError') {
+          setError('Permiso de cámara denegado. Podés subir una imagen del QR.');
+        } else if (name === 'NotFoundError' || name === 'NotReadableError' || name === 'OverconstrainedError') {
+          setError('No se pudo usar la cámara. Subí una imagen del QR.');
+        } else {
+          setError('No se pudo acceder a la cámara. Subí una imagen del QR.');
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      stopCamera();
+    };
+  }, [open, scanLoop, stopCamera]);
+
+  const handleScanClick = () => {
+    setResult(null);
+    setError(null);
+    setInitializing(true);
+    setOpen(true);
+  };
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setScanning(true);
     setError(null);
     setResult(null);
 
     try {
-      const jsQR = (await import('jsqr')).default;
+      if (!jsQRRef.current) {
+        jsQRRef.current = (await import('jsqr')).default as unknown as JsQRFn;
+      }
+      const jsQR = jsQRRef.current;
       const img = new Image();
       const url = URL.createObjectURL(file);
 
@@ -112,18 +233,17 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
 
       URL.revokeObjectURL(url);
 
-      if (code) {
-        const parsed = parseQRData(code.data);
-        setResult(parsed);
+      if (code && code.data) {
+        stopCamera();
+        setResult(parseQRData(code.data));
+        setOpen(false);
       } else {
         setError('No se encontró un código QR en la imagen. Puedes crear la factura manualmente.');
       }
     } catch {
       setError('Error al procesar la imagen');
-    } finally {
-      setScanning(false);
     }
-  }, []);
+  }, [stopCamera]);
 
   const handleUseData = () => {
     const params = new URLSearchParams({ type: 'pago' });
@@ -137,35 +257,73 @@ export default function InvoiceScanner({ orgSlug }: InvoiceScannerProps) {
     router.push(`/${orgSlug}/finance/invoices/new?${params.toString()}`);
   };
 
-  const handleScanClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <div className="space-y-3">
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
       />
       <button
         onClick={handleScanClick}
-        disabled={scanning}
-        className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 min-h-11 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 min-h-11 text-sm font-medium text-foreground hover:bg-accent transition-colors"
       >
         <svg className="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
         </svg>
-        {scanning ? 'Escaneando...' : 'Escanear QR'}
+        Escanear QR
       </button>
 
-      {error && (
+      {/* Modal de escáner en vivo — superficie de cámara, negra a propósito */}
+      {open && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/95">
+          <div className="flex items-center justify-between px-4 py-3 text-white">
+            <span className="text-sm font-medium">Apuntá al QR de la factura</span>
+            <button
+              onClick={() => setOpen(false)}
+              className="inline-flex items-center justify-center rounded-lg px-3 min-h-11 text-sm font-medium text-white/90 hover:bg-white/10 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+
+          <div className="relative flex-1 overflow-hidden">
+            <video
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {/* Marco guía */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="size-64 max-w-[70vw] max-h-[70vw] rounded-2xl border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+            </div>
+            {initializing && (
+              <p className="absolute inset-0 flex items-center justify-center text-sm text-white/80">
+                Iniciando cámara…
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col items-center gap-3 px-4 py-4">
+            {error && (
+              <p className="text-center text-sm text-yellow-300">{error}</p>
+            )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="text-sm text-white/80 underline hover:text-white"
+            >
+              Subir una imagen en su lugar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error fuera del modal (ej. imagen subida sin QR) */}
+      {!open && error && (
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
           <p>{error}</p>
           <button
