@@ -58,8 +58,34 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [existingAttachment, setExistingAttachment] = useState<string | null>(invoice?.attachment_url ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!invoice;
   const total = subtotal + tax;
+
+  // Comprime fotos de celular (5-8 MB) antes de subir, igual que InvoiceAttachment.
+  async function compressImage(f: File): Promise<File> {
+    const MAX_PX = 1920;
+    const QUALITY = 0.82;
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(f);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => resolve(blob ? new File([blob], f.name, { type: 'image/jpeg' }) : f),
+          'image/jpeg',
+          QUALITY
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(f); };
+      img.src = url;
+    });
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -68,24 +94,29 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowed.includes(f.type)) { setError('Solo JPG, PNG, WEBP o PDF.'); return; }
     setError(null);
+    if (filePreview) URL.revokeObjectURL(filePreview);
     setFile(f);
     setFilePreview(f.type.startsWith('image/') ? URL.createObjectURL(f) : null);
   }
 
   function clearFile() {
+    if (filePreview) URL.revokeObjectURL(filePreview);
     setFile(null);
     setFilePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
   }
 
   async function uploadFile(invoiceId: string): Promise<void> {
     if (!file) return;
     const supabase = createClient();
-    const ext = file.name.split('.').pop();
+    const isImage = file.type.startsWith('image/');
+    const toUpload = isImage ? await compressImage(file) : file;
+    const ext = isImage ? 'jpg' : (file.name.split('.').pop() ?? 'pdf');
     const path = `${orgId}/invoices/${invoiceId}.${ext}`;
     const { error: uploadError } = await supabase.storage
       .from('invoice-attachments')
-      .upload(path, file, { upsert: true });
+      .upload(path, toUpload, { upsert: true });
     if (uploadError) throw new Error(uploadError.message);
     const { data } = supabase.storage.from('invoice-attachments').getPublicUrl(path);
     const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, data.publicUrl);
@@ -341,15 +372,15 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
           {/* Adjunto */}
           <div className="form-card space-y-2">
             <h3 className="text-sm font-semibold text-foreground">
-              Adjunto <span className="font-normal text-muted-foreground">(PDF o imagen)</span>
+              Adjunto <span className="font-normal text-muted-foreground">(PDF o foto)</span>
             </h3>
 
             {existingAttachment && !file && (
               <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border">
-                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex-1 truncate">
+                <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex-1 truncate">
                   Ver adjunto actual
                 </a>
                 <button type="button" onClick={() => setExistingAttachment(null)} className="text-muted-foreground hover:text-destructive text-xs">Quitar</button>
@@ -357,41 +388,62 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             )}
 
             {file && (
-              <div className="flex items-center gap-2 p-2.5 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="space-y-2">
                 {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="size-8 rounded object-cover border border-blue-200 shrink-0" />
+                  <div className="overflow-hidden rounded-lg border border-border bg-muted/50">
+                    <img src={filePreview} alt="Vista previa del adjunto" className="w-full max-h-64 object-contain" />
+                  </div>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
+                  <div className="flex items-center gap-2 p-2.5 bg-muted/50 rounded-lg border border-border">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-destructive shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-xs text-foreground flex-1 truncate">{file.name}</span>
+                  </div>
                 )}
-                <span className="text-xs text-foreground flex-1 truncate">{file.name}</span>
-                <button type="button" onClick={clearFile} className="text-muted-foreground hover:text-destructive text-xs shrink-0">Quitar</button>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground flex-1 truncate">{file.name}</span>
+                  <button type="button" onClick={clearFile} className="text-xs text-muted-foreground hover:text-destructive shrink-0">Quitar</button>
+                </div>
               </div>
             )}
 
             {!file && (
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => fileInputRef.current?.click()}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const f = e.dataTransfer.files?.[0];
-                  if (f) handleFileChange({ target: { files: [f] } } as unknown as React.ChangeEvent<HTMLInputElement>);
-                }}
-                className="border-2 border-dashed border-border rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="size-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <p className="text-xs text-muted-foreground">Arrastrá o <span className="text-primary underline">seleccioná</span></p>
-                <p className="text-xs text-muted-foreground mt-0.5">JPG, PNG, WEBP o PDF · máx. 10 MB</p>
+              <div className="space-y-2">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) handleFileChange({ target: { files: [f] } } as unknown as React.ChangeEvent<HTMLInputElement>);
+                  }}
+                  className="border-2 border-dashed border-border rounded-lg p-5 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-6 mx-auto text-muted-foreground/30 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <p className="text-xs text-muted-foreground">Arrastrá o <span className="text-primary underline">seleccioná</span></p>
+                  <p className="text-xs text-muted-foreground mt-0.5">JPG, PNG, WEBP o PDF · máx. 10 MB</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="w-full flex items-center justify-center gap-2 min-h-11 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Tomar foto
+                </button>
               </div>
             )}
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={handleFileChange} />
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
           </div>
 
           {/* Botones */}
