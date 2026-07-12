@@ -44,35 +44,7 @@ export async function InventoryList({ orgId, orgSlug }: InventoryListProps) {
             </Link>
          </Button>
       </div>
-      {/* Mobile: tarjetas tocables */}
-      <div className="md:hidden space-y-3">
-        {items.map((item) => {
-          const low = (item.current_stock || 0) <= (item.min_stock_level || 0);
-          return (
-            <Link
-              key={item.id}
-              href={`/${orgSlug}/inventory/items/${item.id}`}
-              className="block rounded-xl border border-border bg-card p-4 shadow-sm active:bg-accent/50 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-medium text-foreground truncate">{item.name}</p>
-                  <p className="text-xs text-muted-foreground">{item.category || 'Sin categoría'}{item.sku ? ` · ${item.sku}` : ''}</p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className={`font-semibold tabular-nums ${low ? 'text-red-600' : 'text-green-600'}`}>
-                    {item.current_stock} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground tabular-nums">${Number(item.cost_per_unit || 0).toFixed(2)}</p>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Desktop: tabla */}
-      <div className="hidden md:block rounded-md border">
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>

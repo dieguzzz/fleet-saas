@@ -22,7 +22,7 @@ async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; or
     ];
 
     return (
-      <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:flex sm:items-baseline sm:gap-8 lg:gap-12 sm:flex-wrap">
+      <div className="flex items-baseline gap-8 lg:gap-12 flex-wrap">
         {metrics.map((m) => (
           <Link key={m.label} href={m.href} className="group">
             <span className="text-3xl font-bold text-foreground tabular-nums group-hover:text-primary transition-colors">
@@ -46,7 +46,7 @@ async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; or
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:flex sm:items-baseline sm:gap-8 lg:gap-12 sm:flex-wrap">
+    <div className="flex items-baseline gap-8 lg:gap-12 flex-wrap">
       {metrics.map((m) => (
         <Link key={m.label} href={m.href} className="group">
           <span className="text-3xl font-bold text-foreground tabular-nums group-hover:text-primary transition-colors">
