@@ -1,5 +1,15 @@
 import Link from 'next/link';
 import { getTripExpenses } from '../actions';
+import { TripExpenseDeleteButton } from './TripExpenseDeleteButton';
+
+const CATEGORY_LABEL: Record<string, string> = {
+  fuel: 'Combustible',
+  toll: 'Peaje',
+  food: 'Alimentos',
+  lodging: 'Hospedaje',
+  maintenance: 'Mantenimiento',
+  other: 'Otro',
+};
 
 function formatDate(d: string) {
   const [y, m, day] = d.split('T')[0].split('-');
@@ -41,12 +51,13 @@ export async function TripExpensesList({ tripId, orgId, orgSlug }: { tripId: str
                 <th className="px-6 py-3">Notas</th>
                 <th className="px-6 py-3 text-right">Monto</th>
                 <th className="px-6 py-3 text-center">Recibo</th>
+                <th className="px-6 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {expenses.map((expense) => (
                 <tr key={expense.id} className="hover:bg-accent/30 transition-colors">
-                  <td className="px-6 py-3 font-medium text-foreground capitalize">{expense.category.replace('_', ' ')}</td>
+                  <td className="px-6 py-3 font-medium text-foreground">{CATEGORY_LABEL[expense.category] ?? expense.category}</td>
                   <td className="px-6 py-3">{expense.expense_date ? formatDate(expense.expense_date) : '-'}</td>
                   <td className="px-6 py-3 truncate max-w-xs">{expense.notes || '-'}</td>
                   <td className="px-6 py-3 text-right font-medium text-foreground">
@@ -59,11 +70,15 @@ export async function TripExpensesList({ tripId, orgId, orgSlug }: { tripId: str
                       <span className="text-muted-foreground/30">-</span>
                     )}
                   </td>
+                  <td className="px-6 py-3 text-right whitespace-nowrap">
+                    <TripExpenseDeleteButton id={expense.id} orgId={orgId} tripId={tripId} />
+                  </td>
                 </tr>
               ))}
               <tr className="bg-muted/30 font-semibold text-foreground">
                 <td colSpan={3} className="px-6 py-3 text-right">Total:</td>
                 <td className="px-6 py-3 text-right">${totalExpenses.toFixed(2)}</td>
+                <td></td>
                 <td></td>
               </tr>
             </tbody>

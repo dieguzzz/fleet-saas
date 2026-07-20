@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import type { FinancialTransaction } from '@/types/database';
 import NewFinancialTransactionModal from './NewFinancialTransactionModal';
+import { deleteFinancialTransaction } from '../actions';
 
 const PAGE_SIZE = 20;
 
@@ -19,6 +20,12 @@ function formatDate(d: string) {
 export function FinancialTransactionList({ transactions, orgId }: FinancialTransactionListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete(id: string, label: string) {
+    if (!confirm(`¿Eliminar la transacción "${label}"? Esta acción no se puede deshacer.`)) return;
+    startTransition(() => { deleteFinancialTransaction(id, orgId); });
+  }
 
   const totalPages = Math.ceil(transactions.length / PAGE_SIZE);
   const paginated = transactions.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -56,6 +63,7 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
                     <th className="px-6 py-3">Categoría</th>
                     <th className="px-6 py-3">Descripción</th>
                     <th className="px-6 py-3 text-right">Monto</th>
+                    <th className="px-6 py-3 text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -82,6 +90,15 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
                         tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
                       }`}>
                         {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <button
+                          onClick={() => handleDelete(tx.id, tx.category)}
+                          disabled={isPending}
+                          className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50"
+                        >
+                          Eliminar
+                        </button>
                       </td>
                     </tr>
                   ))}
