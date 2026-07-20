@@ -62,7 +62,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
       if ('error' in result) {
         setGenerateResult(result.error ?? 'Error desconocido');
       } else {
-        setGenerateResult(result.count === 0 ? 'No hay inquilinos activos para generar cobros.' : `Se generaron ${result.count} cobros.`);
+        setGenerateResult(result.count === 0 ? 'Sin cobros nuevos: ya estaban generados o no hay inquilinos activos.' : `Se generaron ${result.count} cobros.`);
       }
     });
   }
