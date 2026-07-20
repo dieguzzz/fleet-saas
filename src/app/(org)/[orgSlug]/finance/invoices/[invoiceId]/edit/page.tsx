@@ -1,5 +1,5 @@
 import { InvoiceForm } from '@/features/finance/components/InvoiceForm';
-import { getInvoice } from '@/features/finance/actions';
+import { getInvoice, getInvoiceLineItems } from '@/features/finance/actions';
 import { getCustomersAndSuppliers } from '@/features/contacts/actions';
 import { getProducts } from '@/features/products/actions';
 import { getOrganization } from '@/features/organizations/queries';
@@ -33,6 +33,18 @@ export default async function EditInvoicePage({
 
   const products = orgType === 'kitchen' ? (await getProducts(org.id)).data ?? [] : [];
 
+  // Cargar las líneas de producto existentes para que la edición no arranque vacía
+  // y no las pierda al guardar (solo aplica a orgs tipo cocina).
+  const lineItemsResult = orgType === 'kitchen' ? await getInvoiceLineItems(invoiceId) : null;
+  const initialLineItems = lineItemsResult && 'data' in lineItemsResult
+    ? (lineItemsResult.data ?? []).map((li) => ({
+        product_id: li.product_id ?? null,
+        description: li.description,
+        quantity: li.quantity,
+        unit_price: li.unit_price,
+      }))
+    : [];
+
   return (
     <div className="space-y-6">
       <h1 className="text-lg font-semibold text-foreground">
@@ -46,6 +58,7 @@ export default async function EditInvoicePage({
         contacts={contacts}
         orgType={orgType}
         products={products}
+        initialLineItems={initialLineItems}
       />
     </div>
   );

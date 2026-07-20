@@ -13,7 +13,12 @@ const vehicleSchema = z.object({
   plate_number: z.string().optional(),
   brand: z.string().optional(),
   model: z.string().optional(),
-  year: z.coerce.number().optional(),
+  // Un input numérico vacío llega como '' y z.coerce.number('') daría 0; lo
+  // normalizamos a undefined para que .optional() lo omita en vez de guardar 0.
+  year: z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? undefined : v),
+    z.coerce.number().int().optional()
+  ),
   status: z.enum(['active', 'maintenance', 'inactive']).default('active'),
 });
 

@@ -21,6 +21,15 @@ interface ScannerData {
   amount?: string;
 }
 
+interface InitialLineItem {
+  product_id: string | null;
+  description: string;
+  quantity: number;
+  unit_price: number;
+}
+
+const EMPTY_LINE_ITEMS: InitialLineItem[] = [];
+
 interface InvoiceFormProps {
   orgId: string;
   orgSlug: string;
@@ -30,9 +39,10 @@ interface InvoiceFormProps {
   scannerData?: ScannerData;
   orgType?: OrgType;
   products?: Product[];
+  initialLineItems?: InitialLineItem[];
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData, orgType = 'fleet', products = [] }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData, orgType = 'fleet', products = [], initialLineItems = EMPTY_LINE_ITEMS }: InvoiceFormProps) {
   const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,10 +148,10 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             sort_order: i,
           });
         }
-        if (lineItems.length > 0) {
-          const lineResult = await saveInvoiceLineItems(invoiceId, orgId, lineItems);
-          if (lineResult.error) throw new Error(lineResult.error);
-        }
+        // Persistir siempre (también cuando se vacían las líneas al editar):
+        // saveInvoiceLineItems borra las existentes y reinserta las actuales.
+        const lineResult = await saveInvoiceLineItems(invoiceId, orgId, lineItems);
+        if (lineResult.error) throw new Error(lineResult.error);
       }
       if (file) await uploadFile(invoiceId);
       push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
@@ -293,6 +303,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
               <div className="pt-2">
                 <InvoiceLineItems
                   products={products}
+                  initialItems={initialLineItems}
                   onTotalsChange={(sub) => { setSubtotal(sub); setTax(0); }}
                 />
               </div>

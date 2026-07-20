@@ -260,8 +260,17 @@ export async function recordStockMovement(
   if (type === 'in') {
     newStock += quantity;
   } else if (type === 'out') {
+    if (quantity > previousStock) {
+      return {
+        error: `Stock insuficiente: hay ${previousStock} y se intentó retirar ${quantity}`,
+        success: false,
+      };
+    }
     newStock -= quantity;
   } else if (type === 'adjustment') {
+    if (quantity < 0) {
+      return { error: 'El stock ajustado no puede ser negativo', success: false };
+    }
     newStock = quantity;
   }
 

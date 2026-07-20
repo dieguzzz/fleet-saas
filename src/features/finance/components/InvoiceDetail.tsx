@@ -100,18 +100,24 @@ export default function InvoiceDetail({ orgSlug, invoice, lineItems = [] }: Invo
       </div>
 
       <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-        {/* Cliente / Estado */}
+        {/* Cliente (cobro) o Proveedor (pago) / Estado */}
         <div className="p-8 border-b border-border flex justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase mb-4">Cliente</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase mb-4">
+              {invoice.customer ? 'Cliente' : invoice.supplier ? 'Proveedor' : 'Contacto'}
+            </h2>
             {invoice.customer ? (
               <div className="text-foreground">
                 <p className="font-medium text-lg">{invoice.customer.name}</p>
                 {invoice.customer.address && <p className="text-muted-foreground">{invoice.customer.address}</p>}
                 {invoice.customer.email && <p className="text-muted-foreground">{invoice.customer.email}</p>}
               </div>
+            ) : invoice.supplier ? (
+              <div className="text-foreground">
+                <p className="font-medium text-lg">{invoice.supplier.name}</p>
+              </div>
             ) : (
-              <p className="text-muted-foreground/60 italic">Sin cliente asignado</p>
+              <p className="text-muted-foreground/60 italic">Sin contacto asignado</p>
             )}
           </div>
           <div className="text-right">

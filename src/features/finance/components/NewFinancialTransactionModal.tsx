@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { createFinancialTransaction } from '@/features/finance/actions';
 import { Button } from '@/components/ui/button';
 
@@ -16,6 +16,13 @@ export default function NewFinancialTransactionModal({
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [state, formAction, isPending] = useActionState(createFinancialTransaction, null);
 
+  // Cerrar el modal SOLO cuando la action confirmó éxito. Leer `state` justo
+  // después de `await formAction()` da un valor stale (del render anterior), lo
+  // que cerraba el modal incluso cuando el guardado fallaba (REGLA 13).
+  useEffect(() => {
+    if (state?.success) onClose();
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!isOpen) return null;
 
   return (
@@ -26,10 +33,7 @@ export default function NewFinancialTransactionModal({
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1 rounded transition-colors">✕</button>
         </div>
 
-        <form action={async (formData) => {
-          await formAction(formData);
-          if (!state?.error) onClose();
-        }} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <input type="hidden" name="orgId" value={orgId} />
           <input type="hidden" name="type" value={type} />
 
