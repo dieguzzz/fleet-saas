@@ -97,8 +97,8 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
       .from('invoice-attachments')
       .upload(path, file, { upsert: true });
     if (uploadError) throw new Error(uploadError.message);
-    const { data } = supabase.storage.from('invoice-attachments').getPublicUrl(path);
-    const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, data.publicUrl);
+    // Guardar el PATH (bucket privado, se sirve por el proxy autenticado).
+    const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, path);
     if (result?.error) throw new Error(result.error);
   }
 
