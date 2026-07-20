@@ -77,7 +77,7 @@ function ContactsTable({ contacts, orgSlug, search }: { contacts: Contact[]; org
                 <td className="px-4 py-3 text-muted-foreground">{c.company ? highlight(c.company, search) : '—'}</td>
                 <td className="px-4 py-3">
                   {c.phone
-                    ? <a href={`tel:${c.phone}`} className="text-blue-600 hover:underline">{c.phone}</a>
+                    ? <a href={`tel:${c.phone}`} className="text-primary hover:underline">{c.phone}</a>
                     : <span className="text-muted-foreground">—</span>}
                 </td>
                 <td className="px-4 py-3 text-muted-foreground text-xs">{c.email || '—'}</td>
@@ -136,7 +136,7 @@ function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug:
 
       {contact.phone && (
         <a href={`tel:${contact.phone}`}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+          className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium">
           <svg className="size-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>

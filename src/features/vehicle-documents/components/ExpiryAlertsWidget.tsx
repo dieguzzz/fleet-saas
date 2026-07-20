@@ -28,8 +28,9 @@ interface ExpiryAlertsWidgetProps {
 
 export default async function ExpiryAlertsWidget({ orgId, orgSlug }: ExpiryAlertsWidgetProps) {
   const supabase = await createClient();
-  const today = new Date().toISOString().split('T')[0];
-  const in30 = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const in30 = new Date(now.getTime() + 30 * 86400000).toISOString().split('T')[0];
 
   const [{ data: docs }, { data: employees }] = await Promise.all([
     supabase

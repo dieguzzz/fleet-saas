@@ -127,12 +127,13 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
     fd.set('lat', String(coords.lat));
     fd.set('lng', String(coords.lng));
     const result = await saveTripLocation(null, fd);
-    if (!result?.error) {
-      // Refresh locations list optimistically
+    if (!result?.error && result?.id) {
+      // Refresh optimistically usando el id REAL devuelto por la action, para que
+      // incrementar/eliminar el chip funcione sin recargar.
       const existing = locations.find((l) => l.name.toLowerCase() === name.trim().toLowerCase());
       if (!existing) {
         setLocations((prev) => [
-          { id: crypto.randomUUID(), organization_id: '', name: name.trim(), lat: coords.lat, lng: coords.lng, use_count: 1, created_at: null, updated_at: null },
+          { id: result.id!, organization_id: '', name: name.trim(), lat: coords.lat, lng: coords.lng, use_count: result.use_count ?? 1, created_at: null, updated_at: null },
           ...prev,
         ]);
       }

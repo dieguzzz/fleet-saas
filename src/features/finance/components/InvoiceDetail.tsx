@@ -207,7 +207,7 @@ export default function InvoiceDetail({ orgSlug, invoice, lineItems = [] }: Invo
                 <>
                   <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b border-border">
                     <span className="text-xs font-medium text-muted-foreground">Vista previa del PDF</span>
-                    <a href={attachmentUrl} download className="text-xs text-blue-600 hover:underline">
+                    <a href={attachmentUrl} download className="text-xs text-primary hover:underline">
                       Descargar
                     </a>
                   </div>

@@ -23,16 +23,16 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
     : createContact;
 
   const [state, formAction, isPending] = useActionState(
-    async (prev: ContactFormState, fd: FormData) => action(prev, fd),
-    {}
+    async (prev: ContactFormState | null, fd: FormData) => action(prev ?? {}, fd),
+    null
   );
 
   useEffect(() => {
-    if (state.success) {
+    if (state?.success) {
       setOpen(false);
       if (onSuccess && state.id && state.name) onSuccess(state.id, state.name);
     }
-  }, [state.success, state.id, state.name, onSuccess]);
+  }, [state?.success, state?.id, state?.name, onSuccess]);
 
   const isService = (role: string) => SERVICE_ROLES.includes(role as never);
 
@@ -57,9 +57,9 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
             <form action={formAction} className="p-6 space-y-4">
               <input type="hidden" name="orgSlug" value={orgSlug} />
 
-              {state.error && (
+              {state?.error && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-                  <p className="text-destructive text-sm">{state.error}</p>
+                  <p className="text-destructive text-sm">{state?.error}</p>
                 </div>
               )}
 

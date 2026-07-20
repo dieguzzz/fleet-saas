@@ -30,13 +30,14 @@ export default function VehicleDocumentModal({
     : createVehicleDocument;
 
   const [state, formAction, isPending] = useActionState(
-    async (prev: DocumentFormState, fd: FormData) => action(prev, fd),
-    {}
+    async (prev: DocumentFormState | null, fd: FormData) => action(prev ?? {}, fd),
+    null
   );
 
   useEffect(() => {
-    if (state.success) setOpen(false);
-  }, [state.success]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (state?.success) setOpen(false);
+  }, [state?.success]);
 
   const defaultLabel = VEHICLE_DOCUMENT_LABELS[docType];
 
@@ -61,9 +62,9 @@ export default function VehicleDocumentModal({
             <form action={formAction} className="p-6 space-y-4">
               <input type="hidden" name="orgSlug" value={orgSlug} />
 
-              {state.error && (
+              {state?.error && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-                  <p className="text-destructive text-sm">{state.error}</p>
+                  <p className="text-destructive text-sm">{state?.error}</p>
                 </div>
               )}
 

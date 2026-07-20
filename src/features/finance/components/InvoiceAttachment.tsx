@@ -116,7 +116,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
 
       {/* Confirmación de subida exitosa */}
       {justUploaded && (
-        <div className="flex items-center gap-2 p-2.5 bg-green-50 rounded-lg border border-green-200 text-xs text-green-700">
+        <div className="flex items-center gap-2 p-2.5 bg-green-50 rounded-lg border border-green-200 text-xs text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300">
           <svg xmlns="http://www.w3.org/2000/svg" className="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -143,7 +143,7 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               <p className="text-sm text-muted-foreground">
-                Arrastrá o <span className="text-blue-600 underline">seleccioná archivo</span>
+                Arrastrá o <span className="text-primary underline">seleccioná archivo</span>
               </p>
               <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP o PDF &mdash; máx. 10 MB</p>
             </>

@@ -360,7 +360,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex-1 truncate">
+                <a href={existingAttachment} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex-1 truncate">
                   Ver adjunto actual
                 </a>
                 <button type="button" onClick={() => setExistingAttachment(null)} className="text-muted-foreground hover:text-destructive text-xs">Quitar</button>
@@ -368,9 +368,9 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
             )}
 
             {file && (
-              <div className="flex items-center gap-2 p-2.5 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-2 p-2.5 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
                 {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="size-8 rounded object-cover border border-blue-200 shrink-0" />
+                  <img src={filePreview} alt="Preview" className="size-8 rounded object-cover border border-blue-200 dark:border-blue-800 shrink-0" />
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" className="size-7 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />

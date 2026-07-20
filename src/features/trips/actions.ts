@@ -265,17 +265,23 @@ export async function saveTripLocation(prevState: unknown, formData: FormData) {
     .maybeSingle();
 
   if (existing) {
+    const newCount = existing.use_count + 1;
     await supabase
       .from('trip_locations')
-      .update({ lat, lng, use_count: existing.use_count + 1, updated_at: new Date().toISOString() })
+      .update({ lat, lng, use_count: newCount, updated_at: new Date().toISOString() })
       .eq('id', existing.id);
-  } else {
-    await supabase
-      .from('trip_locations')
-      .insert({ organization_id: orgId, name, lat, lng });
+    return { success: true, id: existing.id as string, use_count: newCount };
   }
 
-  return { success: true };
+  const { data: created } = await supabase
+    .from('trip_locations')
+    .insert({ organization_id: orgId, name, lat, lng })
+    .select('id, use_count')
+    .single();
+
+  // Devolver el id real para que la UI no use un UUID falso en el chip optimista
+  // (que rompía incrementar/eliminar hasta recargar la página).
+  return { success: true, id: created?.id as string | undefined, use_count: created?.use_count ?? 1 };
 }
 
 export async function incrementTripLocationUse(id: string) {
