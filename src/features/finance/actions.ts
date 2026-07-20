@@ -340,14 +340,18 @@ export async function saveInvoiceLineItems(
   return { success: true };
 }
 
-export async function getInvoiceLineItems(invoiceId: string) {
+export async function getInvoiceLineItems(invoiceId: string, orgId?: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('invoice_items')
     .select('*, product:products(id, name, sell_price)')
-    .eq('invoice_id', invoiceId)
-    .order('sort_order');
+    .eq('invoice_id', invoiceId);
+
+  // Defensa en profundidad: filtrar por org además de RLS cuando se conoce.
+  if (orgId) query = query.eq('organization_id', orgId);
+
+  const { data, error } = await query.order('sort_order');
 
   if (error) return { error: error.message };
   return { data: data as unknown as InvoiceItem[] };

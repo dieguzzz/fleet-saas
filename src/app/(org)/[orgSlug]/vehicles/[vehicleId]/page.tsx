@@ -18,7 +18,7 @@ export default async function EditVehiclePage({
   if (!org) notFound();
 
   const [{ data: raw }, { data: docsRaw }, { data: allVehiclesRaw }] = await Promise.all([
-    getVehicle(vehicleId),
+    getVehicle(vehicleId, org.id),
     getDocumentsForVehicle(vehicleId, org.id),
     getVehicles(org.id),
   ]);

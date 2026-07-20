@@ -19,7 +19,7 @@ export default async function TripDetailPage({
     notFound();
   }
 
-  const { data: trip, error } = await getTrip(tripId);
+  const { data: trip, error } = await getTrip(tripId, org.id);
 
   if (error || !trip) {
     return <div>Error cargando viaje: {error || 'No encontrado'}</div>;

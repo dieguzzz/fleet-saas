@@ -131,6 +131,7 @@ export async function deleteVehicle(orgSlug: string, vehicleId: string) {
     .from('vehicles')
     .select('name')
     .eq('id', vehicleId)
+    .eq('organization_id', org.id)
     .single();
 
   const { error } = await supabase
@@ -165,11 +166,11 @@ export async function getVehicles(orgId: string, limit = 50, offset = 0) {
     .range(offset, offset + limit - 1);
 }
 
-export async function getVehicle(vehicleId: string) {
+export async function getVehicle(vehicleId: string, orgId?: string) {
   const supabase = await createClient();
-  return await supabase
-    .from('vehicles')
-    .select('*')
-    .eq('id', vehicleId)
-    .single();
+  let query = supabase.from('vehicles').select('*').eq('id', vehicleId);
+  // Defensa en profundidad: evita que un usuario multi-org abra un vehículo de
+  // otra org bajo un slug distinto (además de RLS).
+  if (orgId) query = query.eq('organization_id', orgId);
+  return await query.single();
 }

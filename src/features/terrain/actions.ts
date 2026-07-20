@@ -164,9 +164,10 @@ export async function generateMonthlyPayments(orgSlug: string, year: number, mon
     };
   });
 
-  const { error } = await supabase
+  const { data: inserted, error } = await supabase
     .from('land_payments')
-    .upsert(payments, { onConflict: 'tenant_id,period_year,period_month', ignoreDuplicates: true });
+    .upsert(payments, { onConflict: 'tenant_id,period_year,period_month', ignoreDuplicates: true })
+    .select('id');
 
   if (error) {
     console.error('Error generating payments:', error);
@@ -174,7 +175,9 @@ export async function generateMonthlyPayments(orgSlug: string, year: number, mon
   }
 
   revalidatePath(`/[orgSlug]/terreno`, 'page');
-  return { count: payments.length };
+  // Con ignoreDuplicates, `.select()` devuelve solo las filas realmente
+  // insertadas (no las que ya existían), así el conteo no es engañoso.
+  return { count: inserted?.length ?? 0 };
 }
 
 export async function getPaymentsByMonth(orgId: string, year: number, month: number) {

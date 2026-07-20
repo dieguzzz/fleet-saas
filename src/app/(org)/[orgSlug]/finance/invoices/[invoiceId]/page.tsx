@@ -22,7 +22,7 @@ export default async function InvoicePage({
 
   const [{ data: invoice }, { data: lineItems }] = await Promise.all([
     getInvoice(invoiceId, orgId),
-    getInvoiceLineItems(invoiceId),
+    getInvoiceLineItems(invoiceId, orgId),
   ]);
 
   if (!invoice) {

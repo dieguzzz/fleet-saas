@@ -35,7 +35,7 @@ export default async function EditInvoicePage({
 
   // Cargar las líneas de producto existentes para que la edición no arranque vacía
   // y no las pierda al guardar (solo aplica a orgs tipo cocina).
-  const lineItemsResult = orgType === 'kitchen' ? await getInvoiceLineItems(invoiceId) : null;
+  const lineItemsResult = orgType === 'kitchen' ? await getInvoiceLineItems(invoiceId, org.id) : null;
   const initialLineItems = lineItemsResult && 'data' in lineItemsResult
     ? (lineItemsResult.data ?? []).map((li) => ({
         product_id: li.product_id ?? null,
