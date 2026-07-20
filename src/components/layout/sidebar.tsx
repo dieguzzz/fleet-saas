@@ -339,7 +339,9 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
                             // 44px minimum touch target height
                             'min-h-[44px]',
                             active
-                              ? 'bg-primary/20 text-primary-foreground font-medium'
+                              // text-primary (no primary-foreground): el fondo es primary/20, no sólido;
+                              // primary-foreground quedaba oscuro sobre oscuro en dark mode.
+                              ? 'bg-primary/20 text-primary font-medium'
                               : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
                           )}
                         >

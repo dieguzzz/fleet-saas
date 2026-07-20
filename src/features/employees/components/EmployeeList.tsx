@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { deleteEmployee } from '@/features/employees/actions';
+import { deactivateEmployee } from '@/features/employees/actions';
 import { EmptyState } from '@/components/ui/empty-state';
 
 interface Employee {
@@ -20,7 +20,7 @@ interface Employee {
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'Activo',
-  inactive: 'Inactivo',
+  inactive: 'Ya no labora',
   on_leave: 'De licencia',
 };
 
@@ -60,8 +60,8 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
   });
 
   function handleDelete(id: string, name: string) {
-    if (!confirm(`¿Eliminar a ${name}? Esta acción no se puede deshacer.`)) return;
-    startTransition(() => deleteEmployee(id, orgSlug));
+    if (!confirm(`¿Dar de baja a ${name}? Se marcará como que ya no labora, pero se conservan sus viajes y registros. Podés reactivarlo editándolo.`)) return;
+    startTransition(() => deactivateEmployee(id, orgSlug));
   }
 
   if (employees.length === 0) {
@@ -92,7 +92,7 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
         >
           <option value="">Todos los estados</option>
           <option value="active">Activo</option>
-          <option value="inactive">Inactivo</option>
+          <option value="inactive">Ya no labora</option>
           <option value="on_leave">De licencia</option>
         </select>
       </div>
@@ -150,7 +150,7 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-3">
                       <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-xs text-primary hover:text-primary/80 font-medium">Editar</Link>
-                      <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">Eliminar</button>
+                      <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50">Dar de baja</button>
                     </div>
                   </td>
                 </tr>
@@ -191,7 +191,7 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
               )}
               <div className="flex gap-4 pt-1 border-t border-border">
                 <Link href={`/${orgSlug}/employees/${e.id}/edit`} className="text-sm text-primary font-medium">Editar</Link>
-                <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">Eliminar</button>
+                <button onClick={() => handleDelete(e.id, e.full_name)} disabled={isPending} className="text-sm text-destructive font-medium disabled:opacity-50">Dar de baja</button>
               </div>
             </div>
           );

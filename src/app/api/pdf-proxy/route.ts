@@ -1,59 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/services/supabase/server';
 
-const ALLOWED_BUCKET_HOST = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : null;
+const BUCKET = 'invoice-attachments';
+
+// Extrae el path dentro del bucket a partir de:
+//  - un path directo: "<orgId>/invoices/<id>.pdf"
+//  - una URL legacy pública/firmada: ".../object/(public|sign)/invoice-attachments/<path>"
+function extractPath(input: string): string | null {
+  if (!input.includes('://')) {
+    return input.replace(/^\/+/, '');
+  }
+  try {
+    const u = new URL(input);
+    const marker = `/${BUCKET}/`;
+    const idx = u.pathname.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(u.pathname.slice(idx + marker.length));
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const url = searchParams.get('url');
+  const raw = searchParams.get('path') ?? searchParams.get('url');
 
-  if (!url) {
-    return new NextResponse('Missing url parameter', { status: 400 });
+  if (!raw) {
+    return new NextResponse('Missing path parameter', { status: 400 });
   }
 
-  // Validar que la URL sea del bucket de Supabase del proyecto
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return new NextResponse('Invalid URL', { status: 400 });
+  const path = extractPath(raw);
+  // Anti path-traversal: sin '..', sin path absoluto, y con la forma <org>/...
+  if (!path || path.includes('..') || path.startsWith('/') || !path.includes('/')) {
+    return new NextResponse('Invalid path', { status: 400 });
   }
 
-  if (ALLOWED_BUCKET_HOST && parsed.hostname !== ALLOWED_BUCKET_HOST) {
-    return new NextResponse('URL not allowed', { status: 403 });
+  // Descarga con la sesión del usuario: la RLS org-scoped del bucket privado
+  // garantiza que solo un miembro de la organización pueda leer el archivo.
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage.from(BUCKET).download(path);
+
+  if (error || !data) {
+    return new NextResponse('No encontrado o sin autorización', { status: 404 });
   }
 
-  // Strict regex to prevent path traversal — only allow files directly under invoice-attachments/
-  const validPath = /^\/storage\/v1\/object\/public\/invoice-attachments\/[^/].*$/;
-  if (!validPath.test(parsed.pathname)) {
-    return new NextResponse('URL not allowed', { status: 403 });
-  }
+  const buffer = await data.arrayBuffer();
+  const contentType = data.type || 'application/octet-stream';
 
-  try {
-    const upstream = await fetch(url, { cache: 'no-store' });
-
-    console.log('[pdf-proxy] upstream status:', upstream.status, 'url:', url);
-
-    if (!upstream.ok) {
-      console.error('[pdf-proxy] upstream error:', upstream.status, upstream.statusText);
-      return new NextResponse('Failed to fetch file', { status: upstream.status });
-    }
-
-    const contentType = upstream.headers.get('content-type') ?? 'application/pdf';
-    const buffer = await upstream.arrayBuffer();
-    console.log('[pdf-proxy] serving', buffer.byteLength, 'bytes, type:', contentType);
-
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Content-Disposition': 'inline',
-        'Cache-Control': 'private, max-age=3600',
-        // Mismo origin → no hay X-Frame-Options que bloquee
-      },
-    });
-  } catch {
-    return new NextResponse('Error fetching file', { status: 500 });
-  }
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      'Content-Type': contentType,
+      'Content-Disposition': 'inline',
+      'Cache-Control': 'private, max-age=3600',
+    },
+  });
 }

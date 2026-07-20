@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteInvoice, updateInvoiceStatus, type InvoiceStatus } from '../actions';
+import { invoiceAttachmentProxyUrl } from '@/lib/attachments';
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Borrador' },
@@ -72,7 +73,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
       </select>
 
       {attachmentUrl ? (
-        <a href={attachmentUrl} target="_blank" rel="noopener noreferrer" title="Ver adjunto" className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+        <a href={invoiceAttachmentProxyUrl(attachmentUrl)} target="_blank" rel="noopener noreferrer" title="Ver adjunto" className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

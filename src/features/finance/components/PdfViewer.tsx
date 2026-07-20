@@ -1,5 +1,7 @@
 'use client';
 
+import { invoiceAttachmentProxyUrl } from '@/lib/attachments';
+
 interface PdfViewerProps {
   url: string;
 }
@@ -8,7 +10,7 @@ interface PdfViewerProps {
 // sin X-Frame-Options). NUNCA blob URL en el cliente — falla por CORS o por el
 // timing de revokeObjectURL. El servidor hace el fetch y sirve desde el mismo origin.
 export function PdfViewer({ url }: PdfViewerProps) {
-  const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
+  const proxyUrl = invoiceAttachmentProxyUrl(url);
 
   return (
     <object
@@ -19,7 +21,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
     >
       <div className="flex flex-col items-center py-10 gap-3">
         <p className="text-sm text-muted-foreground">No se pudo mostrar el PDF en el navegador.</p>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+        <a href={proxyUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
           Abrir en nueva pestaña
         </a>
       </div>

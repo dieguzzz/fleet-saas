@@ -20,6 +20,9 @@ const RESOURCE_LABELS: Record<string, string> = {
   inventory_item: 'Inventario',
   land_tenant: 'Inquilino',
   land_payment: 'Pago de terreno',
+  financial_transaction: 'Transacción',
+  product: 'Producto',
+  vehicle_document: 'Documento de vehículo',
 };
 
 const ACTION_COLORS: Record<string, string> = {
@@ -44,12 +47,36 @@ export default async function AuditPage({ params }: { params: Promise<{ orgSlug:
   if (orgRole !== 'owner' && orgRole !== 'admin') redirect(`/${orgSlug}`);
 
   const supabase = await createClient();
-  const { data: logs } = await supabase
+  // No se puede embeber `profiles` por FK (audit_logs.user_id no tiene FK a
+  // profiles), PostgREST devolvía error y la lista quedaba vacía. Se traen los
+  // logs y los perfiles por separado y se mapean en memoria.
+  const { data: rawLogs, error: logsError } = await supabase
     .from('audit_logs')
-    .select('*, user:profiles(full_name, email)')
+    .select('*')
     .eq('organization_id', orgId!)
     .order('created_at', { ascending: false })
     .limit(200);
+
+  if (logsError) console.error('Error cargando audit_logs:', logsError.message);
+
+  const baseLogs = (rawLogs ?? []) as unknown as AuditLog[];
+
+  const userIds = [...new Set(baseLogs.map((l) => l.user_id).filter((id): id is string => !!id))];
+  const usersById = new Map<string, { full_name: string | null; email: string | null }>();
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', userIds);
+    for (const p of profiles ?? []) {
+      usersById.set(p.id, { full_name: p.full_name, email: p.email });
+    }
+  }
+
+  const logs: AuditLog[] = baseLogs.map((l) => ({
+    ...l,
+    user: l.user_id ? usersById.get(l.user_id) ?? null : null,
+  }));
 
   return (
     <div className="p-6 space-y-6">
@@ -70,7 +97,7 @@ export default async function AuditPage({ params }: { params: Promise<{ orgSlug:
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {(logs as unknown as AuditLog[])?.map((log) => (
+            {logs.map((log) => (
               <tr key={log.id} className="hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                   {formatDate(log.created_at)}
@@ -91,7 +118,7 @@ export default async function AuditPage({ params }: { params: Promise<{ orgSlug:
                 </td>
               </tr>
             ))}
-            {!logs?.length && (
+            {logs.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                   No hay actividad registrada aún

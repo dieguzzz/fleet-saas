@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { InvoiceAttachment } from './InvoiceAttachment';
+import { invoiceAttachmentProxyUrl } from '@/lib/attachments';
 
 const PdfViewer = dynamic(
   () => import('./PdfViewer').then((m) => m.PdfViewer),
@@ -207,7 +208,7 @@ export default function InvoiceDetail({ orgSlug, invoice, lineItems = [] }: Invo
                 <>
                   <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b border-border">
                     <span className="text-xs font-medium text-muted-foreground">Vista previa del PDF</span>
-                    <a href={attachmentUrl} download className="text-xs text-primary hover:underline">
+                    <a href={invoiceAttachmentProxyUrl(attachmentUrl)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                       Descargar
                     </a>
                   </div>
@@ -215,7 +216,7 @@ export default function InvoiceDetail({ orgSlug, invoice, lineItems = [] }: Invo
                 </>
               ) : (
                 <img
-                  src={attachmentUrl}
+                  src={invoiceAttachmentProxyUrl(attachmentUrl)}
                   alt="Adjunto de factura"
                   className="w-full object-contain max-h-[600px]"
                 />

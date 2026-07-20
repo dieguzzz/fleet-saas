@@ -87,7 +87,9 @@ export default function VehicleForm({ orgSlug, vehicle }: VehicleFormProps) {
         <div>
           <label htmlFor="year" className="field-label">Año</label>
           <input id="year" name="year" type="number"
-            defaultValue={vehicle?.year || new Date().getFullYear()} className="field-input" />
+            // El año actual solo como placeholder al CREAR; al editar respeta el
+            // valor guardado (o vacío), para no re-inyectar 2026 en un vehículo sin año.
+            defaultValue={vehicle ? (vehicle.year ?? '') : new Date().getFullYear()} className="field-input" />
         </div>
       </div>
 

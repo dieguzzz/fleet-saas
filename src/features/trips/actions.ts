@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
 import { tryResolveOrgId } from '@/lib/org-resolver';
+import { logAudit } from '@/lib/audit';
 import type { Trip, TripExpense, TripLocation } from '@/types/database';
 
 export async function getTrips(orgId: string, limit = 50, offset = 0) {
@@ -145,6 +146,13 @@ export async function createTrip(prevState: unknown, formData: FormData) {
     return { error: error.message, success: false };
   }
 
+  await logAudit({
+    organizationId: orgId,
+    action: 'create',
+    resourceType: 'trip',
+    resourceLabel: `${origin} → ${destination}`,
+  });
+
   redirect(`/${orgSlug}/trips`);
 }
 
@@ -178,13 +186,22 @@ export async function createTripExpense(prevState: unknown, formData: FormData) 
     return { error: 'Viaje no encontrado', success: false };
   }
 
+  const category = (formData.get('category') as string) || '';
+  const amount = Number(formData.get('amount'));
+  if (!category) {
+    return { error: 'La categoría es obligatoria', success: false };
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { error: 'El monto debe ser mayor a 0', success: false };
+  }
+
   const { error } = await supabase
     .from('trip_expenses')
     .insert({
       organization_id: orgId,
       trip_id: tripId,
-      category: formData.get('category') as string,
-      amount: Number(formData.get('amount')),
+      category,
+      amount,
       currency: (formData.get('currency') as string) || 'USD',
       expense_date: (formData.get('expense_date') as string) || null,
       notes: formData.get('notes') as string,

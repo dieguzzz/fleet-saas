@@ -69,13 +69,13 @@ export function InvoiceAttachment({ invoiceId, orgId, currentUrl, onUploaded }: 
 
       if (uploadError) throw new Error(uploadError.message);
 
-      const { data } = supabase.storage.from('invoice-attachments').getPublicUrl(path);
-
-      const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, data.publicUrl);
+      // Guardar el PATH (no una URL pública): el bucket es privado y se sirve
+      // por el proxy autenticado.
+      const result = await updateInvoiceAttachmentUrl(invoiceId, orgId, path);
       if (result?.error) throw new Error(result.error);
 
       setUploadedFileName(file.name);
-      onUploaded(data.publicUrl);
+      onUploaded(path);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al subir el archivo.');
     } finally {

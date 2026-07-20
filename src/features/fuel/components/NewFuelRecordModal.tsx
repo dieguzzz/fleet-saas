@@ -158,10 +158,13 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
                       </div>
                       <div className="flex justify-between items-center border-t border-primary/20 pt-1">
                         <span className="text-sm font-semibold text-primary">Neto</span>
-                        <span className="text-lg font-bold text-primary">
-                          ${netCost.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                        <span className={`text-lg font-bold ${netCost < 0 ? 'text-destructive' : 'text-primary'}`}>
+                          {netCost < 0 ? '-' : ''}${Math.abs(netCost).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
+                      {netCost < 0 && (
+                        <p className="text-xs text-destructive pt-1">El subsidio no puede superar el total.</p>
+                      )}
                     </>
                   )}
                 </div>
@@ -252,7 +255,7 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
 
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={() => { setOpen(false); resetForm(); }} className="flex-1">Cancelar</Button>
-                <Button type="submit" disabled={isPending || !total} className="flex-1">
+                <Button type="submit" disabled={isPending || !total || (netCost !== null && netCost < 0)} className="flex-1">
                   {isPending ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>

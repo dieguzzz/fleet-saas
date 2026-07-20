@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { memo, useRef, useState, useMemo } from 'react';
+import { memo, useRef, useState, useMemo, useTransition } from 'react';
 import { m, useMotionValue, animate } from 'framer-motion';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { deleteVehicle } from '@/features/vehicles/actions';
 
 interface Vehicle {
   id: string;
@@ -44,12 +45,18 @@ const TYPE_LABEL: Record<string, string> = {
 type SortKey = 'name' | 'status' | 'type';
 type StatusFilter = 'all' | 'active' | 'maintenance' | 'inactive';
 
-const ACTION_WIDTH = 80;
+const ACTION_WIDTH = 160;
+
+function confirmDeleteVehicle(orgSlug: string, id: string, name: string, run: (fn: () => void) => void) {
+  if (!confirm(`¿Eliminar el vehículo "${name}"? Esta acción no se puede deshacer.`)) return;
+  run(() => { deleteVehicle(orgSlug, id); });
+}
 
 const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSlug }: { vehicle: Vehicle; orgSlug: string }) {
   const x = useMotionValue(0);
   const [revealed, setRevealed] = useState(false);
   const dragStartX = useRef(0);
+  const [isPending, startTransition] = useTransition();
 
   function handleDragEnd(_: unknown, info: { offset: { x: number } }) {
     if (info.offset.x < -40) {
@@ -80,6 +87,17 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
           </svg>
           Editar
         </Link>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => confirmDeleteVehicle(orgSlug, vehicle.id, vehicle.name, startTransition)}
+          className="flex-1 flex flex-col items-center justify-center gap-1 bg-destructive text-destructive-foreground text-xs font-semibold disabled:opacity-50"
+        >
+          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Eliminar
+        </button>
       </div>
 
       <m.div
@@ -144,6 +162,7 @@ const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleList
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [isDeleting, startDelete] = useTransition();
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -319,9 +338,19 @@ const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleList
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <Link href={`/${orgSlug}/vehicles/${vehicle.id}`} className="text-primary hover:text-primary/80 font-medium hover:underline">
-                          Editar
-                        </Link>
+                        <div className="flex items-center justify-center gap-3">
+                          <Link href={`/${orgSlug}/vehicles/${vehicle.id}`} className="text-primary hover:text-primary/80 font-medium hover:underline">
+                            Editar
+                          </Link>
+                          <button
+                            type="button"
+                            disabled={isDeleting}
+                            onClick={() => confirmDeleteVehicle(orgSlug, vehicle.id, vehicle.name, startDelete)}
+                            className="text-destructive hover:text-destructive/80 font-medium hover:underline disabled:opacity-50"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

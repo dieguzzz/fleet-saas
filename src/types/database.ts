@@ -332,7 +332,7 @@ export interface AuditLog {
   metadata: Json | null;
   created_at: string;
   // joined
-  user?: { full_name: string | null; email: string };
+  user?: { full_name: string | null; email: string | null } | null;
 }
 
 export interface ImpersonationLog {

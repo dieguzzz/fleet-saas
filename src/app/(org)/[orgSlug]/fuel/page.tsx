@@ -49,8 +49,8 @@ export default async function FuelPage({ params }: { params: Promise<{ orgSlug: 
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Gasto este mes"
-          value={`$${fmt(stats.totalCostMonth)}`}
+          label="Gasto neto este mes"
+          value={`$${fmt(stats.netCostMonth)}`}
         />
         <StatCard
           label="Diesel (total)"

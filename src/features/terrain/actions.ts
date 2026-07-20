@@ -3,6 +3,7 @@
 import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { logAudit } from '@/lib/audit';
 import type { LandTenant, LandPayment } from '@/types/database';
 import { z } from 'zod';
 
@@ -72,6 +73,13 @@ export async function createTenant(prevState: TenantFormState | null, formData: 
     return { error: 'Error al crear el inquilino' };
   }
 
+  await logAudit({
+    organizationId: org.id,
+    action: 'create',
+    resourceType: 'land_tenant',
+    resourceLabel: validated.data.name,
+  });
+
   revalidatePath(`/${orgSlug}/terreno`);
   redirect(`/${orgSlug}/terreno`);
   return { success: true };
@@ -122,6 +130,12 @@ export async function deleteTenant(tenantId: string, orgSlug: string) {
   if (!org) throw new Error('Organización no encontrada');
   const { error } = await supabase.from('land_tenants').delete().eq('id', tenantId).eq('organization_id', org.id);
   if (error) throw new Error('Error al eliminar el inquilino');
+  await logAudit({
+    organizationId: org.id,
+    action: 'delete',
+    resourceType: 'land_tenant',
+    resourceId: tenantId,
+  });
   revalidatePath(`/${orgSlug}/terreno`);
 }
 
