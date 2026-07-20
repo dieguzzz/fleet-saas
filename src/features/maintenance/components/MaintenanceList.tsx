@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useTransition } from 'react';
+import { deleteMaintenanceRecord } from '@/features/maintenance/actions';
 import { EmptyState } from '@/components/ui/empty-state';
 
 interface MaintenanceRecord {
@@ -25,6 +27,13 @@ function formatDate(d: string) {
 }
 
 export default function MaintenanceList({ orgSlug, records }: { orgSlug: string; records: MaintenanceRecord[] }) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete(id: string, label: string) {
+    if (!confirm(`¿Eliminar el registro de mantenimiento "${label}"? Esta acción no se puede deshacer.`)) return;
+    startTransition(() => { deleteMaintenanceRecord(id, orgSlug); });
+  }
+
   if (records.length === 0) {
     return (
       <EmptyState
@@ -47,13 +56,16 @@ export default function MaintenanceList({ orgSlug, records }: { orgSlug: string;
               <th className="px-6 py-3">Tipo</th>
               <th className="px-6 py-3">Descripción</th>
               <th className="px-6 py-3 text-right">Costo</th>
+              <th className="px-6 py-3 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {records.map((record) => (
               <tr key={record.id} className="hover:bg-accent/30 transition-colors">
-                <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
-                  {formatDate(record.performed_at)}
+                <td className="px-6 py-4 font-medium whitespace-nowrap">
+                  <Link href={`/${orgSlug}/maintenance/${record.id}`} className="text-primary hover:underline">
+                    {formatDate(record.performed_at)}
+                  </Link>
                 </td>
                 <td className="px-6 py-4">
                   {record.vehicle ? (
@@ -69,6 +81,18 @@ export default function MaintenanceList({ orgSlug, records }: { orgSlug: string;
                 </td>
                 <td className="px-6 py-4 text-right font-medium text-foreground">
                   {record.cost !== null ? `$${Number(record.cost).toFixed(2)}` : '-'}
+                </td>
+                <td className="px-6 py-4 text-right whitespace-nowrap">
+                  <div className="flex justify-end gap-3">
+                    <Link href={`/${orgSlug}/maintenance/${record.id}/edit`} className="text-xs text-primary hover:text-primary/80 font-medium">Editar</Link>
+                    <button
+                      onClick={() => handleDelete(record.id, record.description || TYPE_LABEL[record.type] || record.type)}
+                      disabled={isPending}
+                      className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

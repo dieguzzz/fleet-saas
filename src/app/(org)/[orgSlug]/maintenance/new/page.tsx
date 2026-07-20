@@ -1,4 +1,5 @@
 import MaintenanceForm from '@/features/maintenance/components/MaintenanceForm';
+import { createMaintenanceRecord } from '@/features/maintenance/actions';
 import { getVehicles } from '@/features/vehicles/actions';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
@@ -20,7 +21,7 @@ export default async function NewMaintenancePage({
         <h1 className="text-lg font-semibold text-foreground">Registrar Mantenimiento</h1>
         <p className="text-muted-foreground text-sm mt-1">Registra un nuevo servicio de mantenimiento.</p>
       </div>
-      <MaintenanceForm orgSlug={orgSlug} vehicles={vehicles || []} />
+      <MaintenanceForm orgSlug={orgSlug} vehicles={vehicles || []} action={createMaintenanceRecord} />
     </div>
   );
 }
