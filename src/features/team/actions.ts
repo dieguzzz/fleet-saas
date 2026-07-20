@@ -34,6 +34,18 @@ export async function inviteMember(prevState: InviteState | null, formData: Form
     return { error: 'No autenticado' };
   }
 
+  // 1b. Authorization: solo owner/admin de ESTA org pueden invitar.
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('role')
+    .eq('organization_id', org.id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    return { error: 'No tienes permisos para invitar miembros' };
+  }
+
   // 2. Validate
   const rawData = {
     email: formData.get('email'),

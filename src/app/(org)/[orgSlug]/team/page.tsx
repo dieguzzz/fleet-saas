@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import TeamList from '@/features/team/components/TeamList';
 import InviteMemberForm from '@/features/team/components/InviteMemberForm';
 import { getOrganizationMembers, getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
+import { hasPermission } from '@/lib/permissions';
+import type { OrgRole } from '@/types/database';
 import { PageHeader } from '@/components/ui/page-header';
 import { SkeletonRow } from '@/components/ui/skeleton';
 
@@ -20,6 +23,10 @@ export default async function TeamPage({
 
   const members = await getOrganizationMembers(org.id);
 
+  const headersList = await headers();
+  const orgRole = headersList.get('x-org-role') as OrgRole | null;
+  const canInvite = hasPermission(orgRole, 'org:invite');
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -27,7 +34,7 @@ export default async function TeamPage({
         description="Gestiona los miembros de tu organización y sus roles."
       />
 
-      <InviteMemberForm orgSlug={orgSlug} />
+      {canInvite && <InviteMemberForm orgSlug={orgSlug} />}
 
       <h2 className="text-lg font-semibold text-foreground pt-2">Miembros Activos</h2>
 

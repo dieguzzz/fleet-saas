@@ -161,6 +161,7 @@ export interface MaintenanceRecord {
   type: string;
   description: string | null;
   cost: number | null;
+  parts_cost: number | null;
   odometer_reading: number | null;
   performed_by: string | null;
   performed_at: string;

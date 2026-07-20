@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { recordStockMovement } from '@/features/inventory/actions';
 import { Button } from '@/components/ui/button';
 
@@ -14,6 +14,12 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
 }) {
   const [type, setType] = useState<'in' | 'out' | 'adjustment'>('in');
   const [state, formAction, isPending] = useActionState(recordStockMovement, null);
+
+  // Cerrar SOLO en éxito. Leer `state` tras `await formAction()` daba un valor
+  // stale y cerraba el modal aunque el movimiento fallara (REGLA 13).
+  useEffect(() => {
+    if (state?.success) onClose();
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isOpen) return null;
 
@@ -30,10 +36,7 @@ export default function StockMovementModal({ isOpen, onClose, orgId, itemId, ite
           <p className="text-muted-foreground text-sm">Stock Actual: <span className="text-foreground font-medium">{currentStock}</span></p>
         </div>
 
-        <form action={async (formData) => {
-          await formAction(formData);
-          if (!state?.error) onClose();
-        }} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <input type="hidden" name="orgId" value={orgId} />
           <input type="hidden" name="itemId" value={itemId} />
           <input type="hidden" name="type" value={type} />

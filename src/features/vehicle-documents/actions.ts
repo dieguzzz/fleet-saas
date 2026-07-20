@@ -87,6 +87,7 @@ export async function createVehicleDocument(
   });
 
   revalidatePath(`/${orgSlug}/vehicles`);
+  revalidatePath('/[orgSlug]/vehicles/[vehicleId]', 'page');
   revalidatePath(`/${orgSlug}`);
   return { success: true };
 }
@@ -126,6 +127,7 @@ export async function updateVehicleDocument(
   if (error) return { error: 'Error al actualizar el documento' };
 
   revalidatePath(`/${orgSlug}/vehicles`);
+  revalidatePath('/[orgSlug]/vehicles/[vehicleId]', 'page');
   revalidatePath(`/${orgSlug}`);
   return { success: true };
 }
@@ -147,5 +149,6 @@ export async function deleteVehicleDocument(docId: string, orgSlug: string): Pro
     .eq('organization_id', org.id);
 
   revalidatePath(`/${orgSlug}/vehicles`);
+  revalidatePath('/[orgSlug]/vehicles/[vehicleId]', 'page');
   revalidatePath(`/${orgSlug}`);
 }

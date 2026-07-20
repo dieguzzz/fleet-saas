@@ -1,5 +1,6 @@
-'use server';
-
+// Utilidades server-side (NO son server actions): reciben un SupabaseClient
+// como argumento, que no es serializable. Con 'use server' se exponían como
+// endpoints RPC y fallarían si se invocaran desde un Client Component.
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**

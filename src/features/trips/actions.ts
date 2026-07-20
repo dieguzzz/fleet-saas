@@ -24,14 +24,17 @@ export async function getTrips(orgId: string, limit = 50, offset = 0) {
   return { data: data as Trip[], count };
 }
 
-export async function getTrip(id: string) {
+export async function getTrip(id: string, orgId?: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let baseQuery = supabase
     .from('trips')
     .select('*, vehicle:vehicles(*), driver:employees(id, full_name)')
-    .eq('id', id)
-    .single();
+    .eq('id', id);
+  // Defensa en profundidad además de RLS.
+  if (orgId) baseQuery = baseQuery.eq('organization_id', orgId);
+
+  const { data, error } = await baseQuery.single();
 
   if (error) {
     console.error('Error fetching trip:', error);
@@ -163,6 +166,18 @@ export async function createTripExpense(prevState: unknown, formData: FormData) 
     return { error: 'Organization not found', success: false };
   }
 
+  // Verificar que el viaje pertenezca a esta org antes de asociarle el gasto
+  // (el trip_id viene de un campo oculto del form y podría estar falseado).
+  const { data: ownTrip } = await supabase
+    .from('trips')
+    .select('id')
+    .eq('id', tripId)
+    .eq('organization_id', orgId)
+    .maybeSingle();
+  if (!ownTrip) {
+    return { error: 'Viaje no encontrado', success: false };
+  }
+
   const { error } = await supabase
     .from('trip_expenses')
     .insert({
@@ -250,17 +265,23 @@ export async function saveTripLocation(prevState: unknown, formData: FormData) {
     .maybeSingle();
 
   if (existing) {
+    const newCount = existing.use_count + 1;
     await supabase
       .from('trip_locations')
-      .update({ lat, lng, use_count: existing.use_count + 1, updated_at: new Date().toISOString() })
+      .update({ lat, lng, use_count: newCount, updated_at: new Date().toISOString() })
       .eq('id', existing.id);
-  } else {
-    await supabase
-      .from('trip_locations')
-      .insert({ organization_id: orgId, name, lat, lng });
+    return { success: true, id: existing.id as string, use_count: newCount };
   }
 
-  return { success: true };
+  const { data: created } = await supabase
+    .from('trip_locations')
+    .insert({ organization_id: orgId, name, lat, lng })
+    .select('id, use_count')
+    .single();
+
+  // Devolver el id real para que la UI no use un UUID falso en el chip optimista
+  // (que rompía incrementar/eliminar hasta recargar la página).
+  return { success: true, id: created?.id as string | undefined, use_count: created?.use_count ?? 1 };
 }
 
 export async function incrementTripLocationUse(id: string) {

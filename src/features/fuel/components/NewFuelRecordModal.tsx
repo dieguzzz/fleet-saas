@@ -25,8 +25,8 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   const [uploadingInvoice, setUploadingInvoice] = useState(false);
   const invoiceInputRef = useRef<HTMLInputElement>(null);
   const [state, formAction, isPending] = useActionState(
-    async (prev: FuelFormState, fd: FormData) => createFuelRecord(prev, fd),
-    {}
+    async (prev: FuelFormState | null, fd: FormData) => createFuelRecord(prev ?? {}, fd),
+    null
   );
 
   const total = liters && pricePerLiter ? (parseFloat(liters) * parseFloat(pricePerLiter)).toFixed(2) : '';
@@ -63,12 +63,12 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
   };
 
   useEffect(() => {
-    if (state.success) {
+    if (state?.success) {
       setOpen(false);
       resetForm();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.success]);
+  }, [state?.success]);
 
   return (
     <>
@@ -88,9 +88,9 @@ export default function NewFuelRecordModal({ orgSlug, vehicles, employees }: {
               <input type="hidden" name="orgSlug" value={orgSlug} />
               <input type="hidden" name="total_cost" value={total} />
 
-              {state.error && (
+              {state?.error && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-                  <p className="text-destructive text-sm">{state.error}</p>
+                  <p className="text-destructive text-sm">{state?.error}</p>
                 </div>
               )}
 

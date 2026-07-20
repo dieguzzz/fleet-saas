@@ -19,7 +19,7 @@ export default async function TripDetailPage({
     notFound();
   }
 
-  const { data: trip, error } = await getTrip(tripId);
+  const { data: trip, error } = await getTrip(tripId, org.id);
 
   if (error || !trip) {
     return <div>Error cargando viaje: {error || 'No encontrado'}</div>;
@@ -53,7 +53,7 @@ export default async function TripDetailPage({
           <div className="flex items-center gap-2 mb-2">
             <Link
               href={`/${orgSlug}/trips`}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               &larr; Volver a Viajes
             </Link>
@@ -182,7 +182,7 @@ export default async function TripDetailPage({
                     href={trip.start_invoice_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
                     Ver factura de inicio
                   </a>
@@ -197,7 +197,7 @@ export default async function TripDetailPage({
                     href={trip.end_invoice_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
                     Ver factura final
                   </a>

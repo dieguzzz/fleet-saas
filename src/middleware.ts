@@ -4,9 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Routes that don't require authentication
 const publicRoutes = ['/', '/login', '/signup', '/invite', '/forgot-password', '/reset-password', '/select-org', '/login-empresa'];
 
-// Routes that require super_admin
-const adminRoutes = ['/admin'];
-
 export async function middleware(request: NextRequest) {
   // Headers reenviados al request para que los Server Components los lean vía headers().
   // Se limpian los x-org-* entrantes para evitar spoofing desde el cliente.
@@ -71,7 +68,8 @@ export async function middleware(request: NextRequest) {
       .eq('user_id', user.id);
 
     const url = request.nextUrl.clone();
-    const slugs = (memberships ?? []).flatMap((m: any) => {
+    type MembershipOrg = { organization: { slug: string } | { slug: string }[] | null };
+    const slugs = ((memberships ?? []) as MembershipOrg[]).flatMap((m) => {
       const org = Array.isArray(m.organization) ? m.organization[0] : m.organization;
       return org?.slug ? [org.slug] : [];
     }) as string[];
@@ -148,7 +146,7 @@ export async function middleware(request: NextRequest) {
             .eq('slug', orgSlug)
             .single();
           if (impOrg) {
-            const orgType = (impOrg as any).org_type || 'fleet';
+            const orgType = (impOrg as { org_type?: string }).org_type || 'fleet';
             requestHeaders.set('x-org-id', impOrg.id);
             requestHeaders.set('x-org-role', 'owner');
             requestHeaders.set('x-org-slug', orgSlug);
@@ -181,7 +179,7 @@ export async function middleware(request: NextRequest) {
             .eq('slug', orgSlug)
             .single();
           if (directOrg) {
-            const orgType = (directOrg as any).org_type || 'fleet';
+            const orgType = (directOrg as { org_type?: string }).org_type || 'fleet';
             requestHeaders.set('x-org-id', directOrg.id);
             requestHeaders.set('x-org-role', 'owner');
             requestHeaders.set('x-org-slug', orgSlug);
