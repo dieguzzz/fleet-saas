@@ -4,6 +4,7 @@ import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { tryResolveOrgId } from '@/lib/org-resolver';
+import { logAudit } from '@/lib/audit';
 import { z } from 'zod';
 
 const maintenanceSchema = z.object({
@@ -63,6 +64,13 @@ export async function createMaintenanceRecord(prevState: CreateMaintenanceState 
     console.error('Error creating maintenance record:', error);
     return { error: 'Error al registrar mantenimiento' };
   }
+
+  await logAudit({
+    organizationId: org.id,
+    action: 'create',
+    resourceType: 'maintenance_record',
+    resourceLabel: validatedFields.data.description || validatedFields.data.type,
+  });
 
   revalidatePath(`/${orgSlug}/maintenance`);
   redirect(`/${orgSlug}/maintenance`);

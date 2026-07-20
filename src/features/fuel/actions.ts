@@ -22,7 +22,10 @@ const fuelSchema = z.object({
     (v: unknown) => (v === '' || v === null || v === undefined ? null : Number(v)),
     z.number().nonnegative('El subsidio no puede ser negativo').nullable().optional()
   ),
-});
+}).refine(
+  (d) => (d.subsidy_amount ?? 0) <= d.total_cost,
+  { message: 'El subsidio no puede superar el total', path: ['subsidy_amount'] }
+);
 
 export type FuelFormState = { error?: string; success?: boolean };
 
@@ -117,10 +120,15 @@ export async function getFuelStats(orgId: string) {
   const diesel = (allTime.data ?? []).filter(r => r.fuel_type === 'diesel');
   const gasoline = (allTime.data ?? []).filter(r => r.fuel_type === 'gasoline' || r.fuel_type === 'gasoil');
 
+  const totalCostMonth = sum(thisMonth.data ?? []);
+  const totalSubsidiesMonth = sumSubsidies(thisMonth.data ?? []);
+
   return {
-    totalCostMonth: sum(thisMonth.data ?? []),
+    totalCostMonth,
+    // Gasto neto (descontando subsidios) — es el número contablemente correcto.
+    netCostMonth: totalCostMonth - totalSubsidiesMonth,
     totalLitersMonth: sumLiters(thisMonth.data ?? []),
-    totalSubsidiesMonth: sumSubsidies(thisMonth.data ?? []),
+    totalSubsidiesMonth,
     totalCostDiesel: sum(diesel),
     totalCostGasoline: sum(gasoline),
     totalLitersDiesel: sumLiters(diesel),

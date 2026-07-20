@@ -92,7 +92,8 @@ export async function createProductAction(
 
   if (error) {
     console.error('Error creating product:', error);
-    return { error: 'Error al crear el producto' };
+    // Exponer la causa real (RLS, constraint, etc.) en vez de un genérico opaco.
+    return { error: `No se pudo crear el producto: ${error.message}` };
   }
 
   await logAudit({

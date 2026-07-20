@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
+import { logAudit } from '@/lib/audit';
 import { z } from 'zod';
 import type { InventoryItem, InventoryMovementType } from '@/types/database';
 
@@ -58,6 +59,14 @@ export async function createInventoryItemAction(
     .single();
 
   if (error) return { error: 'Error al crear el ítem' };
+
+  await logAudit({
+    organizationId: org.id,
+    action: 'create',
+    resourceType: 'inventory_item',
+    resourceId: item?.id,
+    resourceLabel: validated.data.name,
+  });
 
   revalidatePath(`/${orgSlug}/inventory/items`);
   return { success: true, id: item?.id };
@@ -174,6 +183,13 @@ export async function createInventoryItem(
     console.error('Error creating inventory item:', error);
     return { error: error.message, success: false };
   }
+
+  await logAudit({
+    organizationId: orgId,
+    action: 'create',
+    resourceType: 'inventory_item',
+    resourceLabel: validated.data.name,
+  });
 
   revalidatePath(`/${orgSlug}/inventory/items`);
   redirect(`/${orgSlug}/inventory/items`);

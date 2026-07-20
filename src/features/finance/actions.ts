@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/services/supabase/server';
+import { logAudit } from '@/lib/audit';
 import type { Invoice, InvoiceItem } from '@/types/database';
 
 
@@ -90,8 +91,20 @@ export async function createInvoice(
 
   if (error) {
     console.error('Error creating invoice:', error);
-    return { error: error.message };
+    // No filtrar el error crudo de Postgres a la UI (expone el esquema).
+    if (error.code === '23505') {
+      return { error: 'Ya existe una factura con ese número. Por favor reintentá.' };
+    }
+    return { error: 'No se pudo crear la factura. Intentá de nuevo.' };
   }
+
+  await logAudit({
+    organizationId: orgId,
+    action: 'create',
+    resourceType: 'invoice',
+    resourceId: (data as Invoice).id,
+    resourceLabel: (data as Invoice).invoice_number,
+  });
 
   revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { data: data as Invoice };
@@ -162,6 +175,13 @@ export async function deleteInvoice(id: string, orgId: string) {
     console.error('Error deleting invoice:', error);
     return { error: error.message };
   }
+
+  await logAudit({
+    organizationId: orgId,
+    action: 'delete',
+    resourceType: 'invoice',
+    resourceId: id,
+  });
 
   revalidatePath('/[orgSlug]/finance/invoices', 'page');
   return { success: true };
@@ -492,6 +512,13 @@ export async function createFinancialTransaction(prevState: unknown, formData: F
     console.error('Error creating transaction:', error);
     return { error: error.message, success: false };
   }
+
+  await logAudit({
+    organizationId: orgId,
+    action: 'create',
+    resourceType: 'financial_transaction',
+    resourceLabel: `${validated.data.category} · ${validated.data.amount}`,
+  });
 
   revalidatePath('/[orgSlug]/finance/transactions', 'page');
   return { success: true };

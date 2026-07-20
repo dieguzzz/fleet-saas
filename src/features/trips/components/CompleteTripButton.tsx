@@ -69,7 +69,8 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        // z-[1000]: los panes de Leaflet llegan a z-index ~700 y tapaban el modal.
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50">
           <div className="bg-card rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Completar Viaje</h2>
             <p className="text-sm text-muted-foreground">

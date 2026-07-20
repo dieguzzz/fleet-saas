@@ -104,14 +104,21 @@ export async function updateEmployee(prevState: EmployeeFormState | null, formDa
   redirect(`/${orgSlug}/employees`);
 }
 
-export async function deleteEmployee(employeeId: string, orgSlug: string) {
+// Soft-delete ("dar de baja"): marca el empleado como inactivo en vez de
+// borrarlo, para conservar sus viajes/gastos históricos (el hard-delete
+// disparaba una cascada silenciosa que borraba viajes y gastos asociados).
+export async function deactivateEmployee(employeeId: string, orgSlug: string) {
   const supabase = await createClient();
   const { data: org } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
   if (!org) throw new Error('Organización no encontrada');
   const { data: emp } = await supabase.from('employees').select('full_name').eq('id', employeeId).eq('organization_id', org.id).single();
-  const { error } = await supabase.from('employees').delete().eq('id', employeeId).eq('organization_id', org.id);
-  if (error) throw new Error('Error al eliminar empleado');
-  if (emp) await logAudit({ organizationId: org.id, action: 'delete', resourceType: 'employee', resourceId: employeeId, resourceLabel: emp.full_name });
+  const { error } = await supabase
+    .from('employees')
+    .update({ status: 'inactive' })
+    .eq('id', employeeId)
+    .eq('organization_id', org.id);
+  if (error) throw new Error('Error al dar de baja al empleado');
+  if (emp) await logAudit({ organizationId: org.id, action: 'update', resourceType: 'employee', resourceId: employeeId, resourceLabel: `${emp.full_name} (baja)` });
   revalidatePath(`/${orgSlug}/employees`);
 }
 

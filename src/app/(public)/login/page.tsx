@@ -21,7 +21,6 @@ export default function LoginPage() {
   const [setupState, setupAction, setupPending] = useActionState(setupAmd, null);
   const [showPassword, setShowPassword] = useState(false);
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
-  const [amdEmail, setAmdEmail] = useState<string | null>(null);
 
   const [miNeedsSetup, setMiNeedsSetup] = useState<boolean | null>(null);
   const [miSignupState, miSignupAction, miSignupPending] = useActionState(signUpAndJoinOrg, null);
@@ -43,7 +42,6 @@ export default function LoginPage() {
     if (mode === 'amd' && needsSetup === null) {
       getAmdSetupState().then((s) => {
         setNeedsSetup(s.needsSetup);
-        setAmdEmail(s.email);
       });
     }
     if (mode === 'mala-influencia' && miNeedsSetup === null) {
@@ -223,7 +221,6 @@ export default function LoginPage() {
                       type="email"
                       required
                       autoFocus
-                      defaultValue={amdEmail ?? ''}
                       autoComplete="email"
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -279,12 +276,6 @@ export default function LoginPage() {
               {/* LOGIN NORMAL */}
               {needsSetup === false && (
                 <form action={loginAction} className="space-y-4">
-                  {amdEmail && (
-                    <div className="bg-muted rounded-lg p-3">
-                      <p className="text-muted-foreground text-xs text-center">{amdEmail}</p>
-                    </div>
-                  )}
-
                   {loginState?.error && (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                       <p className="text-red-400 text-sm text-center">{loginState.error}</p>
