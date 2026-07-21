@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { deleteInventoryItemAction } from '../actions';
 import { Button } from '@/components/ui/button';
 import InventoryItemModal from './InventoryItemModal';
@@ -62,9 +63,10 @@ function StockCell({ item }: { item: InventoryItem }) {
 
 function DeleteButton({ itemId, orgSlug }: { itemId: string; orgSlug: string }) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
   return (
     <button
-      onClick={() => { if (confirm('¿Eliminar este ítem?')) startTransition(() => deleteInventoryItemAction(itemId, orgSlug)); }}
+      onClick={async () => { if (await confirm('¿Eliminar este ítem?')) startTransition(() => deleteInventoryItemAction(itemId, orgSlug)); }}
       disabled={isPending}
       className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
     >

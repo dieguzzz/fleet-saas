@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useConfirm } from '@/components/ui/confirm';
 import { useTransition } from 'react';
 import { deleteMaintenanceRecord } from '@/features/maintenance/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -28,9 +29,10 @@ function formatDate(d: string) {
 
 export default function MaintenanceList({ orgSlug, records }: { orgSlug: string; records: MaintenanceRecord[] }) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
-  function handleDelete(id: string, label: string) {
-    if (!confirm(`¿Eliminar el registro de mantenimiento "${label}"? Esta acción no se puede deshacer.`)) return;
+  async function handleDelete(id: string, label: string) {
+    if (!(await confirm(`¿Eliminar el registro de mantenimiento "${label}"? Esta acción no se puede deshacer.`))) return;
     startTransition(() => { deleteMaintenanceRecord(id, orgSlug); });
   }
 

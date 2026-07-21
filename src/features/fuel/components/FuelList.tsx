@@ -1,6 +1,7 @@
 'use client';
 
 import { storageProxyUrl } from '@/lib/attachments';
+import { useConfirm } from '@/components/ui/confirm';
 import { useState, useTransition } from 'react';
 import { deleteFuelRecord } from '@/features/fuel/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -44,6 +45,7 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
   const [fuelFilter, setFuelFilter] = useState('');
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const filtered = records.filter(r => {
     const q = search.toLowerCase();
@@ -59,8 +61,8 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: string) {
-    if (!confirm('¿Eliminar este registro de combustible?')) return;
+  async function handleDelete(id: string) {
+    if (!(await confirm('¿Eliminar este registro de combustible?'))) return;
     startTransition(() => deleteFuelRecord(id, orgSlug));
   }
 

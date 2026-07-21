@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import Link from 'next/link';
 import { deleteProductAction } from '@/features/products/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -18,6 +19,7 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const filtered = products.filter((p) => {
     const q = search.toLowerCase();
@@ -29,8 +31,8 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: string, name: string) {
-    if (!confirm(`¿Eliminar "${name}"?`)) return;
+  async function handleDelete(id: string, name: string) {
+    if (!(await confirm(`¿Eliminar "${name}"?`))) return;
     startTransition(async () => {
       await deleteProductAction(id, orgSlug);
     });

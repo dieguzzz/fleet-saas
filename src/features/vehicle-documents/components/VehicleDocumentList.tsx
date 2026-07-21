@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { deleteVehicleDocument } from '../actions';
 import VehicleDocumentModal from './VehicleDocumentModal';
 import { VEHICLE_DOCUMENT_LABELS, type VehicleDocument } from '@/types/database';
@@ -57,9 +58,10 @@ interface VehicleDocumentListProps {
 
 export default function VehicleDocumentList({ orgSlug, documents, vehicles, vehicleId }: VehicleDocumentListProps) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
-  function handleDelete(docId: string) {
-    if (!confirm('¿Eliminar este documento?')) return;
+  async function handleDelete(docId: string) {
+    if (!(await confirm('¿Eliminar este documento?'))) return;
     startTransition(() => deleteVehicleDocument(docId, orgSlug));
   }
 

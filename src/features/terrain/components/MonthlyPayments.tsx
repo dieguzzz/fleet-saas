@@ -1,6 +1,7 @@
 'use client';
 
 import { storageProxyUrl } from '@/lib/attachments';
+import { useConfirm } from '@/components/ui/confirm';
 import { useState, useTransition } from 'react';
 import { generateMonthlyPayments, markPaymentPending } from '@/features/terrain/actions';
 import { MarkPaidForm } from './MarkPaidForm';
@@ -55,6 +56,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
   const [selectedPayment, setSelectedPayment] = useState<PaymentWithTenant | null>(null);
   const [generating, startGenerating] = useTransition();
   const [reverting, startReverting] = useTransition();
+  const confirm = useConfirm();
   const [generateResult, setGenerateResult] = useState<string | null>(null);
 
   function handleGenerate() {
@@ -68,8 +70,8 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
     });
   }
 
-  function handleRevertPaid(paymentId: string) {
-    if (!confirm('¿Revertir este pago a pendiente?')) return;
+  async function handleRevertPaid(paymentId: string) {
+    if (!(await confirm('¿Revertir este pago a pendiente?'))) return;
     startReverting(() => markPaymentPending(paymentId, orgSlug));
   }
 

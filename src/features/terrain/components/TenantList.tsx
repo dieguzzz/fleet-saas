@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import Link from 'next/link';
 import { deleteTenant } from '@/features/terrain/actions';
 import type { LandTenant } from '@/types/database';
@@ -20,6 +21,7 @@ function formatCurrency(amount: number) {
 export function TenantList({ tenants, orgSlug }: TenantListProps) {
   const [search, setSearch] = useState('');
   const [, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const filtered = tenants.filter(
     (t) =>
@@ -27,8 +29,8 @@ export function TenantList({ tenants, orgSlug }: TenantListProps) {
       (t.equipment_description ?? '').toLowerCase().includes(search.toLowerCase())
   );
 
-  function handleDelete(tenantId: string, name: string) {
-    if (!confirm(`¿Eliminar al inquilino "${name}"? Se eliminarán también todos sus cobros.`)) return;
+  async function handleDelete(tenantId: string, name: string) {
+    if (!(await confirm(`¿Eliminar al inquilino "${name}"? Se eliminarán también todos sus cobros.`))) return;
     startTransition(() => deleteTenant(tenantId, orgSlug));
   }
 

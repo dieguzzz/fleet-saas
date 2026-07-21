@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { cancelInvitation } from '@/features/team/actions';
 
 interface Invitation {
@@ -26,9 +27,10 @@ function formatDate(d: string | null) {
 
 export default function PendingInvitations({ orgSlug, invitations }: { orgSlug: string; invitations: Invitation[] }) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
-  function handleCancel(id: string, email: string) {
-    if (!confirm(`¿Cancelar la invitación a ${email}?`)) return;
+  async function handleCancel(id: string, email: string) {
+    if (!(await confirm(`¿Cancelar la invitación a ${email}?`))) return;
     startTransition(() => { cancelInvitation(id, orgSlug); });
   }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import type { FinancialTransaction } from '@/types/database';
 import NewFinancialTransactionModal from './NewFinancialTransactionModal';
 import { deleteFinancialTransaction } from '../actions';
@@ -21,9 +22,10 @@ export function FinancialTransactionList({ transactions, orgId }: FinancialTrans
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
-  function handleDelete(id: string, label: string) {
-    if (!confirm(`¿Eliminar la transacción "${label}"? Esta acción no se puede deshacer.`)) return;
+  async function handleDelete(id: string, label: string) {
+    if (!(await confirm(`¿Eliminar la transacción "${label}"? Esta acción no se puede deshacer.`))) return;
     startTransition(() => { deleteFinancialTransaction(id, orgId); });
   }
 

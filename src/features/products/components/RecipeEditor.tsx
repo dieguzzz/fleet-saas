@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition, useActionState } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import {
   addRecipeIngredientAction,
   removeRecipeIngredientAction,
@@ -30,6 +31,7 @@ function IngredientRow({
   const subtotal = unitCost * ingredient.quantity;
   const [qty, setQty] = useState(String(ingredient.quantity));
   const [removing, startRemove] = useTransition();
+  const confirm = useConfirm();
   const [updating, startUpdate] = useTransition();
 
   function handleBlur() {
@@ -68,7 +70,7 @@ function IngredientRow({
       </td>
       <td className="px-4 py-3 text-right">
         <button
-          onClick={() => { if (confirm('¿Eliminar este ingrediente?')) startRemove(async () => { await removeRecipeIngredientAction(ingredient.id, orgSlug); }); }}
+          onClick={async () => { if (await confirm('¿Eliminar este ingrediente?')) startRemove(async () => { await removeRecipeIngredientAction(ingredient.id, orgSlug); }); }}
           disabled={removing}
           className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useConfirm } from '@/components/ui/confirm';
 import { useState, useTransition } from 'react';
 import { deactivateEmployee } from '@/features/employees/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -51,6 +52,7 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const filtered = employees.filter(e => {
     const q = search.toLowerCase();
@@ -59,8 +61,8 @@ export default function EmployeeList({ orgSlug, employees }: { orgSlug: string; 
     return matchQ && matchS;
   });
 
-  function handleDelete(id: string, name: string) {
-    if (!confirm(`¿Dar de baja a ${name}? Se marcará como que ya no labora, pero se conservan sus viajes y registros. Podés reactivarlo editándolo.`)) return;
+  async function handleDelete(id: string, name: string) {
+    if (!(await confirm(`¿Dar de baja a ${name}? Se marcará como que ya no labora, pero se conservan sus viajes y registros. Podés reactivarlo editándolo.`))) return;
     startTransition(() => deactivateEmployee(id, orgSlug));
   }
 
