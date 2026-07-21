@@ -6,6 +6,7 @@ import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { ImpersonationBanner } from '@/components/layout/impersonation-banner';
+import { ConfirmProvider } from '@/components/ui/confirm';
 import { useTenantStore } from '@/store/tenant-store';
 import { createClient } from '@/services/supabase/client';
 import type { Organization, Profile, OrgRole } from '@/types/database';
@@ -222,7 +223,9 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
             className="flex-1 overflow-y-auto p-4 lg:p-6"
           >
             <div className="w-full">
-              {children}
+              <ConfirmProvider>
+                {children}
+              </ConfirmProvider>
             </div>
           </main>
         </div>

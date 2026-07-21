@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { useRouter } from 'next/navigation';
 import { deleteInvoice, updateInvoiceStatus, type InvoiceStatus } from '../actions';
 import { invoiceAttachmentProxyUrl } from '@/lib/attachments';
@@ -33,6 +34,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
   const [deleting, setDeleting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [status, setStatus] = useState(currentStatus || 'draft');
+  const confirm = useConfirm();
 
   async function handleStatusChange(newStatus: string) {
     if (newStatus === status) return;
@@ -48,7 +50,7 @@ export function InvoiceRowActions({ invoiceId, orgId, orgSlug, attachmentUrl, in
   }
 
   async function handleDelete() {
-    if (!confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.')) return;
+    if (!(await confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.'))) return;
     setDeleting(true);
     const result = await deleteInvoice(invoiceId, orgId);
     if (result.error) {

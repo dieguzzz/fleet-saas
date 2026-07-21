@@ -6,6 +6,7 @@ import { m, useMotionValue, animate } from 'framer-motion';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { deleteVehicle } from '@/features/vehicles/actions';
+import { useConfirm } from '@/components/ui/confirm';
 
 interface Vehicle {
   id: string;
@@ -47,8 +48,8 @@ type StatusFilter = 'all' | 'active' | 'maintenance' | 'inactive';
 
 const ACTION_WIDTH = 160;
 
-function confirmDeleteVehicle(orgSlug: string, id: string, name: string, run: (fn: () => void) => void) {
-  if (!confirm(`¿Eliminar el vehículo "${name}"? Esta acción no se puede deshacer.`)) return;
+async function confirmDeleteVehicle(confirmFn: (msg: string) => Promise<boolean>, orgSlug: string, id: string, name: string, run: (fn: () => void) => void) {
+  if (!(await confirmFn(`¿Eliminar el vehículo "${name}"? Esta acción no se puede deshacer.`))) return;
   run(() => { deleteVehicle(orgSlug, id); });
 }
 
@@ -57,6 +58,7 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
   const [revealed, setRevealed] = useState(false);
   const dragStartX = useRef(0);
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function handleDragEnd(_: unknown, info: { offset: { x: number } }) {
     if (info.offset.x < -40) {
@@ -90,7 +92,7 @@ const SwipeableVehicleCard = memo(function SwipeableVehicleCard({ vehicle, orgSl
         <button
           type="button"
           disabled={isPending}
-          onClick={() => confirmDeleteVehicle(orgSlug, vehicle.id, vehicle.name, startTransition)}
+          onClick={() => confirmDeleteVehicle(confirm, orgSlug, vehicle.id, vehicle.name, startTransition)}
           className="flex-1 flex flex-col items-center justify-center gap-1 bg-destructive text-destructive-foreground text-xs font-semibold disabled:opacity-50"
         >
           <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,6 +165,7 @@ const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleList
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [isDeleting, startDelete] = useTransition();
+  const confirm = useConfirm();
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -345,7 +348,7 @@ const VehicleList = memo(function VehicleList({ orgSlug, vehicles }: VehicleList
                           <button
                             type="button"
                             disabled={isDeleting}
-                            onClick={() => confirmDeleteVehicle(orgSlug, vehicle.id, vehicle.name, startDelete)}
+                            onClick={() => confirmDeleteVehicle(confirm, orgSlug, vehicle.id, vehicle.name, startDelete)}
                             className="text-destructive hover:text-destructive/80 font-medium hover:underline disabled:opacity-50"
                           >
                             Eliminar

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { updateMemberRole, removeMember } from '@/features/team/actions';
 
 interface Member {
@@ -38,13 +39,14 @@ interface TeamListProps {
 
 export default function TeamList({ members, orgSlug, canManage = false, isOwnerActor = false }: TeamListProps) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   function handleRole(memberId: string, role: string) {
     startTransition(() => { updateMemberRole(memberId, orgSlug, role); });
   }
 
-  function handleRemove(memberId: string, name: string) {
-    if (!confirm(`¿Quitar a ${name} de la organización?`)) return;
+  async function handleRemove(memberId: string, name: string) {
+    if (!(await confirm(`¿Quitar a ${name} de la organización?`))) return;
     startTransition(() => { removeMember(memberId, orgSlug); });
   }
 

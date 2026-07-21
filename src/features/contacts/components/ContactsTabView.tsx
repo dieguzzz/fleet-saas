@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useTransition } from 'react';
+import { useConfirm } from '@/components/ui/confirm';
 import { deleteContact } from '../actions';
 import { Button } from '@/components/ui/button';
 import ContactModal from './ContactModal';
@@ -40,9 +41,10 @@ function highlight(text: string, query: string) {
 
 function DeleteButton({ contactId, orgSlug }: { contactId: string; orgSlug: string }) {
   const [isPending, startTransition] = useTransition();
+  const confirm = useConfirm();
   return (
     <button
-      onClick={() => { if (confirm('¿Eliminar este contacto?')) startTransition(() => deleteContact(contactId, orgSlug)); }}
+      onClick={async () => { if (await confirm('¿Eliminar este contacto?')) startTransition(() => deleteContact(contactId, orgSlug)); }}
       disabled={isPending}
       className="p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
     >

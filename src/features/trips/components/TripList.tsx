@@ -87,7 +87,14 @@ export function TripList({ trips, orgSlug }: TripListProps) {
                 </span>
               </TableCell>
               <TableCell>
-                {trip.started_at ? (() => { const [y,m,d] = trip.started_at.split('T')[0].split('-'); return `${d}/${m}/${y}`; })() : '-'}
+                {(() => {
+                  // started_at solo existe cuando el viaje arrancó; para planificados
+                  // se usa created_at para no dejar la columna vacía.
+                  const d = trip.started_at ?? trip.created_at;
+                  if (!d) return '-';
+                  const [y, mo, day] = d.split('T')[0].split('-');
+                  return `${day}/${mo}/${y}`;
+                })()}
               </TableCell>
               <TableCell className="text-right">
                 <Button asChild variant="ghost" size="sm">
