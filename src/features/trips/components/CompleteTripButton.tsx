@@ -36,8 +36,8 @@ export function CompleteTripButton({ tripId, orgSlug }: Props) {
         .from('trip-documents')
         .upload(path, file, { upsert: true });
       if (uploadError) throw uploadError;
-      const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
-      setEndInvoiceUrl(data.publicUrl);
+      // Guardar el PATH (bucket privado, se sirve por el proxy autenticado).
+      setEndInvoiceUrl(path);
       setFileName(file.name);
     } catch {
       setError('Error subiendo la factura final');

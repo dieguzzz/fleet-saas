@@ -1,5 +1,6 @@
 'use client';
 
+import { storageProxyUrl } from '@/lib/attachments';
 import React, { useActionState, useEffect, useRef, useState } from 'react';
 import { createClient } from '@/services/supabase/client';
 import { markPaymentPaid, updatePaymentReceiptUrl, type MarkPaidFormState } from '@/features/terrain/actions';
@@ -85,9 +86,9 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
 
       if (uploadErr) throw uploadErr;
 
-      const { data } = supabase.storage.from('terrain-receipts').getPublicUrl(path);
-      await updatePaymentReceiptUrl(payment.id, orgSlug, data.publicUrl);
-      setReceiptUrl(data.publicUrl);
+      // Guardar el PATH (bucket privado, se sirve por el proxy autenticado).
+      await updatePaymentReceiptUrl(payment.id, orgSlug, path);
+      setReceiptUrl(path);
       setReceiptFileName(file.name);
     } catch (err) {
       console.error('Upload error:', err);
@@ -193,7 +194,7 @@ export function MarkPaidForm({ payment, orgSlug, orgId, onClose }: MarkPaidFormP
                   <svg className="size-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <a href={receiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-400 truncate hover:underline">
+                  <a href={storageProxyUrl('terrain-receipts', receiptUrl)} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-400 truncate hover:underline">
                     {receiptFileName ?? 'Comprobante subido'}
                   </a>
                 </div>

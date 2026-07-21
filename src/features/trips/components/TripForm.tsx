@@ -78,8 +78,8 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
       const path = `${currentOrg.id}/invoices/start-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: true });
       if (error) throw error;
-      const { data } = supabase.storage.from('trip-documents').getPublicUrl(path);
-      setStartInvoiceUrl(data.publicUrl);
+      // Guardar el PATH (bucket privado, se sirve por el proxy autenticado).
+      setStartInvoiceUrl(path);
       setInvoiceFileName(file.name);
     } catch {
       alert('Error subiendo la factura');
