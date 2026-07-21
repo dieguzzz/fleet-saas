@@ -50,6 +50,24 @@ export async function getOrganizationMembers(orgId: string) {
   return data || [];
 }
 
+export async function getOrganizationInvitations(orgId: string) {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('invitations')
+    .select('*')
+    .eq('organization_id', orgId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching invitations:', error);
+    return [];
+  }
+  return data || [];
+}
+
 export async function getOrganizationStats(orgId: string) {
   const supabase = await createClient();
 
