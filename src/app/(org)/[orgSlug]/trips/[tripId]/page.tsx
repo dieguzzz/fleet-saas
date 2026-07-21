@@ -6,6 +6,7 @@ import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { TripMapWrapper } from '@/features/trips/components/TripMapWrapper';
+import { storageProxyUrl } from '@/lib/attachments';
 
 export default async function TripDetailPage({
   params,
@@ -179,7 +180,7 @@ export default async function TripDetailPage({
                 <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura de Inicio</p>
                 {trip.start_invoice_url ? (
                   <a
-                    href={trip.start_invoice_url}
+                    href={storageProxyUrl('trip-documents', trip.start_invoice_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"
@@ -194,7 +195,7 @@ export default async function TripDetailPage({
                 <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura Final</p>
                 {trip.end_invoice_url ? (
                   <a
-                    href={trip.end_invoice_url}
+                    href={storageProxyUrl('trip-documents', trip.end_invoice_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"

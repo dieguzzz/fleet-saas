@@ -1,5 +1,6 @@
 'use client';
 
+import { storageProxyUrl } from '@/lib/attachments';
 import type { LandPayment } from '@/types/database';
 
 const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -76,7 +77,7 @@ export function TenantPaymentHistory({ payments }: { payments: LandPayment[] }) 
                 <td className="px-4 py-3 text-muted-foreground">{p.payment_method ? METHOD_LABELS[p.payment_method] : '—'}</td>
                 <td className="px-4 py-3">
                   {p.receipt_url ? (
-                    <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">Ver</a>
+                    <a href={storageProxyUrl('terrain-receipts', p.receipt_url)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">Ver</a>
                   ) : <span className="text-muted-foreground/30">—</span>}
                 </td>
               </tr>
@@ -118,7 +119,7 @@ export function TenantPaymentHistory({ payments }: { payments: LandPayment[] }) 
               )}
             </div>
             {p.receipt_url && (
-              <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-primary hover:underline pt-1 border-t border-border">
+              <a href={storageProxyUrl('terrain-receipts', p.receipt_url)} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-primary hover:underline pt-1 border-t border-border">
                 Ver comprobante
               </a>
             )}

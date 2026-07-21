@@ -1,5 +1,6 @@
 'use client';
 
+import { storageProxyUrl } from '@/lib/attachments';
 import { useState, useTransition } from 'react';
 import { deleteFuelRecord } from '@/features/fuel/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -146,7 +147,7 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
                     {r.invoice_url && (
-                      <a href={r.invoice_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:text-primary/80 font-medium">
+                      <a href={storageProxyUrl('trip-documents', r.invoice_url)} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:text-primary/80 font-medium">
                         Factura
                       </a>
                     )}
@@ -198,7 +199,7 @@ export default function FuelList({ orgSlug, records }: { orgSlug: string; record
             </div>
             <div className="pt-1 border-t border-border flex items-center justify-between">
               {r.invoice_url ? (
-                <a href={r.invoice_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary font-medium">
+                <a href={storageProxyUrl('trip-documents', r.invoice_url)} target="_blank" rel="noopener noreferrer" className="text-sm text-primary font-medium">
                   Ver factura
                 </a>
               ) : (

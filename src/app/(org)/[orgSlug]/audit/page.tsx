@@ -23,6 +23,8 @@ const RESOURCE_LABELS: Record<string, string> = {
   financial_transaction: 'Transacción',
   product: 'Producto',
   vehicle_document: 'Documento de vehículo',
+  member: 'Miembro',
+  invitation: 'Invitación',
 };
 
 const ACTION_COLORS: Record<string, string> = {

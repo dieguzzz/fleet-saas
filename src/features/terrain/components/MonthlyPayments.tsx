@@ -1,5 +1,6 @@
 'use client';
 
+import { storageProxyUrl } from '@/lib/attachments';
 import { useState, useTransition } from 'react';
 import { generateMonthlyPayments, markPaymentPending } from '@/features/terrain/actions';
 import { MarkPaidForm } from './MarkPaidForm';
@@ -165,7 +166,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
                           <div>{formatDate(p.paid_date!)}</div>
                           <div className="text-muted-foreground/60">{p.payment_method ? methodLabel[p.payment_method] : ''}</div>
                           {p.receipt_url && (
-                            <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
+                            <a href={storageProxyUrl('terrain-receipts', p.receipt_url)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
                               Ver comprobante
                             </a>
                           )}
@@ -233,7 +234,7 @@ export function MonthlyPayments({ payments, orgSlug, orgId, year, month, hasActi
                         </div>
                       )}
                       {p.receipt_url && (
-                        <a href={p.receipt_url} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-600 hover:underline dark:text-blue-400 pt-1">
+                        <a href={storageProxyUrl('terrain-receipts', p.receipt_url)} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-blue-600 hover:underline dark:text-blue-400 pt-1">
                           Ver comprobante
                         </a>
                       )}
