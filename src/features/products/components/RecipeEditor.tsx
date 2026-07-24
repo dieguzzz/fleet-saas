@@ -158,7 +158,9 @@ export default function RecipeEditor({
 
   const margin = sellPrice > 0 ? sellPrice - totalCost : 0;
   const marginPct = sellPrice > 0 ? (margin / sellPrice) * 100 : 0;
-  const existingIds = new Set(ingredients.map(i => i.inventory_item_id));
+  const existingIds = new Set(
+    ingredients.map(i => i.inventory_item_id).filter((id): id is string => id !== null)
+  );
 
   return (
     <div className="space-y-4">

@@ -401,6 +401,8 @@ export type Database = {
           min_stock_level: number | null
           name: string
           organization_id: string
+          package_price: number | null
+          package_quantity: number | null
           sku: string | null
           supplier_contacts_id: string | null
           unit: string | null
@@ -417,6 +419,8 @@ export type Database = {
           min_stock_level?: number | null
           name: string
           organization_id: string
+          package_price?: number | null
+          package_quantity?: number | null
           sku?: string | null
           supplier_contacts_id?: string | null
           unit?: string | null
@@ -433,6 +437,8 @@ export type Database = {
           min_stock_level?: number | null
           name?: string
           organization_id?: string
+          package_price?: number | null
+          package_quantity?: number | null
           sku?: string | null
           supplier_contacts_id?: string | null
           unit?: string | null
@@ -1101,9 +1107,14 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          labor_cost: number
           name: string
           organization_id: string
+          other_costs: number
+          packaging_cost: number
+          portions: number
           sell_price: number | null
+          target_margin: number
           unit: string | null
           updated_at: string | null
         }
@@ -1115,9 +1126,14 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          labor_cost?: number
           name: string
           organization_id: string
+          other_costs?: number
+          packaging_cost?: number
+          portions?: number
           sell_price?: number | null
+          target_margin?: number
           unit?: string | null
           updated_at?: string | null
         }
@@ -1129,9 +1145,14 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          labor_cost?: number
           name?: string
           organization_id?: string
+          other_costs?: number
+          packaging_cost?: number
+          portions?: number
           sell_price?: number | null
+          target_margin?: number
           unit?: string | null
           updated_at?: string | null
         }
@@ -1149,29 +1170,32 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          inventory_item_id: string
+          inventory_item_id: string | null
           notes: string | null
           organization_id: string
           product_id: string
           quantity: number
+          sub_recipe_product_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
-          inventory_item_id: string
+          inventory_item_id?: string | null
           notes?: string | null
           organization_id: string
           product_id: string
           quantity?: number
+          sub_recipe_product_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
-          inventory_item_id?: string
+          inventory_item_id?: string | null
           notes?: string | null
           organization_id?: string
           product_id?: string
           quantity?: number
+          sub_recipe_product_id?: string | null
         }
         Relationships: [
           {
@@ -1193,6 +1217,13 @@ export type Database = {
             columns: ["inventory_item_id"]
             isOneToOne: false
             referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_sub_recipe_product_id_fkey"
+            columns: ["sub_recipe_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
