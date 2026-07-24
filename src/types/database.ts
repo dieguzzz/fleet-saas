@@ -290,6 +290,12 @@ export interface Product {
   unit: string | null;
   is_active: boolean;
   image_url: string | null;
+  // Costeo de recetas (orgs kitchen)
+  portions: number | null;
+  labor_cost: number | null;
+  packaging_cost: number | null;
+  other_costs: number | null;
+  target_margin: number | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -298,12 +304,14 @@ export interface RecipeIngredient {
   id: string;
   organization_id: string;
   product_id: string;
-  inventory_item_id: string;
+  inventory_item_id: string | null;
+  sub_recipe_product_id: string | null;
   quantity: number;
   notes: string | null;
   created_at: string | null;
   // joined
   inventory_item?: InventoryItem;
+  sub_recipe?: Product;
 }
 
 export interface InvoiceItem {
@@ -383,6 +391,8 @@ export interface InventoryItem {
   min_stock_level: number | null;
   unit: string | null;
   cost_per_unit: number | null;
+  package_price: number | null;
+  package_quantity: number | null;
   supplier_contacts_id: string | null;
   location: string | null;
   created_at: string | null;
