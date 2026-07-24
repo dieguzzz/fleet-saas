@@ -17,9 +17,24 @@ const itemSchema = z.object({
   min_stock_level: z.coerce.number().min(0).optional(),
   unit: z.string().optional(),
   cost_per_unit: z.coerce.number().min(0).optional(),
+  package_price: z.coerce.number().min(0).optional(),
+  package_quantity: z.coerce.number().min(0).optional(),
   location: z.string().optional(),
   description: z.string().optional(),
 });
+
+/**
+ * Deriva el costo unitario a partir del precio y la cantidad por paquete
+ * (ej. precio 2.38 / 2270 gr → 0.00105 por gr). Si no hay datos de paquete,
+ * respeta el `cost_per_unit` ingresado manualmente.
+ */
+function withDerivedCost<T extends { package_price?: number; package_quantity?: number; cost_per_unit?: number }>(data: T): T {
+  const { package_price, package_quantity } = data;
+  if (package_price && package_quantity && package_quantity > 0) {
+    return { ...data, cost_per_unit: package_price / package_quantity };
+  }
+  return data;
+}
 
 async function resolveOrg(supabase: Awaited<ReturnType<typeof createClient>>, orgSlug: string) {
   const { data } = await supabase.from('organizations').select('id').eq('slug', orgSlug).single();
@@ -54,7 +69,7 @@ export async function createInventoryItemAction(
 
   const { data: item, error } = await supabase
     .from('inventory_items')
-    .insert({ organization_id: org.id, ...validated.data })
+    .insert({ organization_id: org.id, ...withDerivedCost(validated.data) })
     .select('id')
     .single();
 
@@ -88,7 +103,7 @@ export async function updateInventoryItemAction(
   const { current_stock: _, ...updateData } = validated.data;
   const { error } = await supabase
     .from('inventory_items')
-    .update({ ...updateData, updated_at: new Date().toISOString() })
+    .update({ ...withDerivedCost(updateData), updated_at: new Date().toISOString() })
     .eq('id', itemId)
     .eq('organization_id', org.id);
 
@@ -175,7 +190,7 @@ export async function createInventoryItem(
   const { error } = await supabase
     .from('inventory_items')
     .insert({
-      ...validated.data,
+      ...withDerivedCost(validated.data),
       organization_id: orgId,
     });
 

@@ -4,7 +4,7 @@ import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createProductAction, updateProductAction } from '@/features/products/actions';
 import type { ProductFormState } from '@/features/products/actions';
-import type { Product } from '@/types/database';
+import type { Product, OrgType } from '@/types/database';
 import { PRODUCT_CATEGORY_LABELS } from '@/types/database';
 
 const CATEGORIES = Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => ({ value, label }));
@@ -20,11 +20,13 @@ const UNITS = [
 interface ProductFormProps {
   orgSlug: string;
   product?: Product;
+  orgType?: OrgType;
 }
 
-export default function ProductForm({ orgSlug, product }: ProductFormProps) {
+export default function ProductForm({ orgSlug, product, orgType = 'fleet' }: ProductFormProps) {
   const router = useRouter();
   const isEdit = !!product;
+  const isKitchen = orgType === 'kitchen';
 
   const action = isEdit
     ? updateProductAction.bind(null, product.id, orgSlug)
@@ -127,21 +129,86 @@ export default function ProductForm({ orgSlug, product }: ProductFormProps) {
           />
         </div>
 
-        <div>
-          <label htmlFor="cost_estimate" className="mb-1.5 block text-sm font-medium text-foreground">
-            Costo estimado ($)
-          </label>
-          <input
-            id="cost_estimate"
-            name="cost_estimate"
-            type="number"
-            step="0.01"
-            min="0"
-            defaultValue={product?.cost_estimate ?? ''}
-            placeholder="0.00"
-            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-          />
-        </div>
+        {!isKitchen && (
+          <div>
+            <label htmlFor="cost_estimate" className="mb-1.5 block text-sm font-medium text-foreground">
+              Costo estimado ($)
+            </label>
+            <input
+              id="cost_estimate"
+              name="cost_estimate"
+              type="number"
+              step="0.01"
+              min="0"
+              defaultValue={product?.cost_estimate ?? ''}
+              placeholder="0.00"
+              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+          </div>
+        )}
+
+        {isKitchen && (
+          <>
+            <div>
+              <label htmlFor="portions" className="mb-1.5 block text-sm font-medium text-foreground">
+                Porciones (rinde)
+              </label>
+              <input
+                id="portions" name="portions" type="number" step="1" min="1"
+                defaultValue={product?.portions ?? 1}
+                placeholder="1"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="labor_cost" className="mb-1.5 block text-sm font-medium text-foreground">
+                Mano de obra ($)
+              </label>
+              <input
+                id="labor_cost" name="labor_cost" type="number" step="0.01" min="0"
+                defaultValue={product?.labor_cost ?? ''}
+                placeholder="0.00"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="packaging_cost" className="mb-1.5 block text-sm font-medium text-foreground">
+                Embalaje / empaque ($)
+              </label>
+              <input
+                id="packaging_cost" name="packaging_cost" type="number" step="0.01" min="0"
+                defaultValue={product?.packaging_cost ?? ''}
+                placeholder="0.00"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="other_costs" className="mb-1.5 block text-sm font-medium text-foreground">
+                Otros costos ($)
+              </label>
+              <input
+                id="other_costs" name="other_costs" type="number" step="0.01" min="0"
+                defaultValue={product?.other_costs ?? ''}
+                placeholder="0.00"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div>
+              <label htmlFor="target_margin" className="mb-1.5 block text-sm font-medium text-foreground">
+                Margen deseado (%)
+              </label>
+              <input
+                id="target_margin" name="target_margin" type="number" step="1" min="0" max="99"
+                defaultValue={product?.target_margin ?? ''}
+                placeholder="40"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <div className="sm:col-span-2 rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              El <span className="font-medium text-foreground">costo</span> se calcula automáticamente desde los ingredientes, sub-recetas y estos costos. Gestioná la receta más abajo.
+            </div>
+          </>
+        )}
 
         <div className="sm:col-span-2">
           <label className="flex items-center gap-2">

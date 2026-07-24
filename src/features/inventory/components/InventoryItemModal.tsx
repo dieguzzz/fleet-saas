@@ -22,6 +22,11 @@ interface InventoryItemModalProps {
 
 export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, defaultCategory, trigger }: InventoryItemModalProps) {
   const [open, setOpen] = useState(false);
+  const [pkgPrice, setPkgPrice] = useState(item?.package_price?.toString() ?? '');
+  const [pkgQty, setPkgQty] = useState(item?.package_quantity?.toString() ?? '');
+  const [costManual, setCostManual] = useState(item?.cost_per_unit?.toString() ?? '');
+  const derivedCost = orgType === 'kitchen' && Number(pkgPrice) > 0 && Number(pkgQty) > 0 ? Number(pkgPrice) / Number(pkgQty) : null;
+  const costValue = derivedCost !== null ? derivedCost.toFixed(4) : costManual;
 
   const action = item
     ? updateInventoryItemAction.bind(null, item.id, orgSlug)
@@ -100,9 +105,40 @@ export default function InventoryItemModal({ orgSlug, orgType = 'fleet', item, d
                   <input id="unit" name="unit" type="text" defaultValue={item?.unit ?? 'unidades'} placeholder={orgType === 'kitchen' ? 'kg, litros, unidades...' : 'unidades, litros...'} className="field-input" />
                 </div>
 
+                {orgType === 'kitchen' && (
+                  <>
+                    <div>
+                      <label htmlFor="package_price" className="field-label">Precio por paquete</label>
+                      <input id="package_price" name="package_price" type="number" min="0" step="0.01" value={pkgPrice} onChange={(e) => setPkgPrice(e.target.value)} placeholder="0.00" className="field-input" />
+                    </div>
+                    <div>
+                      <label htmlFor="package_quantity" className="field-label">Cantidad por paquete</label>
+                      <input id="package_quantity" name="package_quantity" type="number" min="0" step="0.01" value={pkgQty} onChange={(e) => setPkgQty(e.target.value)} placeholder="Ej. 2270" className="field-input" />
+                    </div>
+                  </>
+                )}
+
                 <div>
-                  <label htmlFor="cost_per_unit" className="field-label">Costo unitario</label>
-                  <input id="cost_per_unit" name="cost_per_unit" type="number" min="0" step="0.01" defaultValue={item?.cost_per_unit ?? ''} placeholder="0.00" className="field-input" />
+                  <label htmlFor="cost_per_unit" className="field-label">
+                    Costo unitario{orgType === 'kitchen' && derivedCost !== null ? ' (calculado)' : ''}
+                  </label>
+                  <input
+                    id="cost_per_unit"
+                    name="cost_per_unit"
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    value={costValue}
+                    onChange={(e) => setCostManual(e.target.value)}
+                    placeholder="0.00"
+                    readOnly={derivedCost !== null}
+                    className="field-input"
+                  />
+                  {orgType === 'kitchen' && derivedCost !== null && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {Number(pkgPrice).toFixed(2)} ÷ {Number(pkgQty)} = <span className="font-medium text-foreground">${derivedCost.toFixed(4)}</span> por unidad
+                    </p>
+                  )}
                 </div>
 
                 <div>
