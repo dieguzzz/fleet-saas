@@ -5,6 +5,8 @@ import { createClient } from '@/services/supabase/server';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionCard } from '@/components/ui/section-card';
 import { FinanceOverview } from '@/features/finance/components/FinanceOverview';
+import { FinanceDonuts } from '@/features/finance/components/FinanceDonuts';
+import { getDashboardFinanceKPIs } from '@/features/finance/actions';
 import ExpiryAlertsWidget from '@/features/vehicle-documents/components/ExpiryAlertsWidget';
 import KitchenSalesWidget from '@/features/finance/components/KitchenSalesWidget';
 
@@ -59,6 +61,11 @@ async function DashboardStats({ orgSlug, orgId, orgType }: { orgSlug: string; or
       ))}
     </div>
   );
+}
+
+async function KitchenDonutsPanel({ orgId }: { orgId: string }) {
+  const kpis = await getDashboardFinanceKPIs(orgId);
+  return <FinanceDonuts trend={kpis.trend} />;
 }
 
 function StatsSkeleton() {
@@ -273,6 +280,17 @@ export default async function OrgDashboardPage({ params }: DashboardPageProps) {
           <FinanceOverview orgId={org.id} orgSlug={orgSlug} />
         </Suspense>
       </div>
+
+      {/* Panel mensual de donuts (kitchen) */}
+      {orgType === 'kitchen' && (
+        <div className="pt-4">
+          <SectionCard title="Panel mensual">
+            <Suspense fallback={<Skeleton className="h-64 rounded-xl" />}>
+              <KitchenDonutsPanel orgId={org.id} />
+            </Suspense>
+          </SectionCard>
+        </div>
+      )}
 
       {/* Main content grid */}
       <div className="pt-4">
