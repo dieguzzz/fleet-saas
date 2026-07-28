@@ -6,6 +6,7 @@ import { deleteProductAction } from '@/features/products/actions';
 import { EmptyState } from '@/components/ui/empty-state';
 import type { Product, ProductCategory } from '@/types/database';
 import { PRODUCT_CATEGORY_LABELS } from '@/types/database';
+import { costPerPortion } from '@/features/products/lib';
 
 function fmt(n: number) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -89,7 +90,7 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Producto</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Categoría</th>
               <th className="px-4 py-3 text-right font-medium text-muted-foreground">Precio venta</th>
-              <th className="px-4 py-3 text-right font-medium text-muted-foreground hidden md:table-cell">Costo</th>
+              <th className="px-4 py-3 text-right font-medium text-muted-foreground hidden md:table-cell">Costo/porción</th>
               <th className="px-4 py-3 text-center font-medium text-muted-foreground hidden md:table-cell">Estado</th>
               <th className="px-4 py-3 text-right font-medium text-muted-foreground">Acciones</th>
             </tr>
@@ -105,7 +106,11 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
                 </td>
                 <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{PRODUCT_CATEGORY_LABELS[p.category as ProductCategory] ?? p.category ?? '—'}</td>
                 <td className="px-4 py-3 text-right font-medium text-foreground">${fmt(p.sell_price ?? 0)}</td>
-                <td className="px-4 py-3 text-right text-muted-foreground hidden md:table-cell">${fmt(p.cost_estimate ?? 0)}</td>
+                {/* Por porción, no el total de la receta: la columna de al lado
+                    es el precio de venta, que también es por porción. Compararlas
+                    en bases distintas hacía parecer que una receta multi-porción
+                    se vendía por debajo del costo. */}
+                <td className="px-4 py-3 text-right text-muted-foreground hidden md:table-cell">${fmt(costPerPortion(p))}</td>
                 <td className="px-4 py-3 text-center hidden md:table-cell">
                   <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                     p.is_active
