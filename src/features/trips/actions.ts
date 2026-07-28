@@ -311,10 +311,18 @@ export async function linkTripInvoice(tripId: string, invoiceId: string, orgSlug
   const orgId = await tryResolveOrgId(supabase, orgSlug);
   if (!orgId) return { error: 'Organización no encontrada' };
 
-  const [{ data: ownTrip }, { data: ownInvoice }] = await Promise.all([
+  const [{ data: ownTrip, error: tripLookupError }, { data: ownInvoice, error: invoiceLookupError }] = await Promise.all([
     supabase.from('trips').select('id').eq('id', tripId).eq('organization_id', orgId).maybeSingle(),
     supabase.from('invoices').select('id').eq('id', invoiceId).eq('organization_id', orgId).maybeSingle(),
   ]);
+
+  // Un error en el SELECT (falla transitoria, timeout, etc.) no es lo mismo
+  // que "no existe" — reportarlo como "no encontrado" es engañoso y suena
+  // permanente cuando en realidad puede resolverse reintentando.
+  if (tripLookupError || invoiceLookupError) {
+    console.error('Error verifying trip/invoice ownership:', tripLookupError ?? invoiceLookupError);
+    return { error: 'No se pudo verificar el viaje y la factura. Intentá de nuevo.' };
+  }
 
   if (!ownTrip) return { error: 'Viaje no encontrado' };
   if (!ownInvoice) return { error: 'Factura no encontrada' };
