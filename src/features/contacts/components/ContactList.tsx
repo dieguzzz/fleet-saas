@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { EmptyState } from '@/components/ui/empty-state';
+import { roleLabels } from '@/features/contacts/lib';
+import type { ContactRole } from '@/types/database';
 
 interface Contact {
   id: string;
   name: string;
-  role?: string | null;
+  roles: ContactRole[];
   company?: string | null;
   email?: string | null;
   phone?: string | null;
@@ -47,11 +49,18 @@ export default function ContactList({ orgSlug, contacts }: ContactListProps) {
             {contacts.map((contact) => (
               <tr key={contact.id} className="hover:bg-accent/30 transition-colors">
                 <td className="px-6 py-4 font-medium text-foreground">{contact.name}</td>
-                <td className="px-6 py-4 capitalize">
-                  {contact.role === 'driver' ? 'Conductor' :
-                   contact.role === 'supplier' ? 'Proveedor' :
-                   contact.role === 'customer' ? 'Cliente' :
-                   contact.role === 'mechanic' ? 'Mecánico' : contact.role || '-'}
+                <td className="px-6 py-4">
+                  <div className="flex flex-wrap gap-1">
+                    {roleLabels(contact).map((label) => (
+                      <span
+                        key={label}
+                        className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                    {contact.roles.length === 0 && <span className="text-muted-foreground">-</span>}
+                  </div>
                 </td>
                 <td className="px-6 py-4">{contact.company || '-'}</td>
                 <td className="px-6 py-4">
