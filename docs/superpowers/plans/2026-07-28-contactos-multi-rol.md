@@ -636,6 +636,8 @@ export function ContactRolesField({ defaultRoles = [] }: ContactRolesFieldProps)
 npm test
 ```
 
+**Validación en el navegador.** El `<select>` viejo era `required` y bloqueaba el submit sin ida y vuelta al servidor; un grupo de checkboxes no puede expresar "al menos uno" de forma nativa. Se resuelve con el patrón estándar: llevar la cuenta de cuántos hay marcados en estado, poner `required` en todos mientras la cuenta sea cero, y sacarlo apenas se marca uno. Los inputs siguen siendo no controlados (`defaultChecked`, no `checked`), porque el form lee los valores del DOM al enviar.
+
 - [ ] **Step 5: Usarlo en `ContactModal.tsx`**
 
 Agregar el import:
