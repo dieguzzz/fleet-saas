@@ -365,7 +365,7 @@ export function parseRoles(formData: FormData): string[] {
 npm test
 ```
 
-Esperado: verde, 76 tests (60 previos + 16 nuevos).
+Esperado: verde, 75 tests (60 previos + 15 nuevos).
 
 - [ ] **Step 5: Verificar build**
 
