@@ -5,6 +5,7 @@ import { createContact } from '../actions';
 import Link from 'next/link';
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
+import { ContactRolesField } from './ContactRolesField';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,16 +35,8 @@ export default function ContactForm({ orgSlug }: { orgSlug: string }) {
           <input id="name" name="name" type="text" required placeholder="Ej. Juan Pérez" className="field-input" />
         </div>
 
-        <div>
-          <label htmlFor="role" className="field-label">Rol / Tipo</label>
-          <select id="role" name="role" className="field-input">
-            <option value="">Seleccionar rol</option>
-            <option value="driver">Conductor</option>
-            <option value="supplier">Proveedor</option>
-            <option value="customer">Cliente</option>
-            <option value="mechanic">Mecánico</option>
-            <option value="other">Otro</option>
-          </select>
+        <div className="sm:col-span-2">
+          <ContactRolesField />
         </div>
 
         <div>

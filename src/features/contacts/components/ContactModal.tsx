@@ -3,14 +3,13 @@
 import { useActionState, useEffect, useState } from 'react';
 import { createContact, updateContact, type ContactFormState } from '../actions';
 import { Button } from '@/components/ui/button';
-import { CONTACT_ROLE_LABELS, SERVICE_ROLES, type Contact } from '@/types/database';
-
-const ALL_ROLES = ['customer', 'supplier', ...SERVICE_ROLES] as const;
+import { type Contact, type ContactRole } from '@/types/database';
+import { ContactRolesField } from './ContactRolesField';
 
 interface ContactModalProps {
   orgSlug: string;
   contact?: Contact;
-  defaultRole?: string;
+  defaultRole?: ContactRole;
   trigger?: React.ReactNode;
   onSuccess?: (id: string, name: string) => void;
 }
@@ -33,8 +32,6 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
       if (onSuccess && state.id && state.name) onSuccess(state.id, state.name);
     }
   }, [state?.success, state?.id, state?.name, onSuccess]);
-
-  const isService = (role: string) => SERVICE_ROLES.includes(role as never);
 
   return (
     <>
@@ -70,22 +67,9 @@ export default function ContactModal({ orgSlug, contact, defaultRole, trigger, o
                 </div>
 
                 <div className="col-span-2">
-                  <label htmlFor="role" className="field-label">Tipo *</label>
-                  <select id="role" name="role" required defaultValue={contact?.role ?? defaultRole ?? ''} className="field-input">
-                    <option value="">Seleccionar tipo</option>
-                    <optgroup label="Facturación">
-                      <option value="customer">Cliente</option>
-                      <option value="supplier">Proveedor</option>
-                    </optgroup>
-                    <optgroup label="Servicios">
-                      <option value="mechanic">Mecánico</option>
-                      <option value="workshop">Taller</option>
-                      <option value="tow_truck">Grúa</option>
-                      <option value="tire_service">Gomería</option>
-                      <option value="insurance">Seguro</option>
-                      <option value="other">Otro</option>
-                    </optgroup>
-                  </select>
+                  <ContactRolesField
+                    defaultRoles={contact?.roles ?? (defaultRole ? [defaultRole] : [])}
+                  />
                 </div>
 
                 <div>

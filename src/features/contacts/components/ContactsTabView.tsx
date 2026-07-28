@@ -5,11 +5,12 @@ import { deleteContact } from '../actions';
 import { Button } from '@/components/ui/button';
 import ContactModal from './ContactModal';
 import {
-  CONTACT_ROLE_LABELS,
+  CONTACT_ROLE_COLORS,
   SERVICE_ROLES,
-  SERVICE_ROLE_COLORS,
   type Contact,
+  type ContactRole,
 } from '@/types/database';
+import { hasAnyRole, roleLabels } from '@/features/contacts/lib';
 
 type Tab = 'clientes' | 'proveedores' | 'servicios';
 
@@ -19,7 +20,7 @@ const TAB_CONFIG: { id: Tab; label: string; roles: string[] }[] = [
   { id: 'servicios', label: 'Servicios', roles: [...SERVICE_ROLES, 'driver'] },
 ];
 
-function getDefaultRole(tab: Tab): string {
+function getDefaultRole(tab: Tab): ContactRole {
   if (tab === 'clientes') return 'customer';
   if (tab === 'proveedores') return 'supplier';
   return 'mechanic';
@@ -103,14 +104,21 @@ function ContactsTable({ contacts, orgSlug, search }: { contacts: Contact[]; org
 }
 
 function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug: string; search: string }) {
-  const roleColor = SERVICE_ROLE_COLORS[contact.role ?? 'other'] ?? SERVICE_ROLE_COLORS.other;
-  const roleLabel = CONTACT_ROLE_LABELS[contact.role ?? 'other'] ?? contact.role ?? 'Otro';
+  // Una sola pasada: roleLabels devuelve las etiquetas en el mismo orden que contact.roles.
+  const labels = roleLabels(contact);
 
   return (
     <div className="bg-card border border-border rounded-xl p-4 space-y-3 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleColor}`}>{roleLabel}</span>
+          {contact.roles.map((rol, i) => (
+            <span
+              key={rol}
+              className={`text-xs font-medium px-2 py-0.5 rounded-full ${CONTACT_ROLE_COLORS[rol] ?? CONTACT_ROLE_COLORS.other}`}
+            >
+              {labels[i]}
+            </span>
+          ))}
           {contact.is_emergency && (
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
               Emergencia 24hs
@@ -183,7 +191,7 @@ export default function ContactsTabView({ orgSlug, contacts }: { orgSlug: string
 
   const filtered = useMemo(() => {
     const tabConfig = TAB_CONFIG.find(t => t.id === activeTab)!;
-    const byTab = contacts.filter(c => tabConfig.roles.includes(c.role ?? 'other'));
+    const byTab = contacts.filter(c => hasAnyRole(c, tabConfig.roles));
     if (!search.trim()) return byTab;
     const q = search.toLowerCase();
     return byTab.filter(c =>
@@ -195,7 +203,7 @@ export default function ContactsTabView({ orgSlug, contacts }: { orgSlug: string
   }, [contacts, activeTab, search]);
 
   const counts = useMemo(() =>
-    Object.fromEntries(TAB_CONFIG.map(t => [t.id, contacts.filter(c => t.roles.includes(c.role ?? 'other')).length])),
+    Object.fromEntries(TAB_CONFIG.map(t => [t.id, contacts.filter(c => hasAnyRole(c, t.roles)).length])),
   [contacts]);
 
   return (

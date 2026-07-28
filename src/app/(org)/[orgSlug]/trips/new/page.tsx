@@ -49,8 +49,8 @@ export default async function NewTripPage({
     .map((e) => ({ id: e.id, full_name: e.full_name }));
 
   // Solo clientes: el flete se le cobra a un cliente, no a un proveedor.
-  const customers = ((contactsRaw ?? []) as { id: string; name: string; role: string | null }[])
-    .flatMap((c) => (c.role === 'customer' ? [{ id: c.id, name: c.name }] : []));
+  const customers = (contactsRaw ?? [])
+    .flatMap((c) => (c.roles.includes('customer') ? [{ id: c.id, name: c.name }] : []));
 
   return (
     <div className="space-y-4">

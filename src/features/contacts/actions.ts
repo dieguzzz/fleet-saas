@@ -4,10 +4,11 @@ import { createClient } from '@/services/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { logAudit } from '@/lib/audit';
+import { parseRoles } from './lib';
 
 const contactSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),
-  role: z.string().min(1, 'El tipo es obligatorio'),
+  roles: z.array(z.string()).min(1, 'Elegí al menos un rol'),
   company: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
@@ -26,7 +27,7 @@ async function resolveOrg(supabase: Awaited<ReturnType<typeof createClient>>, or
 function parseContactForm(formData: FormData) {
   return {
     name: formData.get('name') as string,
-    role: formData.get('role') as string,
+    roles: parseRoles(formData),
     company: (formData.get('company') as string) || undefined,
     phone: (formData.get('phone') as string) || undefined,
     email: (formData.get('email') as string) || undefined,
@@ -120,8 +121,10 @@ export async function getCustomersAndSuppliers(orgId: string) {
   const supabase = await createClient();
   return await supabase
     .from('contacts')
-    .select('id, name, role, company, tax_id')
+    .select('id, name, roles, company, tax_id')
     .eq('organization_id', orgId)
-    .in('role', ['customer', 'supplier'])
+    // overlaps = "tiene alguno de estos roles". Un contacto que es cliente Y
+    // proveedor entra una sola vez y después cada página filtra el que necesita.
+    .overlaps('roles', ['customer', 'supplier'])
     .order('name');
 }
