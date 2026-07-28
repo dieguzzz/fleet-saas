@@ -8,6 +8,7 @@ import {
   CONTACT_ROLE_COLORS,
   SERVICE_ROLES,
   type Contact,
+  type ContactRole,
 } from '@/types/database';
 import { hasAnyRole, roleLabels } from '@/features/contacts/lib';
 
@@ -19,7 +20,7 @@ const TAB_CONFIG: { id: Tab; label: string; roles: string[] }[] = [
   { id: 'servicios', label: 'Servicios', roles: [...SERVICE_ROLES, 'driver'] },
 ];
 
-function getDefaultRole(tab: Tab): string {
+function getDefaultRole(tab: Tab): ContactRole {
   if (tab === 'clientes') return 'customer';
   if (tab === 'proveedores') return 'supplier';
   return 'mechanic';

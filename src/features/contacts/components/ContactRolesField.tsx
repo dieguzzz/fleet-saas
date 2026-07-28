@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { CONTACT_ROLE_LABELS } from '@/types/database';
+import { CONTACT_ROLE_LABELS, type ContactRole } from '@/types/database';
 
 // Los dos grupos que ya usaba el <select> de rol único, conservados para que
 // la lista larga siga siendo navegable.
-const GRUPOS: { titulo: string; roles: string[] }[] = [
+const GRUPOS: { titulo: string; roles: ContactRole[] }[] = [
   { titulo: 'Facturación', roles: ['customer', 'supplier'] },
   {
     titulo: 'Servicios',
@@ -14,7 +14,7 @@ const GRUPOS: { titulo: string; roles: string[] }[] = [
 ];
 
 interface ContactRolesFieldProps {
-  defaultRoles?: string[];
+  defaultRoles?: ContactRole[];
 }
 
 /**

@@ -30,6 +30,10 @@ END $$;
 
 -- cardinality, no array_length: array_length('{}', 1) devuelve NULL y un CHECK
 -- que evalúa a NULL pasa, con lo cual no impediría un array vacío.
+--
+-- Estos CHECK también pasan sobre filas donde `roles` sigue en NULL, que es lo
+-- que se quiere en la ventana entre esta migración y la 020: la columna todavía
+-- es nullable acá y recién se endurece allá.
 ALTER TABLE contacts DROP CONSTRAINT IF EXISTS contacts_roles_no_vacio;
 ALTER TABLE contacts ADD CONSTRAINT contacts_roles_no_vacio
   CHECK (cardinality(roles) >= 1);

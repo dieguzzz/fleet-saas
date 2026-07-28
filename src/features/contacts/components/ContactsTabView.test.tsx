@@ -8,7 +8,6 @@ function makeContact(overrides: Partial<Contact> = {}): Contact {
     id: 'c1',
     organization_id: 'org-1',
     name: 'Contacto Uno',
-    role: null,
     roles: ['customer'],
     company: null,
     phone: null,

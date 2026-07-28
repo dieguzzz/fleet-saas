@@ -3,13 +3,13 @@
 import { useActionState, useEffect, useState } from 'react';
 import { createContact, updateContact, type ContactFormState } from '../actions';
 import { Button } from '@/components/ui/button';
-import { type Contact } from '@/types/database';
+import { type Contact, type ContactRole } from '@/types/database';
 import { ContactRolesField } from './ContactRolesField';
 
 interface ContactModalProps {
   orgSlug: string;
   contact?: Contact;
-  defaultRole?: string;
+  defaultRole?: ContactRole;
   trigger?: React.ReactNode;
   onSuccess?: (id: string, name: string) => void;
 }
