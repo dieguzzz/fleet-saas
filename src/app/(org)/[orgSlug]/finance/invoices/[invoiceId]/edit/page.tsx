@@ -29,7 +29,7 @@ export default async function EditInvoicePage({
   const invoiceType = (invoice as Invoice & { invoice_type?: string }).invoice_type === 'pago' ? 'pago' : 'cobro';
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
-    .flatMap(c => c.role === role ? [{ id: c.id, name: c.name, company: c.company }] : []);
+    .flatMap(c => c.roles?.includes(role) ? [{ id: c.id, name: c.name, company: c.company }] : []);
 
   const products = orgType === 'kitchen' ? (await getProducts(org.id)).data ?? [] : [];
 
