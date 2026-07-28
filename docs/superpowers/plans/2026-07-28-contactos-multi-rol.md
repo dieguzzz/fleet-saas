@@ -957,6 +957,8 @@ Borrar estas dos líneas de `src/types/database.ts`:
 
 Mientras `roles` era nullable, las dos páginas de factura tuvieron que escribir `c.roles?.includes(role)`. Ahora la columna es `NOT NULL` y el tipo generado lo refleja, así que el `?.` sobra y sugiere una nulabilidad que ya no existe. En `finance/invoices/new/page.tsx` y `finance/invoices/[invoiceId]/edit/page.tsx`, cambiar `c.roles?.includes(role)` por `c.roles.includes(role)`.
 
+En `trips/new/page.tsx` el mismo problema se resolvió distinto: con un cast `as { id: string; name: string; roles: string[] }[]` que le dice al compilador que la nulabilidad no existe. Ahora que efectivamente no existe, el cast sobra: sacarlo y dejar que el tipo se infiera. Las tres páginas quedan expresando la misma garantía de la misma forma.
+
 - [ ] **Step 7: Verificar — esta es la red de seguridad**
 
 ```bash
