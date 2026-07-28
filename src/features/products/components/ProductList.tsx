@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import Link from 'next/link';
 import { deleteProductAction } from '@/features/products/actions';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -14,7 +14,17 @@ function fmt(n: number) {
 
 const PAGE_SIZE = 20;
 
-export default function ProductList({ orgSlug, products }: { orgSlug: string; products: Product[] }) {
+export default function ProductList({
+  orgSlug,
+  products,
+  subRecipeIds = [],
+}: {
+  orgSlug: string;
+  products: Product[];
+  /** Productos que alguna receta usa como insumo. Se muestran con badge "Preparación". */
+  subRecipeIds?: string[];
+}) {
+  const esPreparacion = useMemo(() => new Set(subRecipeIds), [subRecipeIds]);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [page, setPage] = useState(1);
@@ -101,6 +111,14 @@ export default function ProductList({ orgSlug, products }: { orgSlug: string; pr
                 <td className="px-4 py-3">
                   <div>
                     <span className="font-medium text-foreground">{p.name}</span>
+                    {esPreparacion.has(p.id) && (
+                      <span
+                        className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary align-middle"
+                        title="Se usa como insumo de otra receta"
+                      >
+                        Preparación
+                      </span>
+                    )}
                     {p.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{p.description}</p>}
                   </div>
                 </td>

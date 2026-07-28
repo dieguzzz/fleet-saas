@@ -43,6 +43,35 @@ export async function getProducts(orgId: string) {
   return { data: data as Product[] };
 }
 
+/**
+ * Ids de los productos que alguna receta usa como sub-receta.
+ *
+ * Se deriva de `recipe_ingredients` en vez de guardarse como flag en el
+ * producto: así nadie tiene que mantenerlo a mano y no puede quedar desfasado
+ * respecto de las recetas reales.
+ */
+export async function getSubRecipeProductIds(orgId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('recipe_ingredients')
+    .select('sub_recipe_product_id')
+    .eq('organization_id', orgId)
+    .not('sub_recipe_product_id', 'is', null);
+
+  if (error) {
+    console.error('Error fetching sub-recipe ids:', error);
+    return { data: [] as string[] };
+  }
+
+  const ids = (data ?? []).flatMap((r) => {
+    const id = (r as { sub_recipe_product_id: string | null }).sub_recipe_product_id;
+    return id ? [id] : [];
+  });
+
+  return { data: [...new Set(ids)] };
+}
+
 export async function getProduct(id: string) {
   const supabase = await createClient();
 
@@ -404,6 +433,18 @@ async function isDescendant(
 }
 
 /** Productos con su costo calculado (para la comparación de precios). */
+/**
+ * Productos con su costo calculado, para la pantalla de comparación de precios.
+ *
+ * Filtra por `sell_price > 0` a propósito: esa pantalla compara rentabilidad de
+ * carta, y una preparación que solo se usa como insumo — una salsa base, un
+ * caldo — no se vende, así que no tiene margen que comparar. Aparecía con 0% y
+ * ganancia negativa, ensuciando justo lo que la pantalla existe para mostrar.
+ *
+ * El criterio es el precio y no "¿es sub-receta?" porque una preparación puede
+ * venderse además por separado (la salsa en pote). Filtrando por precio, ese
+ * caso sigue apareciendo, que es lo correcto.
+ */
 export async function getProductsWithCost(orgId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -411,6 +452,7 @@ export async function getProductsWithCost(orgId: string) {
     .select('*')
     .eq('organization_id', orgId)
     .eq('is_active', true)
+    .gt('sell_price', 0)
     .order('name');
 
   if (error) return { error: error.message };
