@@ -953,6 +953,10 @@ Borrar estas dos líneas de `src/types/database.ts`:
   role: string | null;
 ```
 
+- [ ] **Step 6b: Limpiar los optional chaining que ya no hacen falta**
+
+Mientras `roles` era nullable, las dos páginas de factura tuvieron que escribir `c.roles?.includes(role)`. Ahora la columna es `NOT NULL` y el tipo generado lo refleja, así que el `?.` sobra y sugiere una nulabilidad que ya no existe. En `finance/invoices/new/page.tsx` y `finance/invoices/[invoiceId]/edit/page.tsx`, cambiar `c.roles?.includes(role)` por `c.roles.includes(role)`.
+
 - [ ] **Step 7: Verificar — esta es la red de seguridad**
 
 ```bash
