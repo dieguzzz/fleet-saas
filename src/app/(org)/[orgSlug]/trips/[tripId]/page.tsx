@@ -215,10 +215,10 @@ export default async function TripDetailPage({
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
-                    Ver factura de inicio
+                    Ver comprobante de inicio
                   </a>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Sin factura</p>
+                  <p className="text-sm text-muted-foreground">Sin comprobante</p>
                 )}
               </div>
               <div>
@@ -230,7 +230,7 @@ export default async function TripDetailPage({
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
-                    Ver factura final
+                    Ver comprobante final
                   </a>
                 ) : (
                   <p className="text-sm text-muted-foreground">
