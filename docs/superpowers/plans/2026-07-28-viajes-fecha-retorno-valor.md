@@ -15,7 +15,8 @@
 ## Global Constraints
 
 - **TDD.** El repo no tenía test runner; la Task 0 lo instala. A partir de la Task 2, toda lógica nueva se escribe con test primero: test que falla → implementación mínima → test que pasa → commit. Las tareas de DDL (Task 1) y las puramente visuales verifican distinto, y cada una dice explícitamente cómo.
-- **Comandos de verificación:** `npm test` (Vitest, una corrida), `npm run build` (TypeScript estricto, falla ante cualquier error de tipos), `npm run lint`.
+- **Comandos de verificación:** `npm test` (Vitest, una corrida) y `npm run build` (TypeScript estricto, falla ante cualquier error de tipos). Los dos tienen que quedar verdes.
+- **`npm run lint` NO se puede exigir verde.** El repo arrastra 1648 problemas preexistentes (18 errores: `setState` sincrónico dentro de efectos, `any` sueltos, y un archivo vendorizado minificado). Verificado en la base de la rama, antes de tocar nada. El criterio de cada tarea es: **no agregar problemas nuevos en los archivos que tocó**. Para comprobarlo, correr `npm run lint` y buscar los archivos propios en la salida — no deben aparecer. Limpiar el lint preexistente está fuera del alcance de este plan.
 - **Lógica pura fuera de los archivos `'use server'`.** `src/features/trips/actions.ts` lleva la directiva `'use server'`, que obliga a que todo export sea una función async. Los helpers sincrónicos van en `src/features/trips/lib.ts`, que no lleva la directiva y por eso es testeable e importable desde componentes cliente.
 - **Proyecto Supabase:** `fufdpotzoxljmehpsoyb` (nombre "Fleet"). Las migraciones se aplican con `mcp__supabase__apply_migration`.
 - **REGLA 10 — dos archivos de tipos.** Todo cambio de schema actualiza `src/types/supabase.ts` (regenerado) **y** `src/types/database.ts` (a mano). Saltear uno rompe el build en Railway.
@@ -2278,7 +2279,7 @@ npm run lint
 grep -rE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" src/features/trips
 ```
 
-Los cuatro tienen que estar limpios: tests verdes, build verde, lint verde, grep sin resultados.
+Criterio: tests verdes, build verde, grep sin resultados, y en el lint ningún archivo tocado por este plan entre los reportados (el resto de los problemas son preexistentes — ver Global Constraints).
 
 - [ ] **Actualizar CLAUDE.md**
 
