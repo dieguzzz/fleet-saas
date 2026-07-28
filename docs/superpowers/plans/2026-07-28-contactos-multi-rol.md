@@ -56,7 +56,7 @@ Lo que el usuario decidió se conserva íntegro: `role` desaparece en este PR, n
 
 **Interfaces:**
 - Consumes: nada
-- Produces: columna `contacts.roles text[] NOT NULL`, con las constraints `contacts_roles_no_vacio` y `contacts_roles_conocidos`. `contacts.role` **sigue existiendo** — se borra en la Task 6. En TypeScript: `ContactRole` incluye `'driver'`; `Contact` gana `roles: ContactRole[]` y conserva `role: string | null`.
+- Produces: columna `contacts.roles text[]` (nullable hasta la 020), con las constraints `contacts_roles_no_vacio` y `contacts_roles_conocidos`. `contacts.role` **sigue existiendo** — se borra en la Task 6. En TypeScript: `ContactRole` incluye `'driver'`; `Contact` gana `roles: ContactRole[]` y conserva `role: string | null`.
 
 - [ ] **Step 1: Escribir el archivo de migración**
 
@@ -88,10 +88,15 @@ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE contacts ALTER COLUMN roles SET NOT NULL;
+-- OJO: el SET NOT NULL NO va acá, va en la 020. Si la columna nace NOT NULL sin
+-- default, el tipo Insert que genera Supabase la vuelve obligatoria y
+-- createContact deja de compilar hasta que la Task 3 la escriba. Se endurece en
+-- la 020, cuando el código ya garantiza escribirla siempre.
 
 -- cardinality, no array_length: array_length('{}', 1) devuelve NULL y un CHECK
 -- que evalúa a NULL pasa, con lo cual no impediría un array vacío.
+-- Sobre filas con roles NULL estos CHECK pasan, que es lo que se quiere en la
+-- ventana entre las dos migraciones.
 ALTER TABLE contacts DROP CONSTRAINT IF EXISTS contacts_roles_no_vacio;
 ALTER TABLE contacts ADD CONSTRAINT contacts_roles_no_vacio
   CHECK (cardinality(roles) >= 1);
@@ -892,7 +897,7 @@ git commit -m "Contactos: pestanas y fichas con varios roles"
 
 **Interfaces:**
 - Consumes: todo el código ya migrado a `roles` (Tasks 3-5).
-- Produces: `contacts.role` deja de existir en la base y en los tipos.
+- Produces: `contacts.role` deja de existir en la base y en los tipos; `contacts.roles` pasa a `NOT NULL`.
 
 - [ ] **Step 1: Escribir el archivo de migración**
 
@@ -910,6 +915,12 @@ git commit -m "Contactos: pestanas y fichas con varios roles"
 -- deploy, no antes.
 
 ALTER TABLE contacts DROP COLUMN IF EXISTS role;
+
+-- El NOT NULL vive acá y no en la 019 a propósito: recién ahora todo el código
+-- escribe `roles` siempre, así que endurecer la columna no rompe ningún insert.
+-- En la 019 habría vuelto obligatorio el tipo Insert generado y dejado
+-- createContact sin compilar durante dos tareas.
+ALTER TABLE contacts ALTER COLUMN roles SET NOT NULL;
 ```
 
 - [ ] **Step 2: Aplicar la migración**
