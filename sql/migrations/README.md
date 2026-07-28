@@ -23,3 +23,4 @@ Ordenadas cronológicamente. Todas las que figuran como APPLIED ya están en pro
 | 017_kitchen_recipe_costing.sql | Costeo de recetas para organizaciones tipo kitchen | APPLIED |
 | 018_trip_date_cargo_customer_value.sql | Fecha, carga, cliente y valor por tramo de viaje | APPLIED |
 | 019_contacts_roles.sql | Columna `contacts.roles text[]`, backfill desde `role` (que se conserva) | APPLIED |
+| 020_contacts_drop_role.sql | Borra `contacts.role`; `contacts.roles` pasa a NOT NULL | APPLIED |

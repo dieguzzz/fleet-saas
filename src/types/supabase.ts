@@ -71,8 +71,7 @@ export type Database = {
           notes: string | null
           organization_id: string
           phone: string | null
-          role: string | null
-          roles: string[] | null
+          roles: string[]
           tax_id: string | null
           updated_at: string | null
         }
@@ -88,8 +87,7 @@ export type Database = {
           notes?: string | null
           organization_id: string
           phone?: string | null
-          role?: string | null
-          roles?: string[] | null
+          roles: string[]
           tax_id?: string | null
           updated_at?: string | null
         }
@@ -105,8 +103,7 @@ export type Database = {
           notes?: string | null
           organization_id?: string
           phone?: string | null
-          role?: string | null
-          roles?: string[] | null
+          roles?: string[]
           tax_id?: string | null
           updated_at?: string | null
         }

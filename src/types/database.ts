@@ -246,8 +246,6 @@ export interface Contact {
   id: string;
   organization_id: string;
   name: string;
-  /** @deprecated Se borra en la migración 020. Usar `roles`. */
-  role: string | null;
   roles: ContactRole[];
   company: string | null;
   phone: string | null;

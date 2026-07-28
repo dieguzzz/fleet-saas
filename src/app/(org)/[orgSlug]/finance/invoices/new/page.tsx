@@ -44,7 +44,7 @@ export default async function NewInvoicePage({
   const { data: contactsRaw } = await getCustomersAndSuppliers(org.id);
   const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
   const contacts = (contactsRaw ?? [])
-    .flatMap(c => c.roles?.includes(role) ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
+    .flatMap(c => c.roles.includes(role) ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
 
   const products = orgType === 'kitchen' ? (await getProducts(org.id)).data ?? [] : [];
 
