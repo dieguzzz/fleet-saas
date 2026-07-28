@@ -23,7 +23,10 @@ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE contacts ALTER COLUMN roles SET NOT NULL;
+-- OJO: el SET NOT NULL NO va acá, va en la 020. Si la columna nace NOT NULL sin
+-- default, el tipo Insert que genera Supabase la vuelve obligatoria y
+-- createContact deja de compilar hasta que la Task 3 la escriba. Se endurece en
+-- la 020, cuando el código ya garantiza escribirla siempre.
 
 -- cardinality, no array_length: array_length('{}', 1) devuelve NULL y un CHECK
 -- que evalúa a NULL pasa, con lo cual no impediría un array vacío.

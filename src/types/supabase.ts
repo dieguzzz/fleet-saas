@@ -72,7 +72,7 @@ export type Database = {
           organization_id: string
           phone: string | null
           role: string | null
-          roles: string[]
+          roles: string[] | null
           tax_id: string | null
           updated_at: string | null
         }
@@ -89,7 +89,7 @@ export type Database = {
           organization_id: string
           phone?: string | null
           role?: string | null
-          roles: string[]
+          roles?: string[] | null
           tax_id?: string | null
           updated_at?: string | null
         }
@@ -106,7 +106,7 @@ export type Database = {
           organization_id?: string
           phone?: string | null
           role?: string | null
-          roles?: string[]
+          roles?: string[] | null
           tax_id?: string | null
           updated_at?: string | null
         }
