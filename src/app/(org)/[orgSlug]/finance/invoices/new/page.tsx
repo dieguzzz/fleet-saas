@@ -26,10 +26,13 @@ export default async function NewInvoicePage({
     cufe?: string;
     dgi_url?: string;
     qr_data?: string;
+    contact_id?: string;
+    description?: string;
+    trip_id?: string;
   }>;
 }) {
   const { orgSlug } = await params;
-  const { type, amount, date, ruc, cufe, dgi_url, qr_data } = await searchParams;
+  const { type, amount, date, ruc, cufe, dgi_url, qr_data, contact_id, description, trip_id } = await searchParams;
   const invoiceType = type === 'pago' ? 'pago' : 'cobro';
 
   const org = await getOrganization(orgSlug);
@@ -45,7 +48,7 @@ export default async function NewInvoicePage({
 
   const products = orgType === 'kitchen' ? (await getProducts(org.id)).data ?? [] : [];
 
-  const scannerData = (ruc || cufe || dgi_url) ? {
+  const scannerData = (ruc || cufe || dgi_url || amount || date) ? {
     ruc,
     cufe,
     dgi_url,
@@ -67,6 +70,9 @@ export default async function NewInvoicePage({
         scannerData={scannerData}
         orgType={orgType}
         products={products}
+        prefillContactId={contact_id}
+        prefillNotes={description}
+        tripId={trip_id}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { getTrip } from '@/features/trips/actions';
 import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
 import { CompleteTripButton } from '@/features/trips/components/CompleteTripButton';
+import { InvoiceTripButton } from '@/features/trips/components/InvoiceTripButton';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -239,6 +240,15 @@ export default async function TripDetailPage({
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="bg-card p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4 border-b pb-2">Facturación</h3>
+            <div className="mb-3 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Valor del tramo</span>
+              <span className="font-semibold">{formatMoney(trip.trip_value)}</span>
+            </div>
+            <InvoiceTripButton trip={trip} orgSlug={orgSlug} />
           </div>
         </div>
       </div>
