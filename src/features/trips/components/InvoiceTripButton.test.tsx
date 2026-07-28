@@ -62,13 +62,13 @@ describe('InvoiceTripButton', () => {
 
   it('explica qué falta cuando no hay cliente', () => {
     render(<InvoiceTripButton trip={makeTrip({ customer_id: null })} orgSlug="amd" />);
-    expect(screen.getByText(/hace falta cargarle cliente y valor/)).toBeInTheDocument();
+    expect(screen.getByText(/el cliente y el valor se cargan al crear el viaje/)).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBeNull();
   });
 
   it('explica qué falta cuando no hay valor', () => {
     render(<InvoiceTripButton trip={makeTrip({ trip_value: null })} orgSlug="amd" />);
-    expect(screen.getByText(/hace falta cargarle cliente y valor/)).toBeInTheDocument();
+    expect(screen.getByText(/el cliente y el valor se cargan al crear el viaje/)).toBeInTheDocument();
   });
 
   it('permite facturar un tramo de valor cero', () => {

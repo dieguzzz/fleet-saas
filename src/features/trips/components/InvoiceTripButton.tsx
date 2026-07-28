@@ -23,7 +23,7 @@ export function InvoiceTripButton({ trip, orgSlug }: { trip: Trip; orgSlug: stri
   if (!trip.customer_id || trip.trip_value === null) {
     return (
       <p className="text-sm text-muted-foreground">
-        Para facturar este tramo hace falta cargarle cliente y valor.
+        Este tramo no se puede facturar: el cliente y el valor se cargan al crear el viaje.
       </p>
     );
   }
