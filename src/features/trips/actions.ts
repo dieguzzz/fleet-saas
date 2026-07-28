@@ -6,15 +6,20 @@ import { createClient } from '@/services/supabase/server';
 import { tryResolveOrgId } from '@/lib/org-resolver';
 import { logAudit } from '@/lib/audit';
 import type { Trip, TripExpense, TripLocation } from '@/types/database';
+import { buildTripRows } from './build-trip-rows';
 
 export async function getTrips(orgId: string, limit = 50, offset = 0) {
   const supabase = await createClient();
 
   const { data, error, count } = await supabase
     .from('trips')
-    .select('*, vehicle:vehicles(name, plate_number), driver:employees(full_name)', { count: 'exact' })
+    .select(
+      '*, vehicle:vehicles(name, plate_number), driver:employees(full_name), customer:contacts(id, name)',
+      { count: 'exact' }
+    )
     .eq('organization_id', orgId)
-    .order('started_at', { ascending: false })
+    .order('trip_date', { ascending: false })
+    .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -22,7 +27,7 @@ export async function getTrips(orgId: string, limit = 50, offset = 0) {
     return { error: error.message };
   }
 
-  return { data: data as Trip[], count };
+  return { data: data as unknown as Trip[], count };
 }
 
 export async function getTrip(id: string, orgId?: string) {
@@ -30,7 +35,7 @@ export async function getTrip(id: string, orgId?: string) {
 
   let baseQuery = supabase
     .from('trips')
-    .select('*, vehicle:vehicles(*), driver:employees(id, full_name)')
+    .select('*, vehicle:vehicles(*), driver:employees(id, full_name), customer:contacts(id, name)')
     .eq('id', id);
   // Defensa en profundidad además de RLS.
   if (orgId) baseQuery = baseQuery.eq('organization_id', orgId);
@@ -42,17 +47,17 @@ export async function getTrip(id: string, orgId?: string) {
     return { error: error.message };
   }
 
-  const trip = data as Trip;
+  const trip = data as unknown as Trip;
 
   // Viaje ida y regreso: adjuntar el tramo hermano (la otra dirección).
   if (trip.round_trip_group_id) {
     const { data: sibling } = await supabase
       .from('trips')
-      .select('id, leg, origin, destination, status')
+      .select('id, leg, origin, destination, status, trip_date, trip_value, invoice_id')
       .eq('round_trip_group_id', trip.round_trip_group_id)
       .neq('id', trip.id)
       .maybeSingle();
-    trip.sibling = (sibling as Trip['sibling']) ?? null;
+    trip.sibling = (sibling as unknown as Trip['sibling']) ?? null;
   }
 
   return { data: trip };
@@ -89,55 +94,7 @@ export async function createTrip(prevState: unknown, formData: FormData) {
     return { error: 'Organization not found', success: false };
   }
 
-  const vehicleId = (formData.get('vehicle_id') as string) || null;
-  const driverId = (formData.get('driver_id') as string) || null;
-  const origin = formData.get('origin') as string;
-  const destination = formData.get('destination') as string;
-  const originCoords = formData.get('origin_coords') ? JSON.parse(formData.get('origin_coords') as string) : null;
-  const destinationCoords = formData.get('destination_coords') ? JSON.parse(formData.get('destination_coords') as string) : null;
-  const status = (formData.get('status') as 'planned' | 'in_progress' | 'completed' | 'cancelled') || 'planned';
-  const notes = (formData.get('notes') as string) || null;
-  const startInvoiceUrl = (formData.get('start_invoice_url') as string) || null;
-  const isRoundTrip = formData.get('is_round_trip') === 'on';
-
-  // Tramo de ida (o viaje único si no es ida y regreso).
-  const outbound = {
-    organization_id: orgId,
-    vehicle_id: vehicleId,
-    driver_id: driverId,
-    origin,
-    destination,
-    origin_coords: originCoords,
-    destination_coords: destinationCoords,
-    status,
-    notes,
-    started_at: status === 'in_progress' ? new Date().toISOString() : null,
-    start_invoice_url: startInvoiceUrl,
-    round_trip_group_id: isRoundTrip ? crypto.randomUUID() : null,
-    leg: isRoundTrip ? 'outbound' : null,
-  };
-
-  const rows = [outbound];
-
-  // Tramo de vuelta: inverso de la ida (origen↔destino), mismo vehículo/conductor,
-  // en estado planificado. Comparte el round_trip_group_id.
-  if (isRoundTrip) {
-    rows.push({
-      organization_id: orgId,
-      vehicle_id: vehicleId,
-      driver_id: driverId,
-      origin: destination,
-      destination: origin,
-      origin_coords: destinationCoords,
-      destination_coords: originCoords,
-      status: 'planned',
-      notes,
-      started_at: null,
-      start_invoice_url: null,
-      round_trip_group_id: outbound.round_trip_group_id,
-      leg: 'return',
-    });
-  }
+  const rows = buildTripRows(formData, orgId, crypto.randomUUID(), new Date().toISOString());
 
   const { error } = await supabase.from('trips').insert(rows);
 
@@ -150,7 +107,7 @@ export async function createTrip(prevState: unknown, formData: FormData) {
     organizationId: orgId,
     action: 'create',
     resourceType: 'trip',
-    resourceLabel: `${origin} → ${destination}`,
+    resourceLabel: `${rows[0].origin} → ${rows[0].destination}`,
   });
 
   redirect(`/${orgSlug}/trips`);
@@ -341,4 +298,47 @@ export async function deleteTripExpense(id: string, orgId: string, tripId: strin
 
   revalidatePath('/[orgSlug]/trips/[tripId]', 'page');
   return { success: true };
+}
+
+/**
+ * Vincula un tramo con la factura del sistema que lo cubre.
+ * Valida que ambos pertenezcan a la misma org antes de escribir: el tripId
+ * viaja por query param y podría estar falseado.
+ */
+export async function linkTripInvoice(tripId: string, invoiceId: string, orgSlug: string) {
+  const supabase = await createClient();
+
+  const orgId = await tryResolveOrgId(supabase, orgSlug);
+  if (!orgId) return { error: 'Organización no encontrada' };
+
+  const [{ data: ownTrip, error: tripLookupError }, { data: ownInvoice, error: invoiceLookupError }] = await Promise.all([
+    supabase.from('trips').select('id').eq('id', tripId).eq('organization_id', orgId).maybeSingle(),
+    supabase.from('invoices').select('id').eq('id', invoiceId).eq('organization_id', orgId).maybeSingle(),
+  ]);
+
+  // Un error en el SELECT (falla transitoria, timeout, etc.) no es lo mismo
+  // que "no existe" — reportarlo como "no encontrado" es engañoso y suena
+  // permanente cuando en realidad puede resolverse reintentando.
+  if (tripLookupError || invoiceLookupError) {
+    console.error('Error verifying trip/invoice ownership:', tripLookupError ?? invoiceLookupError);
+    return { error: 'No se pudo verificar el viaje y la factura. Intentá de nuevo.' };
+  }
+
+  if (!ownTrip) return { error: 'Viaje no encontrado' };
+  if (!ownInvoice) return { error: 'Factura no encontrada' };
+
+  const { error } = await supabase
+    .from('trips')
+    .update({ invoice_id: invoiceId })
+    .eq('id', tripId)
+    .eq('organization_id', orgId);
+
+  if (error) {
+    console.error('Error linking trip invoice:', error);
+    return { error: 'No se pudo vincular la factura al viaje' };
+  }
+
+  revalidatePath('/[orgSlug]/trips/[tripId]', 'page');
+  revalidatePath(`/${orgSlug}/trips`);
+  return { success: true as const };
 }

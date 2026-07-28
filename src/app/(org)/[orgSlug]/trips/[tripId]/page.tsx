@@ -2,11 +2,13 @@ import { Suspense } from 'react';
 import { getTrip } from '@/features/trips/actions';
 import { TripExpensesList } from '@/features/trips/components/TripExpensesList';
 import { CompleteTripButton } from '@/features/trips/components/CompleteTripButton';
+import { InvoiceTripButton } from '@/features/trips/components/InvoiceTripButton';
 import { getOrganization } from '@/features/organizations/queries';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { TripMapWrapper } from '@/features/trips/components/TripMapWrapper';
 import { storageProxyUrl } from '@/lib/attachments';
+import { formatTripDate, formatMoney } from '@/features/trips/lib';
 
 export default async function TripDetailPage({
   params,
@@ -63,7 +65,7 @@ export default async function TripDetailPage({
             Viaje a {trip.destination}
           </h1>
           <p className="text-muted-foreground">
-            {trip.started_at ? (() => { const [y,m,d] = trip.started_at.split('T')[0].split('-'); return `${d}/${m}/${y}`; })() : ''} &bull;{' '}
+            {formatTripDate(trip.trip_date)} &bull;{' '}
             {trip.vehicle?.name} ({trip.vehicle?.plate_number})
           </p>
         </div>
@@ -92,9 +94,14 @@ export default async function TripDetailPage({
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
           <div className="flex items-center gap-2 text-sm">
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-              ⇄ {trip.leg === 'outbound' ? 'Ida' : 'Vuelta'}
+              {trip.leg === 'outbound' ? '↑ Ida' : '↓ Vuelta'}
             </span>
             <span className="text-muted-foreground">Este viaje es parte de un ida y regreso.</span>
+            {trip.sibling && (trip.trip_value !== null || trip.sibling.trip_value !== null) && (
+              <span className="font-medium text-foreground">
+                Total del viaje: {formatMoney((trip.trip_value ?? 0) + (trip.sibling.trip_value ?? 0))}
+              </span>
+            )}
           </div>
           {trip.sibling ? (
             <Link
@@ -153,6 +160,30 @@ export default async function TripDetailPage({
               </span>
               <p className="text-foreground">{trip.distance_km ? `${trip.distance_km} km` : '-'}</p>
             </div>
+            <div>
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
+                Fecha
+              </span>
+              <p className="text-foreground">{formatTripDate(trip.trip_date)}</p>
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
+                Carga
+              </span>
+              <p className="text-foreground">{trip.cargo || '-'}</p>
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
+                Cliente
+              </span>
+              <p className="text-foreground">{trip.customer?.name || 'Sin cliente'}</p>
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-muted-foreground uppercase">
+                Valor del viaje
+              </span>
+              <p className="text-foreground font-semibold">{formatMoney(trip.trip_value)}</p>
+            </div>
           </div>
           <div className="mt-4">
              <span className="block text-xs font-semibold text-muted-foreground uppercase">
@@ -172,12 +203,12 @@ export default async function TripDetailPage({
              </div>
           </div>
 
-          {/* Facturas */}
+          {/* Comprobantes adjuntos */}
           <div className="bg-card p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-4 border-b pb-2">Facturas</h3>
+            <h3 className="text-lg font-semibold mb-4 border-b pb-2">Comprobantes adjuntos</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura de Inicio</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Comprobante de inicio</p>
                 {trip.start_invoice_url ? (
                   <a
                     href={storageProxyUrl('trip-documents', trip.start_invoice_url)}
@@ -185,14 +216,14 @@ export default async function TripDetailPage({
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
-                    Ver factura de inicio
+                    Ver comprobante de inicio
                   </a>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Sin factura</p>
+                  <p className="text-sm text-muted-foreground">Sin comprobante</p>
                 )}
               </div>
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Factura Final</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Comprobante final</p>
                 {trip.end_invoice_url ? (
                   <a
                     href={storageProxyUrl('trip-documents', trip.end_invoice_url)}
@@ -200,15 +231,24 @@ export default async function TripDetailPage({
                     rel="noopener noreferrer"
                     className="text-sm text-primary hover:underline flex items-center gap-1"
                   >
-                    Ver factura final
+                    Ver comprobante final
                   </a>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {trip.status === 'completed' ? 'Sin factura final' : 'Se pedirá al completar'}
+                    {trip.status === 'completed' ? 'Sin comprobante' : 'Se pedirá al completar'}
                   </p>
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="bg-card p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4 border-b pb-2">Facturación</h3>
+            <div className="mb-3 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Valor del tramo</span>
+              <span className="font-semibold">{formatMoney(trip.trip_value)}</span>
+            </div>
+            <InvoiceTripButton trip={trip} orgSlug={orgSlug} />
           </div>
         </div>
       </div>

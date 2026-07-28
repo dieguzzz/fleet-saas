@@ -134,13 +134,32 @@ export interface Trip {
   // Ida y regreso: ambos tramos comparten round_trip_group_id; leg distingue ida/vuelta.
   round_trip_group_id: string | null;
   leg: TripLeg | null;
+  // Fecha operativa declarada al planificar. Distinta de started_at/ended_at,
+  // que registran cuándo arrancó y terminó de verdad.
+  trip_date: string;
+  cargo: string | null;
+  customer_id: string | null;
+  trip_value: number | null;
+  // Factura del sistema que cubre este tramo. Distinto de start_invoice_url /
+  // end_invoice_url, que son comprobantes escaneados adjuntos.
+  invoice_id: string | null;
   created_at: string | null;
   updated_at: string | null;
   // Joined data
   vehicle?: Vehicle;
   driver?: { id: string; full_name: string | null };
+  customer?: { id: string; name: string } | null;
   // Tramo hermano (la otra dirección) en un viaje ida y regreso.
-  sibling?: { id: string; leg: TripLeg | null; origin: string; destination: string; status: TripStatus | null } | null;
+  sibling?: {
+    id: string;
+    leg: TripLeg | null;
+    origin: string;
+    destination: string;
+    status: TripStatus | null;
+    trip_date: string;
+    trip_value: number | null;
+    invoice_id: string | null;
+  } | null;
 }
 
 export interface TripLocation {

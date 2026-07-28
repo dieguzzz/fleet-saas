@@ -7,6 +7,7 @@ import { createClient } from '@/services/supabase/client';
 import { useCurrentOrg } from '@/store/tenant-store';
 import dynamic from 'next/dynamic';
 import type { TripLocation } from '@/types/database';
+import { TripLegFields } from './TripLegFields';
 
 const TripMap = dynamic(() => import('./TripMap').then((mod) => mod.TripMap), {
   ssr: false,
@@ -22,6 +23,7 @@ interface TripFormProps {
   vehicles: { id: string; name: string; plate_number: string }[];
   drivers: { id: string; full_name: string }[];
   savedLocations: TripLocation[];
+  customers: { id: string; name: string }[];
 }
 
 interface Coords { lat: number; lng: number }
@@ -45,7 +47,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
   }
 }
 
-export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: initialLocations }: TripFormProps) {
+export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: initialLocations, customers }: TripFormProps) {
   const currentOrg = useCurrentOrg();
   const [state, formAction, isPending] = useActionState(createTrip, null);
   const [locations, setLocations] = useState<TripLocation[]>(initialLocations);
@@ -57,6 +59,27 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
   const [selecting, setSelecting] = useState<'origin' | 'destination' | null>(null);
   const [geocoding, setGeocoding] = useState<'origin' | 'destination' | null>(null);
   const [isRoundTrip, setIsRoundTrip] = useState(false);
+
+  // Fecha local, no UTC: toISOString() usa UTC y Panamá es UTC-5 sin DST, así
+  // que entre las 19:00 y medianoche locales el string ISO ya cae en el día
+  // siguiente y precargaba la fecha equivocada.
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const [tripDate, setTripDate] = useState(today);
+  const [returnDate, setReturnDate] = useState(today);
+  // Mientras la fecha de regreso no se toque a mano, sigue a la de ida:
+  // el caso normal es salir y volver el mismo día.
+  const [returnDateTouched, setReturnDateTouched] = useState(false);
+
+  const handleTripDateChange = (value: string) => {
+    setTripDate(value);
+    if (!returnDateTouched) setReturnDate(value);
+  };
+
+  const handleReturnDateChange = (value: string) => {
+    setReturnDate(value);
+    setReturnDateTouched(true);
+  };
 
   const [startInvoiceUrl, setStartInvoiceUrl] = useState('');
   const [uploadingInvoice, setUploadingInvoice] = useState(false);
@@ -288,6 +311,18 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
           )}
         </div>
 
+        {/* ── Ida ── */}
+        <div className="pt-2 border-t border-border space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {isRoundTrip ? 'Ida' : 'Datos del viaje'}
+          </p>
+          <TripLegFields
+            customers={customers}
+            date={tripDate}
+            onDateChange={handleTripDateChange}
+          />
+        </div>
+
         {/* Ida y regreso */}
         <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer hover:bg-accent/50 transition-colors">
           <input
@@ -304,6 +339,40 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
             </span>
           </span>
         </label>
+
+        {/* ── Regreso ── */}
+        {isRoundTrip && (
+          <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Regreso
+            </p>
+
+            <TripLegFields
+              prefix="return_"
+              customers={customers}
+              date={returnDate}
+              onDateChange={handleReturnDateChange}
+              dateLabel="Fecha de regreso"
+            />
+
+            <div className="space-y-2">
+              <label htmlFor="return_notes" className="text-sm font-medium text-foreground">
+                Notas del regreso
+              </label>
+              <textarea
+                id="return_notes"
+                name="return_notes"
+                rows={2}
+                placeholder="Detalles del tramo de vuelta…"
+                className="field-input"
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              El tramo de vuelta se crea como planificado. Podés completarlo desde su propia página.
+            </p>
+          </div>
+        )}
 
         {/* Estado */}
         <div className="space-y-2">

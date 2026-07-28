@@ -7,6 +7,7 @@ import { createInvoice, updateInvoice, updateInvoiceAttachmentUrl, saveInvoiceLi
 import type { Invoice, Product, OrgType } from '@/types/database';
 import ContactModal from '@/features/contacts/components/ContactModal';
 import InvoiceLineItems from './InvoiceLineItems';
+import { linkTripInvoice } from '@/features/trips/actions';
 
 interface ContactOption { id: string; name: string; company: string | null; tax_id?: string | null }
 
@@ -40,9 +41,12 @@ interface InvoiceFormProps {
   orgType?: OrgType;
   products?: Product[];
   initialLineItems?: InitialLineItem[];
+  prefillContactId?: string;
+  prefillNotes?: string;
+  tripId?: string;
 }
 
-export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData, orgType = 'fleet', products = [], initialLineItems = EMPTY_LINE_ITEMS }: InvoiceFormProps) {
+export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: initialContacts = EMPTY_CONTACTS, scannerData, orgType = 'fleet', products = [], initialLineItems = EMPTY_LINE_ITEMS, prefillContactId, prefillNotes, tripId }: InvoiceFormProps) {
   const { push, refresh, back } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +58,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
     : undefined;
   const [contactId, setContactId] = useState<string>(
     matchedContact?.id
+      ?? prefillContactId
       ?? (invoiceType === 'cobro' ? (invoice?.customer_id ?? '') : (invoice?.supplier_id ?? ''))
   );
   const [contacts, setContacts] = useState<ContactOption[]>(initialContacts);
@@ -154,6 +159,24 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
         if (lineResult.error) throw new Error(lineResult.error);
       }
       if (file) await uploadFile(invoiceId);
+      // Si la factura salió del botón "Facturar este tramo", dejar el viaje
+      // marcado como facturado para que no se facture dos veces. Va después
+      // de uploadFile: si esto falla, el adjunto ya se subió y no se pierde.
+      //
+      // No se relanza como excepción: la factura ya es real en este punto
+      // (con su número consecuente y, si había, el archivo adjunto), así que
+      // un throw acá describiría mal lo que pasó. Se muestra como aviso no
+      // bloqueante y se deja al usuario en la página en lugar de navegar,
+      // para que el mensaje sea visible y no un flash que desaparece con la
+      // redirección.
+      if (tripId && !isEditing) {
+        const linkResult = await linkTripInvoice(tripId, invoiceId, orgSlug);
+        if ('error' in linkResult) {
+          setError(`La factura se creó, pero no se pudo vincular al viaje: ${linkResult.error}`);
+          setLoading(false);
+          return;
+        }
+      }
       push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
       refresh();
     } catch (err: unknown) {
@@ -293,7 +316,7 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
                 id="invoice_notes"
                 name="notes"
                 rows={2}
-                defaultValue={invoice?.notes ?? ''}
+                defaultValue={invoice?.notes ?? prefillNotes ?? ''}
                 className="field-input resize-none"
                 placeholder="Notas opcionales..."
               />
