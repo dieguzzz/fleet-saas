@@ -8,6 +8,7 @@ import {
   type RecipeCostBreakdown,
 } from '../actions';
 import type { RecipeIngredient, InventoryItem, Product } from '@/types/database';
+import { costPerPortion } from '@/features/products/lib';
 
 type InventoryOption = Pick<InventoryItem, 'id' | 'name' | 'unit' | 'cost_per_unit' | 'category'>;
 type SubRecipeOption = Pick<Product, 'id' | 'name' | 'unit' | 'portions'>;
@@ -27,18 +28,12 @@ function money(n: number, digits = 2) {
   return `$${n.toLocaleString('es-AR', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
-/** Costo por porción de una sub-receta a partir del snapshot persistido. */
-function subUnitCost(sub: Product): number {
-  const portions = Math.max(Number(sub.portions ?? 1) || 1, 1);
-  return Number(sub.cost_estimate ?? 0) / portions;
-}
-
 function IngredientRow({ ingredient, orgSlug }: { ingredient: RecipeIngredient; orgSlug: string }) {
   const isSub = !!ingredient.sub_recipe_product_id;
   const name = isSub ? (ingredient.sub_recipe?.name ?? '—') : (ingredient.inventory_item?.name ?? '—');
   const unit = isSub ? 'porción' : (ingredient.inventory_item?.unit ?? '');
   const unitCost = isSub
-    ? (ingredient.sub_recipe ? subUnitCost(ingredient.sub_recipe as Product) : 0)
+    ? (ingredient.sub_recipe ? costPerPortion(ingredient.sub_recipe as Product) : 0)
     : Number(ingredient.inventory_item?.cost_per_unit ?? 0);
   const subtotal = unitCost * ingredient.quantity;
 
