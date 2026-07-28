@@ -16,12 +16,12 @@
 
 ## Desviación del spec: dos migraciones, no una
 
-El spec dice que `role` se borra en la misma migración. **Este plan lo hace en dos archivos, dentro del mismo PR.** La razón es concreta: si la primera tarea borra la columna, todo el código que lee `contact.role` deja de compilar y el build queda roto durante cinco tareas seguidas. No habría forma de verificar nada en el medio.
+El spec dice que `role` se borra en la misma migración. **Este plan lo hace en dos archivos, dentro del mismo PR.** La razón es concreta: si la primera tarea borra la columna, todo el código que lee `contact.role` deja de compilar y el build queda roto durante cuatro tareas seguidas. No habría forma de verificar nada en el medio.
 
 Con dos migraciones:
 
 - **`019`** agrega `roles`, backfillea y deja `role` en su lugar. El build sigue verde.
-- Las tareas 2 a 6 migran todo el código a `roles`.
+- Las tareas 2 a 5 migran todo el código a `roles`.
 - **`020`** borra `role` y lo saca de los tipos. Cualquier lector que se haya escapado **rompe el build acá**, que es exactamente la red de seguridad que justificaba borrar la columna.
 
 Lo que el usuario decidió se conserva íntegro: `role` desaparece en este PR, no en uno posterior, y las dos migraciones se aplican juntas en el mismo deploy. La ventana de incompatibilidad es idéntica.
@@ -56,7 +56,7 @@ Lo que el usuario decidió se conserva íntegro: `role` desaparece en este PR, n
 
 **Interfaces:**
 - Consumes: nada
-- Produces: columna `contacts.roles text[] NOT NULL`, con las constraints `contacts_roles_no_vacio` y `contacts_roles_conocidos`. `contacts.role` **sigue existiendo** — se borra en la Task 7. En TypeScript: `ContactRole` incluye `'driver'`; `Contact` gana `roles: ContactRole[]` y conserva `role: string | null`.
+- Produces: columna `contacts.roles text[] NOT NULL`, con las constraints `contacts_roles_no_vacio` y `contacts_roles_conocidos`. `contacts.role` **sigue existiendo** — se borra en la Task 6. En TypeScript: `ContactRole` incluye `'driver'`; `Contact` gana `roles: ContactRole[]` y conserva `role: string | null`.
 
 - [ ] **Step 1: Escribir el archivo de migración**
 
@@ -377,16 +377,23 @@ git commit -m "Contactos: helpers de roles con tests"
 
 ---
 
-### Task 3: Server actions
+### Task 3: Server actions y páginas consumidoras
+
+**Por qué van juntas:** `getCustomersAndSuppliers` deja de devolver `role`, y las tres páginas que consumen esa función filtran con `c.role === role`. Separarlas dejaría el build roto entre una tarea y la otra. Van en el mismo commit y el build queda verde.
 
 **Files:**
 - Modify: `src/features/contacts/actions.ts:8-17` (schema Zod)
 - Modify: `src/features/contacts/actions.ts:26-37` (`parseContactForm`)
 - Modify: `src/features/contacts/actions.ts:119-127` (`getCustomersAndSuppliers`)
+- Modify: `src/app/(org)/[orgSlug]/finance/invoices/new/page.tsx:42-44`
+- Modify: `src/app/(org)/[orgSlug]/finance/invoices/[invoiceId]/edit/page.tsx:30-32`
+- Modify: `src/app/(org)/[orgSlug]/trips/new/page.tsx:41-43`
 
 **Interfaces:**
 - Consumes: `parseRoles` de `src/features/contacts/lib.ts` (Task 2).
 - Produces: `createContact` y `updateContact` escriben `roles` en lugar de `role`. `getCustomersAndSuppliers` devuelve filas con `roles` en lugar de `role`.
+
+**Nota:** las tres páginas son Server Components async, que Testing Library no renderiza sin andamiaje que este plan no construye. Se verifican con `npm run build` y en el navegador al cierre.
 
 - [ ] **Step 1: Cambiar el schema de Zod**
 
@@ -426,7 +433,37 @@ export async function getCustomersAndSuppliers(orgId: string) {
 }
 ```
 
-- [ ] **Step 4: Verificar**
+- [ ] **Step 4: Actualizar `finance/invoices/new/page.tsx`**
+
+Reemplazar el filtro (líneas 42-44):
+
+```ts
+  const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
+  const contacts = (contactsRaw ?? [])
+    .flatMap(c => c.roles.includes(role) ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
+```
+
+- [ ] **Step 5: Actualizar `finance/invoices/[invoiceId]/edit/page.tsx`**
+
+Reemplazar el filtro (líneas 30-32):
+
+```ts
+  const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
+  const contacts = (contactsRaw ?? [])
+    .flatMap(c => c.roles.includes(role) ? [{ id: c.id, name: c.name, company: c.company }] : []);
+```
+
+- [ ] **Step 6: Actualizar `trips/new/page.tsx`**
+
+Reemplazar el filtro (líneas 41-43):
+
+```ts
+  // Solo clientes: el flete se le cobra a un cliente, no a un proveedor.
+  const customers = ((contactsRaw ?? []) as { id: string; name: string; roles: string[] }[])
+    .flatMap((c) => (c.roles.includes('customer') ? [{ id: c.id, name: c.name }] : []));
+```
+
+- [ ] **Step 7: Verificar**
 
 ```bash
 npm test
@@ -436,21 +473,13 @@ npm test
 npm run build
 ```
 
-El build va a fallar todavía en los componentes y páginas que leen `c.role` — **eso es esperado en esta tarea**: `getCustomersAndSuppliers` ya no devuelve esa columna. Las Tasks 5 y 6 los arreglan.
+Esperado: **los dos verdes.** Si el build falla con `Property 'role' does not exist`, quedó un consumidor sin migrar y el error dice cuál.
 
-Para que esta tarea quede verificable por sí sola, correr en su lugar el chequeo de tipos acotado a lo que tocaste:
-
-```bash
-npx tsc --noEmit 2>&1 | grep "features/contacts/actions.ts" || echo "actions.ts sin errores de tipos"
-```
-
-Esperado: `actions.ts sin errores de tipos`.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add src/features/contacts/actions.ts
-git commit -m "Contactos: las actions leen y escriben roles"
+git add src/features/contacts/actions.ts "src/app/(org)/[orgSlug]/finance/invoices/new/page.tsx" "src/app/(org)/[orgSlug]/finance/invoices/[invoiceId]/edit/page.tsx" "src/app/(org)/[orgSlug]/trips/new/page.tsx"
+git commit -m "Contactos: actions y paginas consumidoras usan roles"
 ```
 
 ---
@@ -851,71 +880,7 @@ git commit -m "Contactos: pestanas y fichas con varios roles"
 
 ---
 
-### Task 6: Páginas consumidoras
-
-**Files:**
-- Modify: `src/app/(org)/[orgSlug]/finance/invoices/new/page.tsx:42-44`
-- Modify: `src/app/(org)/[orgSlug]/finance/invoices/[invoiceId]/edit/page.tsx:30-32`
-- Modify: `src/app/(org)/[orgSlug]/trips/new/page.tsx:41-43`
-
-**Interfaces:**
-- Consumes: `getCustomersAndSuppliers` devolviendo `roles` (Task 3).
-- Produces: nada.
-
-**Nota:** son Server Components async, que Testing Library no renderiza sin andamiaje que este plan no construye. Se verifican con `npm run build` y en el navegador.
-
-- [ ] **Step 1: `finance/invoices/new/page.tsx`**
-
-Reemplazar el filtro (líneas 42-44):
-
-```ts
-  const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
-  const contacts = (contactsRaw ?? [])
-    .flatMap(c => c.roles.includes(role) ? [{ id: c.id, name: c.name, company: c.company, tax_id: c.tax_id ?? null }] : []);
-```
-
-- [ ] **Step 2: `finance/invoices/[invoiceId]/edit/page.tsx`**
-
-Reemplazar el filtro (líneas 30-32):
-
-```ts
-  const role = invoiceType === 'cobro' ? 'customer' : 'supplier';
-  const contacts = (contactsRaw ?? [])
-    .flatMap(c => c.roles.includes(role) ? [{ id: c.id, name: c.name, company: c.company }] : []);
-```
-
-- [ ] **Step 3: `trips/new/page.tsx`**
-
-Reemplazar el filtro (líneas 41-43):
-
-```ts
-  // Solo clientes: el flete se le cobra a un cliente, no a un proveedor.
-  const customers = ((contactsRaw ?? []) as { id: string; name: string; roles: string[] }[])
-    .flatMap((c) => (c.roles.includes('customer') ? [{ id: c.id, name: c.name }] : []));
-```
-
-- [ ] **Step 4: Verificar**
-
-```bash
-npm test
-```
-
-```bash
-npm run build
-```
-
-Esperado: **los dos verdes.** Esta es la primera tarea desde la 3 en que el build completo tiene que pasar — si falla, quedó algún lector de `role` sin migrar y el error dice exactamente dónde.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add "src/app/(org)/[orgSlug]/finance/invoices/new/page.tsx" "src/app/(org)/[orgSlug]/finance/invoices/[invoiceId]/edit/page.tsx" "src/app/(org)/[orgSlug]/trips/new/page.tsx"
-git commit -m "Contactos: las paginas de factura y viaje filtran por roles"
-```
-
----
-
-### Task 7: Migración 020 y limpieza de tipos
+### Task 6: Migración 020 y limpieza de tipos
 
 **Verificación:** DDL más el borrado del campo en TypeScript. El build es la red de seguridad: si algún lector de `role` sobrevivió, falla acá.
 
@@ -926,7 +891,7 @@ git commit -m "Contactos: las paginas de factura y viaje filtran por roles"
 - Modify: `src/types/database.ts` (`interface Contact`)
 
 **Interfaces:**
-- Consumes: todo el código ya migrado a `roles` (Tasks 3-6).
+- Consumes: todo el código ya migrado a `roles` (Tasks 3-5).
 - Produces: `contacts.role` deja de existir en la base y en los tipos.
 
 - [ ] **Step 1: Escribir el archivo de migración**
