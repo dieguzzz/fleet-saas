@@ -22,3 +22,4 @@ Ordenadas cronológicamente. Todas las que figuran como APPLIED ya están en pro
 | 016_private_trip_terrain_buckets.sql | Buckets privados: trip-documents + terrain-receipts | APPLIED |
 | 017_kitchen_recipe_costing.sql | Costeo de recetas para organizaciones tipo kitchen | APPLIED |
 | 018_trip_date_cargo_customer_value.sql | Fecha, carga, cliente y valor por tramo de viaje | APPLIED |
+| 019_contacts_roles.sql | Columna `contacts.roles text[]`, backfill desde `role` (que se conserva) | APPLIED |

@@ -7,7 +7,7 @@ import ContactModal from './ContactModal';
 import {
   CONTACT_ROLE_LABELS,
   SERVICE_ROLES,
-  SERVICE_ROLE_COLORS,
+  CONTACT_ROLE_COLORS,
   type Contact,
 } from '@/types/database';
 
@@ -103,7 +103,7 @@ function ContactsTable({ contacts, orgSlug, search }: { contacts: Contact[]; org
 }
 
 function ServicioCard({ contact, orgSlug, search }: { contact: Contact; orgSlug: string; search: string }) {
-  const roleColor = SERVICE_ROLE_COLORS[contact.role ?? 'other'] ?? SERVICE_ROLE_COLORS.other;
+  const roleColor = CONTACT_ROLE_COLORS[contact.role ?? 'other'] ?? CONTACT_ROLE_COLORS.other;
   const roleLabel = CONTACT_ROLE_LABELS[contact.role ?? 'other'] ?? contact.role ?? 'Otro';
 
   return (

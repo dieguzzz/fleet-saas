@@ -213,7 +213,8 @@ export interface FinancialTransaction {
 
 export type ContactRole =
   | 'customer' | 'supplier'
-  | 'mechanic' | 'workshop' | 'tow_truck' | 'tire_service' | 'insurance' | 'other';
+  | 'mechanic' | 'workshop' | 'tow_truck' | 'tire_service' | 'insurance' | 'other'
+  | 'driver';
 
 export const CONTACT_ROLE_LABELS: Record<string, string> = {
   customer: 'Cliente',
@@ -229,7 +230,9 @@ export const CONTACT_ROLE_LABELS: Record<string, string> = {
 
 export const SERVICE_ROLES: ContactRole[] = ['mechanic', 'workshop', 'tow_truck', 'tire_service', 'insurance', 'other'];
 
-export const SERVICE_ROLE_COLORS: Record<string, string> = {
+export const CONTACT_ROLE_COLORS: Record<string, string> = {
+  customer: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
+  supplier: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
   mechanic: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
   workshop: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
   tow_truck: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
@@ -243,7 +246,9 @@ export interface Contact {
   id: string;
   organization_id: string;
   name: string;
+  /** @deprecated Se borra en la migración 020. Usar `roles`. */
   role: string | null;
+  roles: ContactRole[];
   company: string | null;
   phone: string | null;
   email: string | null;
