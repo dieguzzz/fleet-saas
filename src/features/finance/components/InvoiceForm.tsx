@@ -158,13 +158,25 @@ export function InvoiceForm({ orgId, orgSlug, invoiceType, invoice, contacts: in
         const lineResult = await saveInvoiceLineItems(invoiceId, orgId, lineItems);
         if (lineResult.error) throw new Error(lineResult.error);
       }
+      if (file) await uploadFile(invoiceId);
       // Si la factura salió del botón "Facturar este tramo", dejar el viaje
-      // marcado como facturado para que no se facture dos veces.
+      // marcado como facturado para que no se facture dos veces. Va después
+      // de uploadFile: si esto falla, el adjunto ya se subió y no se pierde.
+      //
+      // No se relanza como excepción: la factura ya es real en este punto
+      // (con su número consecuente y, si había, el archivo adjunto), así que
+      // un throw acá describiría mal lo que pasó. Se muestra como aviso no
+      // bloqueante y se deja al usuario en la página en lugar de navegar,
+      // para que el mensaje sea visible y no un flash que desaparece con la
+      // redirección.
       if (tripId && !isEditing) {
         const linkResult = await linkTripInvoice(tripId, invoiceId, orgSlug);
-        if ('error' in linkResult) throw new Error(linkResult.error);
+        if ('error' in linkResult) {
+          setError(`La factura se creó, pero no se pudo vincular al viaje: ${linkResult.error}`);
+          setLoading(false);
+          return;
+        }
       }
-      if (file) await uploadFile(invoiceId);
       push(`/${orgSlug}/finance/invoices?tab=${invoiceType === 'pago' ? 'pagos' : 'cobros'}`);
       refresh();
     } catch (err: unknown) {
