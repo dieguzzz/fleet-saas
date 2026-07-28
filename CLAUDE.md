@@ -5,12 +5,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Comandos
 
 ```bash
-npm run dev      # Dev server con Turbopack en localhost:3000
-npm run build    # Build de producción (TypeScript strict — falla en type errors)
-npm run lint     # ESLint
+npm run dev        # Dev server con Turbopack en localhost:3000
+npm run build      # Build de producción (TypeScript strict — falla en type errors)
+npm run lint       # ESLint
+npm test           # Vitest, una corrida
+npm run test:watch # Vitest en modo watch
 ```
 
-No hay test runner configurado.
+**Tests:** Vitest + Testing Library + jsdom. Los tests viven junto al código como `*.test.ts` / `*.test.tsx` bajo `src/`.
+
+Dos convenciones que importan:
+- **No hay `globals: true`.** Cada archivo importa `describe` / `it` / `expect` de `vitest` explícitamente. Por eso `vitest.setup.ts` registra `afterEach(cleanup)` a mano — sin eso, Testing Library no limpia el DOM entre tests y las aserciones se contaminan entre sí.
+- **La lógica pura va fuera de los archivos `'use server'`.** Un archivo con esa directiva obliga a que todo export sea `async`, así que los helpers sincrónicos van en un módulo aparte (ej. `src/features/trips/lib.ts`), que además se puede importar desde componentes cliente.
+
+**`npm run lint` no está en verde** y no se puede usar como criterio de aprobación: el repo arrastra ~1648 problemas preexistentes (18 errores — `setState` sincrónico dentro de efectos, `any` sueltos, un archivo vendorizado minificado). El criterio realista es no agregar problemas nuevos en los archivos que tocás.
 
 ---
 
@@ -576,6 +584,8 @@ file public/manifest.json  # debe decir "ASCII text" no "with CRLF line terminat
 ## REGLA 19 — Documentación Obsidian: actualizar junto con el código
 
 **Vault:** `C:\Users\Diegu\Obisdian-BlackdogAPP\Proyectos\Fleet SaaS\`
+
+> ⚠️ **Esta ruta está desactualizada.** Verificado el 2026-07-28: no existe en el entorno actual, cuyo usuario de Windows es `Diego Arauz`, no `Diegu`. Antes de seguir esta regla, confirmá dónde está el vault y corregí la ruta acá.
 
 **Estructura:**
 ```
