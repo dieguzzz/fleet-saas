@@ -84,7 +84,19 @@ export default defineConfig({
 
 ```ts
 import '@testing-library/jest-dom/vitest';
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
+// Sin `globals: true`, @testing-library/react no puede auto-detectar el
+// `afterEach` global y su auto-cleanup nunca se registra. Sin esto, los
+// renders de un `it()` quedan en el DOM compartido y ensucian las
+// aserciones de los tests siguientes del mismo archivo.
+afterEach(() => {
+  cleanup();
+});
 ```
+
+El `cleanup` explícito es obligatorio, no opcional: es la contrapartida de haber descartado `globals: true`. Sin él, los tests de componentes de las Tasks 4, 5 y 7 fallan de forma no determinista.
 
 - [ ] **Step 4: Agregar los scripts a `package.json`**
 
