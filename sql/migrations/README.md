@@ -24,3 +24,5 @@ Ordenadas cronológicamente. Todas las que figuran como APPLIED ya están en pro
 | 018_trip_date_cargo_customer_value.sql | Fecha, carga, cliente y valor por tramo de viaje | APPLIED |
 | 019_contacts_roles.sql | Columna `contacts.roles text[]`, backfill desde `role` (que se conserva) | APPLIED |
 | 020_contacts_drop_role.sql | Borra `contacts.role`; `contacts.roles` pasa a NOT NULL | APPLIED |
+| 021_contacts_role_shim.sql | **HOTFIX DE INCIDENTE**: 019/020 se aplicaron antes del deploy; repone `contacts.role` y la sincroniza con `roles` vía trigger para que código viejo y nuevo convivan | APPLIED |
+| 022_contacts_drop_role_shim.sql | Retira el shim del 021 (trigger + columna `role`). Se aplica JUNTO con el deploy del código que usa `roles` | PENDING (deploy-time) |
