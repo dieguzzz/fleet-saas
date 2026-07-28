@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CONTACT_ROLE_LABELS } from '@/types/database';
 
 // Los dos grupos que ya usaba el <select> de rol único, conservados para que
@@ -24,6 +25,12 @@ interface ContactRolesFieldProps {
  * entradas repetidas y parseRoles las junta.
  */
 export function ContactRolesField({ defaultRoles = [] }: ContactRolesFieldProps) {
+  const [checkedCount, setCheckedCount] = useState(defaultRoles.length);
+
+  const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckedCount((n) => n + (e.target.checked ? 1 : -1));
+  };
+
   return (
     <fieldset className="space-y-2">
       <legend className="field-label">Roles *</legend>
@@ -44,6 +51,8 @@ export function ContactRolesField({ defaultRoles = [] }: ContactRolesFieldProps)
                   name="roles"
                   value={rol}
                   defaultChecked={defaultRoles.includes(rol)}
+                  onChange={handleRoleChange}
+                  required={checkedCount === 0}
                   className="size-4 accent-primary"
                 />
                 {CONTACT_ROLE_LABELS[rol] ?? rol}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ContactRolesField } from './ContactRolesField';
 
 describe('ContactRolesField', () => {
@@ -46,5 +46,46 @@ describe('ContactRolesField', () => {
     render(<ContactRolesField />);
     expect(screen.getByText('Facturación')).toBeInTheDocument();
     expect(screen.getByText('Servicios')).toBeInTheDocument();
+  });
+
+  it('todos los checkboxes son required cuando no hay defaultRoles', () => {
+    const { container } = render(<ContactRolesField />);
+    const checkboxes = [...container.querySelectorAll('input[type="checkbox"][name="roles"]')] as HTMLInputElement[];
+    expect(checkboxes.every(cb => cb.required)).toBe(true);
+  });
+
+  it('ningún checkbox es required cuando hay defaultRoles', () => {
+    const { container } = render(<ContactRolesField defaultRoles={['customer']} />);
+    const checkboxes = [...container.querySelectorAll('input[type="checkbox"][name="roles"]')] as HTMLInputElement[];
+    expect(checkboxes.every(cb => !cb.required)).toBe(true);
+  });
+
+  it('después de marcar un checkbox, ninguno es required', () => {
+    const { container } = render(<ContactRolesField />);
+    const checkboxes = [...container.querySelectorAll('input[type="checkbox"][name="roles"]')] as HTMLInputElement[];
+
+    // Inicialmente todos required
+    expect(checkboxes.every(cb => cb.required)).toBe(true);
+
+    // Click en el primer checkbox
+    fireEvent.click(checkboxes[0]);
+
+    // Después del click, ninguno required
+    expect(checkboxes.every(cb => !cb.required)).toBe(true);
+  });
+
+  it('después de desmarcar el único checkbox marcado, todos son required nuevamente', () => {
+    const { container } = render(<ContactRolesField />);
+    const checkboxes = [...container.querySelectorAll('input[type="checkbox"][name="roles"]')] as HTMLInputElement[];
+
+    // Click en el primer checkbox para marcarlo
+    fireEvent.click(checkboxes[0]);
+    expect(checkboxes.every(cb => !cb.required)).toBe(true);
+
+    // Click nuevamente para desmarcarlo
+    fireEvent.click(checkboxes[0]);
+
+    // Vuelven a ser required
+    expect(checkboxes.every(cb => cb.required)).toBe(true);
   });
 });
