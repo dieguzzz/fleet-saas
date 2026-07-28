@@ -60,7 +60,11 @@ export default function TripForm({ orgSlug, vehicles, drivers, savedLocations: i
   const [geocoding, setGeocoding] = useState<'origin' | 'destination' | null>(null);
   const [isRoundTrip, setIsRoundTrip] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  // Fecha local, no UTC: toISOString() usa UTC y Panamá es UTC-5 sin DST, así
+  // que entre las 19:00 y medianoche locales el string ISO ya cae en el día
+  // siguiente y precargaba la fecha equivocada.
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const [tripDate, setTripDate] = useState(today);
   const [returnDate, setReturnDate] = useState(today);
   // Mientras la fecha de regreso no se toque a mano, sigue a la de ida:
