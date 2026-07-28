@@ -93,4 +93,25 @@ describe('TripList', () => {
       '/amd/trips/vuelta',
     ]);
   });
+
+  it('muestra el total del viaje cuando ambos tramos tienen valor cero', () => {
+    const trips = [
+      makeTrip({ id: 'ida', round_trip_group_id: 'g1', leg: 'outbound', trip_value: 0 }),
+      makeTrip({ id: 'vuelta', round_trip_group_id: 'g1', leg: 'return', trip_value: 0 }),
+    ];
+    render(<TripList trips={trips} orgSlug="amd" />);
+    expect(screen.getByText('Total del viaje')).toBeInTheDocument();
+    const amounts = screen.getAllByText('$0.00');
+    // 2 legs + 1 total = 3 instances of $0.00
+    expect(amounts).toHaveLength(3);
+  });
+
+  it('no muestra el total del viaje cuando ambos tramos tienen valor null', () => {
+    const trips = [
+      makeTrip({ id: 'ida', round_trip_group_id: 'g1', leg: 'outbound', trip_value: null }),
+      makeTrip({ id: 'vuelta', round_trip_group_id: 'g1', leg: 'return', trip_value: null }),
+    ];
+    render(<TripList trips={trips} orgSlug="amd" />);
+    expect(screen.queryByText('Total del viaje')).toBeNull();
+  });
 });

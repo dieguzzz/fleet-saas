@@ -114,7 +114,7 @@ export function TripList({ trips, orgSlug }: TripListProps) {
                   </TableRow>
                 ))}
 
-                {isRoundTrip && groupTotal > 0 && (
+                {isRoundTrip && group.some((t) => t.trip_value !== null) && (
                   <TableRow className="bg-muted/30 border-l-2 border-l-primary">
                     <TableCell colSpan={7} className="text-right text-xs font-medium text-muted-foreground">
                       Total del viaje
