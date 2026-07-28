@@ -2305,7 +2305,16 @@ npm run lint
 grep -rE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" src/features/trips
 ```
 
-Criterio: tests verdes, build verde, grep sin resultados, y en el lint ningún archivo tocado por este plan entre los reportados (el resto de los problemas son preexistentes — ver Global Constraints).
+Criterio: tests verdes, build verde, y **ningún archivo tocado por este plan** entre los reportados por el lint ni entre las ocurrencias nuevas del grep.
+
+**Ojo con el grep:** no da cero y nunca dio cero. En la base de la rama (`80123af`) ya había 4 ocurrencias en `src/features/trips` — 2 en `CompleteTripButton.tsx` y 2 en `TripForm.tsx` — y todas caen bajo la excepción que la propia REGLA 20 permite: botones de acción con color fijo (`bg-green-600 text-white`) y texto blanco sobre el overlay `bg-black/60` del mapa. El criterio correcto es comparar contra la base:
+
+```bash
+git grep -cE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" 80123af -- src/features/trips
+git grep -cE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" HEAD -- src/features/trips
+```
+
+Los dos conteos deben coincidir.
 
 - [ ] **Actualizar CLAUDE.md**
 
