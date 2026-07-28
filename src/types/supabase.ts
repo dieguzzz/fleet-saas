@@ -618,6 +618,67 @@ export type Database = {
           },
         ]
       }
+      invoice_items: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          invoice_id: string
+          organization_id: string
+          product_id: string | null
+          quantity: number
+          sort_order: number | null
+          total: number | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          invoice_id: string
+          organization_id: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number | null
+          total?: number | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          invoice_id?: string
+          organization_id?: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number | null
+          total?: number | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           attachment_url: string | null
@@ -712,65 +773,6 @@ export type Database = {
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      invoice_items: {
-        Row: {
-          created_at: string | null
-          description: string
-          id: string
-          invoice_id: string
-          organization_id: string
-          product_id: string | null
-          quantity: number
-          sort_order: number | null
-          total: number
-          unit_price: number
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          id?: string
-          invoice_id: string
-          organization_id: string
-          product_id?: string | null
-          quantity?: number
-          sort_order?: number | null
-          unit_price?: number
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          id?: string
-          invoice_id?: string
-          organization_id?: string
-          product_id?: string | null
-          quantity?: number
-          sort_order?: number | null
-          unit_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "invoice_items_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoice_items_invoice_id_fkey"
-            columns: ["invoice_id"]
-            isOneToOne: false
-            referencedRelation: "invoices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoice_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -1106,7 +1108,7 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
-          is_active: boolean
+          is_active: boolean | null
           labor_cost: number
           name: string
           organization_id: string
@@ -1125,7 +1127,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          is_active?: boolean
+          is_active?: boolean | null
           labor_cost?: number
           name: string
           organization_id: string
@@ -1144,7 +1146,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
-          is_active?: boolean
+          is_active?: boolean | null
           labor_cost?: number
           name?: string
           organization_id?: string
@@ -1165,6 +1167,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_super_admin: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          is_super_admin?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_super_admin?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       recipe_ingredients: {
         Row: {
@@ -1199,6 +1231,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "recipe_ingredients_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "recipe_ingredients_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
@@ -1213,13 +1252,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "recipe_ingredients_inventory_item_id_fkey"
-            columns: ["inventory_item_id"]
-            isOneToOne: false
-            referencedRelation: "inventory_items"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "recipe_ingredients_sub_recipe_product_id_fkey"
             columns: ["sub_recipe_product_id"]
             isOneToOne: false
@@ -1227,36 +1259,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          email: string
-          full_name: string | null
-          id: string
-          is_super_admin: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email: string
-          full_name?: string | null
-          id: string
-          is_super_admin?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email?: string
-          full_name?: string | null
-          id?: string
-          is_super_admin?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       trip_expenses: {
         Row: {
@@ -1434,7 +1436,9 @@ export type Database = {
       }
       trips: {
         Row: {
+          cargo: string | null
           created_at: string | null
+          customer_id: string | null
           destination: string
           destination_coords: Json | null
           distance_km: number | null
@@ -1443,6 +1447,7 @@ export type Database = {
           ended_at: string | null
           fuel_consumed: number | null
           id: string
+          invoice_id: string | null
           leg: string | null
           notes: string | null
           organization_id: string
@@ -1452,11 +1457,15 @@ export type Database = {
           start_invoice_url: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["trip_status"] | null
+          trip_date: string
+          trip_value: number | null
           updated_at: string | null
           vehicle_id: string | null
         }
         Insert: {
+          cargo?: string | null
           created_at?: string | null
+          customer_id?: string | null
           destination: string
           destination_coords?: Json | null
           distance_km?: number | null
@@ -1465,6 +1474,7 @@ export type Database = {
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
+          invoice_id?: string | null
           leg?: string | null
           notes?: string | null
           organization_id: string
@@ -1474,11 +1484,15 @@ export type Database = {
           start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
+          trip_date?: string
+          trip_value?: number | null
           updated_at?: string | null
           vehicle_id?: string | null
         }
         Update: {
+          cargo?: string | null
           created_at?: string | null
+          customer_id?: string | null
           destination?: string
           destination_coords?: Json | null
           distance_km?: number | null
@@ -1487,6 +1501,7 @@ export type Database = {
           ended_at?: string | null
           fuel_consumed?: number | null
           id?: string
+          invoice_id?: string | null
           leg?: string | null
           notes?: string | null
           organization_id?: string
@@ -1496,15 +1511,31 @@ export type Database = {
           start_invoice_url?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["trip_status"] | null
+          trip_date?: string
+          trip_value?: number | null
           updated_at?: string | null
           vehicle_id?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "trips_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "trips_driver_id_fkey"
             columns: ["driver_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
           {
@@ -1632,14 +1663,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_organization_for_user: {
-        Args: { p_name: string; p_slug: string; p_org_type?: string }
-        Returns: {
-          org_id: string
-          org_name: string
-          org_slug: string
-        }[]
+      confirm_and_join_org: {
+        Args: { p_email: string; p_org_slug: string }
+        Returns: Json
       }
+      create_organization_for_user:
+        | {
+            Args: { p_name: string; p_slug: string }
+            Returns: {
+              org_id: string
+              org_name: string
+              org_slug: string
+            }[]
+          }
+        | {
+            Args: { p_name: string; p_org_type?: string; p_slug: string }
+            Returns: {
+              org_id: string
+              org_name: string
+              org_slug: string
+            }[]
+          }
       get_next_invoice_number: { Args: { org_id: string }; Returns: string }
       get_trip_financials: {
         Args: { p_trip_id: string }
@@ -1667,6 +1711,7 @@ export type Database = {
       is_amd_setup: { Args: never; Returns: Json }
       is_first_org_member: { Args: { org_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      join_org: { Args: { p_org_slug: string }; Returns: Json }
       setup_amd_user: {
         Args: { p_email: string; p_password: string }
         Returns: Json
