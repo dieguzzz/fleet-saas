@@ -2,6 +2,7 @@ import TripForm from '@/features/trips/components/TripForm';
 import { createClient } from '@/services/supabase/server';
 import { getTripLocations } from '@/features/trips/actions';
 import { getEmployees } from '@/features/employees/actions';
+import { getCustomersAndSuppliers } from '@/features/contacts/actions';
 import type { TripLocation } from '@/types/database';
 
 export default async function NewTripPage({
@@ -30,10 +31,12 @@ export default async function NewTripPage({
     { data: vehiclesData },
     employeesResult,
     { data: savedLocations },
+    { data: contactsRaw },
   ] = await Promise.all([
     supabase.from('vehicles').select('id, name, plate_number').eq('organization_id', org.id).order('name'),
     getEmployees(org.id),
     getTripLocations(org.id),
+    getCustomersAndSuppliers(org.id),
   ]);
 
   const vehicles = ((vehiclesData as unknown as VehicleRow[] | null) || []).map((v) => ({
@@ -44,6 +47,10 @@ export default async function NewTripPage({
   const drivers = ((employeesResult.data ?? []) as { id: string; full_name: string; status: string }[])
     .filter((e) => e.status === 'active')
     .map((e) => ({ id: e.id, full_name: e.full_name }));
+
+  // Solo clientes: el flete se le cobra a un cliente, no a un proveedor.
+  const customers = ((contactsRaw ?? []) as { id: string; name: string; role: string | null }[])
+    .flatMap((c) => (c.role === 'customer' ? [{ id: c.id, name: c.name }] : []));
 
   return (
     <div className="space-y-4">
@@ -56,6 +63,7 @@ export default async function NewTripPage({
         vehicles={vehicles || []}
         drivers={drivers}
         savedLocations={(savedLocations as TripLocation[]) || []}
+        customers={customers}
       />
     </div>
   );
