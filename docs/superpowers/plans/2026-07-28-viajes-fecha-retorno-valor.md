@@ -46,8 +46,10 @@
 - [ ] **Step 1: Instalar las dependencias**
 
 ```bash
-npm install -D vitest @vitejs/plugin-react jsdom vite-tsconfig-paths @testing-library/react @testing-library/dom @testing-library/jest-dom
+npm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom
 ```
+
+El alias `@/` lo resuelve Vitest 4 de forma nativa con `resolve.tsconfigPaths`; no hace falta el plugin `vite-tsconfig-paths`, que además emite un warning por redundante.
 
 `@testing-library/react` tiene que quedar en v16 o superior — es la primera que soporta React 19, y este repo usa React 19.2.3. Verificar después de instalar:
 
@@ -64,12 +66,12 @@ La extensión `.mts` es intencional: el repo tiene `next.config.ts` y `postcss.c
 ```ts
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  // tsconfigPaths resuelve el alias @/ leyendo tsconfig.json,
-  // así los tests importan igual que el resto del código.
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
+  // Resuelve el alias @/ leyendo tsconfig.json, así los tests importan
+  // igual que el resto del código.
+  resolve: { tsconfigPaths: true },
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
