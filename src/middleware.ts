@@ -151,17 +151,6 @@ export async function middleware(request: NextRequest) {
             requestHeaders.set('x-org-role', 'owner');
             requestHeaders.set('x-org-slug', orgSlug);
             requestHeaders.set('x-org-type', orgType);
-
-            const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
-            const kitchenOnlySegments = new Set(['products']);
-            const secondSegment = pathname.split('/')[2];
-
-            if (secondSegment && fleetOnlySegments.has(secondSegment) && orgType !== 'fleet') {
-              return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
-            }
-            if (secondSegment && kitchenOnlySegments.has(secondSegment) && orgType !== 'kitchen') {
-              return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
-            }
           }
         }
       } else {
@@ -201,15 +190,25 @@ export async function middleware(request: NextRequest) {
       requestHeaders.set('x-org-role', membership.role);
       requestHeaders.set('x-org-slug', orgSlug);
       requestHeaders.set('x-org-type', orgType);
+    }
 
+    // Gate por tipo de org — UNA sola vez, después de todas las ramas.
+    //
+    // Antes esto estaba duplicado dentro de dos de las tres ramas que resuelven
+    // la org (membresía normal e impersonación con cookie) y faltaba en la
+    // tercera: super admin sin cookie de impersonación. Por eso un super admin
+    // podía entrar a /amd/products aunque el menú no lo muestre. Al leerlo del
+    // header, que las tres ramas ya setean, quedan cubiertas todas.
+    const resolvedOrgType = requestHeaders.get('x-org-type');
+    if (resolvedOrgType) {
       const fleetOnlySegments = new Set(['vehicles', 'trips', 'maintenance', 'employees', 'fuel', 'terreno']);
       const kitchenOnlySegments = new Set(['products']);
       const secondSegment = pathname.split('/')[2];
 
-      if (secondSegment && fleetOnlySegments.has(secondSegment) && orgType !== 'fleet') {
+      if (secondSegment && fleetOnlySegments.has(secondSegment) && resolvedOrgType !== 'fleet') {
         return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
       }
-      if (secondSegment && kitchenOnlySegments.has(secondSegment) && orgType !== 'kitchen') {
+      if (secondSegment && kitchenOnlySegments.has(secondSegment) && resolvedOrgType !== 'kitchen') {
         return NextResponse.redirect(new URL(`/${orgSlug}`, request.url));
       }
     }

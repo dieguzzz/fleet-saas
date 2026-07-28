@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/services/supabase/server';
-import { getProducts } from '@/features/products/actions';
+import { getProducts, getSubRecipeProductIds } from '@/features/products/actions';
 import ProductList from '@/features/products/components/ProductList';
 import { PageHeader } from '@/components/ui/page-header';
 
@@ -16,7 +16,10 @@ export default async function ProductsPage({ params }: { params: Promise<{ orgSl
   if (!orgData) notFound();
   const orgId = (orgData as unknown as { id: string }).id;
 
-  const { data: products } = await getProducts(orgId);
+  const [{ data: products }, { data: subRecipeIds }] = await Promise.all([
+    getProducts(orgId),
+    getSubRecipeProductIds(orgId),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -35,7 +38,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ orgSl
           </Link>
         }
       />
-      <ProductList orgSlug={orgSlug} products={products ?? []} />
+      <ProductList orgSlug={orgSlug} products={products ?? []} subRecipeIds={subRecipeIds ?? []} />
     </div>
   );
 }
