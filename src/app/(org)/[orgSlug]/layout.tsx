@@ -198,9 +198,12 @@ export default function OrgLayout({ children }: OrgLayoutProps) {
           sidebarProgress={sidebarProgress}
         />
 
-        {/* Progressive backdrop (mobile only) */}
+        {/* Progressive backdrop (mobile only).
+            z-[1000]: tiene que quedar por encima del header, que usa z-[900] para
+            no quedar debajo de los panes de Leaflet. Con un z menor, abrir el
+            drawer dejaba el header y el banner de impersonación sin atenuar. */}
         <m.div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-[1000] lg:hidden"
           style={{
             opacity: backdropOpacity,
             backdropFilter: backdropFilter,

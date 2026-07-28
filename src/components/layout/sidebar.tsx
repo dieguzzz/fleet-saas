@@ -285,8 +285,11 @@ export function Sidebar({ isOpen, onClose, sidebarProgress }: SidebarProps) {
       {/* Sidebar — m.aside, position driven by sidebarProgress on mobile */}
       <m.aside
         className={cn(
-          // Mobile: fixed, driven by sidebarX
-          'fixed top-0 left-0 h-full bg-sidebar text-sidebar-foreground flex flex-col z-50',
+          // Mobile: fixed, driven by sidebarX.
+          // z-[1001]: el drawer es una capa modal y tiene que quedar por encima
+          // de su backdrop (z-[1000]) y del header (z-[900]). Con z-50 el header
+          // se pintaba encima del drawer abierto.
+          'fixed top-0 left-0 h-full bg-sidebar text-sidebar-foreground flex flex-col z-[1001]',
           // Mobile width wider for comfort
           'w-72',
           // Desktop: static, always visible
