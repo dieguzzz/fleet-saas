@@ -1912,9 +1912,19 @@ La sección actual se titula "Facturas" y mezcla dos conceptos. Renombrar el tí
             <h3 className="text-lg font-semibold mb-4 border-b pb-2">Comprobantes adjuntos</h3>
 ```
 
-Los labels internos pasan a "Comprobante de inicio" y "Comprobante final". El texto del caso vacío del final queda: `{trip.status === 'completed' ? 'Sin comprobante' : 'Se pedirá al completar'}`.
+**El rename tiene que ser completo, no solo el título.** Todos estos textos visibles cambian:
 
-Esto libera el nombre "factura" para la factura real del sistema, que llega en la Task 7.
+| Antes | Después |
+|---|---|
+| `Facturas` (título de sección) | `Comprobantes adjuntos` |
+| `Factura de Inicio` (label) | `Comprobante de inicio` |
+| `Factura Final` (label) | `Comprobante final` |
+| `Ver factura de inicio` (link) | `Ver comprobante de inicio` |
+| `Ver factura final` (link) | `Ver comprobante final` |
+| `Sin factura` (vacío) | `Sin comprobante` |
+| `Sin factura final` (vacío) | `Sin comprobante` |
+
+Al terminar, buscar "factura" en el archivo: no debe quedar ninguna ocurrencia. Esto libera el nombre para la factura real del sistema, que llega en la Task 7.
 
 - [ ] **Step 5: Verificar**
 
