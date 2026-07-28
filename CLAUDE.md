@@ -633,9 +633,46 @@ Módulos/
 Excepción permitida: botones de acción con color fijo (`bg-blue-600`, `bg-green-600`, `bg-red-600`) y logos/avatares con gradiente.
 
 **Verificación al crear o modificar un módulo:**
+
+El criterio **no** es que el grep dé cero — hay ocurrencias preexistentes que caen bajo la excepción de arriba (verificado el 2026-07-28: `src/features/trips` tiene 4, en `CompleteTripButton` y en el overlay del mapa de `TripForm`). El criterio es **no aumentar el conteo** respecto de la base de tu rama:
+
 ```bash
-grep -rE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" src/features/<modulo>
+git grep -cE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" <rama-base> -- src/features/<modulo>
+git grep -cE "(bg-white|text-white|bg-slate-|text-slate-|bg-gray-|text-gray-|border-slate-|border-gray-)" HEAD -- src/features/<modulo>
 ```
-Debe devolver 0 resultados.
+
+Los dos conteos tienen que coincidir.
 
 **Regla:** Toda UI nueva usa tokens semánticos del sistema. Antes de dar por terminado un módulo, ejecutar el grep de verificación y resolver cualquier ocurrencia.
+
+---
+
+## REGLA 21 — Migraciones: el orden entre la DDL y el deploy no es opcional
+
+**Error que ocurre:** la app en producción se rompe entera después de aplicar una migración, aunque el código nuevo funcione perfecto en local y todos los tests pasen.
+
+**Causa:** una migración destructiva se aplicó a la base **antes** de que Railway terminara de deployar el código que la acompaña. En esa ventana, el código viejo consulta un esquema que ya no existe. Y falla de la peor forma: sin error visible.
+
+**Caso real (2026-07-28).** Las migraciones `019` y `020` de contactos multi-rol se aplicaron durante la implementación, con Railway corriendo todavía el commit anterior. En vivo:
+
+- Alta y edición de contactos caída — el código viejo escribía `role`, y `roles` era `NOT NULL` sin default.
+- Selectores de contacto de facturas vacíos — `getCustomersAndSuppliers` pedía `role`, PostgREST devolvía 400, el resultado caía a `?? []` y la lista quedaba en cero **sin mostrar ningún error**.
+- Pestañas de contactos mal clasificadas — todo caía en Servicios.
+
+Duró horas, y nadie se hubiera enterado por un log.
+
+**Solución correcta — clasificar la migración antes de aplicarla:**
+
+| Tipo | Cuándo aplicarla |
+|---|---|
+| Aditiva — `ADD COLUMN` nullable, `CREATE INDEX`, `CREATE TABLE` | Antes o después del deploy, da igual |
+| Endurecedora — `SET NOT NULL`, `ADD CONSTRAINT` | Con el deploy o después. Nunca antes |
+| Destructiva — `DROP COLUMN`, `DROP TABLE`, `RENAME` | Solo **después** de que el deploy esté arriba |
+
+**Durante el desarrollo se aplica solo la parte aditiva.** El `DROP` se commitea como archivo y se corre al deployar.
+
+Si el plan necesita que la columna vieja desaparezca para que TypeScript encuentre a los lectores que quedaron, eso se consigue **borrándola del tipo en `src/types/database.ts`** — el compilador no mira la base. No hace falta tocar producción para conseguir esa red de seguridad.
+
+**Si ya rompiste producción:** un shim de convivencia. Devolver la columna vieja y agregar un trigger `BEFORE INSERT OR UPDATE` que la sincronice con la nueva en los dos sentidos, para que el código viejo y el nuevo funcionen a la vez. Ver `sql/migrations/021_contacts_role_shim.sql` como ejemplo trabajado. El shim se retira con el deploy (`022`).
+
+**Regla:** ninguna migración destructiva se aplica a producción durante la implementación. Se commitea el archivo y se corre al deployar. Al abrir el PR, decir explícitamente qué migraciones quedaron pendientes y en qué orden van.
