@@ -1754,7 +1754,9 @@ Reemplazar `<TableHeader>` y `<TableBody>` completos:
                   </TableRow>
                 ))}
 
-                {isRoundTrip && groupTotal > 0 && (
+                {/* El total se muestra si el valor es CONOCIDO, no si es positivo:
+                    cero es un monto válido y formatMoney lo renderiza como $0.00. */}
+                {isRoundTrip && group.some((t) => t.trip_value !== null) && (
                   <TableRow className="bg-muted/30 border-l-2 border-l-primary">
                     <TableCell colSpan={7} className="text-right text-xs font-medium text-muted-foreground">
                       Total del viaje
