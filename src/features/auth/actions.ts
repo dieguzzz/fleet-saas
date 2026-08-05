@@ -3,7 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/services/supabase/server';
+import { resolveAmdEmail } from './lib';
 import type { Profile } from '@/types/database';
+
+const AMD_EMAIL_MISSING = 'Falta configurar AMD_AUTH_EMAIL en el servidor';
 
 export async function signUp(prevState: unknown, formData: FormData) {
   const supabase = await createClient();
@@ -31,16 +34,15 @@ export async function signUp(prevState: unknown, formData: FormData) {
   redirect('/onboarding');
 }
 
-export async function getAmdSetupState(): Promise<{ needsSetup: boolean; email: string | null }> {
+export async function getAmdSetupState(): Promise<{ needsSetup: boolean }> {
   const supabase = await createClient();
   // AMD = sistema de acceso especial con usuario fijo (single-tenant dentro de la org).
   // is_amd_setup / setup_amd_user son RPCs SECURITY DEFINER definidas en la DB.
   // El cast a unknown + Record es necesario porque la RPC no está en los tipos autogenerados.
   const { data } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: Record<string, unknown> | null }>)('is_amd_setup');
-  return {
-    needsSetup: (data?.needsSetup as boolean) ?? true,
-    email: (data?.email as string) ?? null,
-  };
+  // Solo `needsSetup` cruza al cliente: el email de la cuenta AMD no se devuelve
+  // al browser (ver 013 y `resolveAmdEmail`).
+  return { needsSetup: (data?.needsSetup as boolean) ?? true };
 }
 
 export async function setupAmd(prevState: unknown, formData: FormData) {
@@ -73,11 +75,12 @@ export async function loginAmd(prevState: unknown, formData: FormData) {
   const password = formData.get('password') as string;
   if (!password) return { error: 'Ingresá tu contraseña' };
 
-  const supabase = await createClient();
-  const { data: state } = await (supabase.rpc as unknown as (fn: string) => Promise<{ data: Record<string, unknown> | null }>)('is_amd_setup');
-  const email = state?.email as string | undefined;
-  if (!email) return { error: 'Usuario AMD no configurado' };
+  // `is_amd_setup()` devuelve el email en NULL una vez completado el setup (013),
+  // así que el login lo resuelve desde el entorno del servidor.
+  const email = resolveAmdEmail();
+  if (!email) return { error: AMD_EMAIL_MISSING };
 
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) return { error: 'Contraseña incorrecta' };
@@ -87,9 +90,12 @@ export async function loginAmd(prevState: unknown, formData: FormData) {
 }
 
 export async function sendAmdPasswordReset() {
+  const email = resolveAmdEmail();
+  if (!email) return { error: AMD_EMAIL_MISSING };
+
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(
-    process.env.AMD_AUTH_EMAIL!,
+    email,
     {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/auth/callback?next=/reset-password`,
     }
